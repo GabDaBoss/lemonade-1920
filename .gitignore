@@ -1,0 +1,4 @@
+bin/runner
+dist/*
+build/*
+*.swp
