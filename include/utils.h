@@ -28,7 +28,16 @@ extern "C" {
     typedef unsigned char TinyId;
     typedef unsigned short SmallId;
     typedef unsigned int Id;
+    typedef unsigned char TinyIndex;
+    typedef unsigned short SmallIndex;
+    typedef unsigned int Index;
 
+#define VOID_TINY_ID ((TinyId) -1)
+#define VOID_SMALL_ID ((SmallId) -1)
+#define VOID_ID ((Id) -1)
+#define VOID_TINY_INDEX ((TinyIndex) -1)
+#define VOID_SMALL_INDEX ((SmallIndex) -1)
+#define VOID_INDEX ((Index) -1)
 
 #define HAS_ID(strct, id) (strct.ids[strct.indexes[id]] == id)
 
