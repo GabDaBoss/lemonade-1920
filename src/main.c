@@ -28,6 +28,8 @@ static Id levelSelectBottomBorder = VOID_ID;
 static Id levelSelectRightBorder = VOID_ID;
 static Id levelSelectTopBar = VOID_ID;
 
+static Id firstLevelButton = VOID_ID;
+
 void createMainMenu();
 void centerMainMenu();
 void handleMainMenuEvents();
@@ -219,6 +221,25 @@ openLevelSelector()
     topBarDest.h = 10;
     levelSelectTopBar = 
       graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
+
+    SDL_Rect firstLevelButtonDest;
+    firstLevelButtonDest.x = backgroundDest.x + backgroundDest.w * 0.05;
+    firstLevelButtonDest.y = backgroundDest.y + backgroundDest.h * 0.05;
+    firstLevelButtonDest.w = backgroundDest.w * 0.2;
+    firstLevelButtonDest.h = backgroundDest.w * 0.2;
+
+    SDL_Rect firstLevelButtonSrc;
+    graphic_queryTextureSize(backgroundTextureId, 
+                             &firstLevelButtonSrc.w, 
+                             &firstLevelButtonSrc.h);
+
+    firstLevelButtonSrc.x = (firstLevelButtonSrc.w - firstLevelButtonSrc.h) /2;
+    firstLevelButtonSrc.y = 0;
+    firstLevelButtonSrc.w = firstLevelButtonSrc.h;
+    firstLevelButton = 
+      graphic_createTilesetSprite(backgroundTextureId,
+                                  firstLevelButtonSrc, 
+                                  firstLevelButtonDest);
   }
 }
 
@@ -232,9 +253,11 @@ closeLevelSelector()
   graphic_deleteSprite(levelSelectBottomBorder);
   graphic_deleteSprite(levelSelectRightBorder);
   graphic_deleteSprite(levelSelectTopBar);
+  graphic_deleteSprite(firstLevelButton);
   levelSelectorBackground = VOID_ID;
   levelSelectLeftBorder = VOID_ID;
   levelSelectBottomBorder = VOID_ID;
   levelSelectRightBorder = VOID_ID;
   levelSelectTopBar = VOID_ID;
+  firstLevelButton = VOID_ID;
 }
