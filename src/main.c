@@ -14,9 +14,9 @@ static SpriteTextId quitButton;
 static SpriteTextId highScoresButton;
 static double selectedButton;
 static const double SELECTION_SPEED = 0.10;
-static const SDL_Color textColor = {0, 255, 255, 255};
+static const SDL_Color textColor = {255, 255, 0, 255};
 
-static TextureId ghostsTextureId;
+static TextureId backgroundTextureId;
 
 void createMainMenu();
 void centerMainMenu();
@@ -25,9 +25,12 @@ void handleMainMenuEvents();
 int main() {
   bool running = true;
 
-  if (!graphic_init("MyCPacman", 800, 600, 24)) {
+  if (!graphic_init("Lemonade 5000", 1200, 400, 24)) {
     return(EXIT_FAILURE);
   };
+
+  backgroundTextureId = graphic_loadTexture("background.png");
+  graphic_setBackgroundTexture(backgroundTextureId);
 
   createMainMenu();
 
@@ -50,6 +53,7 @@ int main() {
       lag -= MS_PER_UPDATE;
     }
 
+    graphic_resizeBackgroundToScreen();
     graphic_render();
 
     SDL_Delay(1);
@@ -62,10 +66,10 @@ int main() {
 
 void
 createMainMenu() {
-  mainMenuTitle = graphic_createText("Just a Pacman clone", 0, 40, textColor);
-  playButton = graphic_createText(">Play", 0, 0, textColor);
-  quitButton = graphic_createText("Quit", 0, 0, textColor);
-  highScoresButton = graphic_createText("High Scores", 0, 0, textColor);
+  mainMenuTitle = graphic_createText("Lemonade 5000", 0, 40, textColor);
+  playButton = graphic_createText(">New", 0, 0, textColor);
+  quitButton = graphic_createText("Load", 0, 0, textColor);
+  highScoresButton = graphic_createText("Quit", 0, 0, textColor);
 }
 
 void 
@@ -79,34 +83,39 @@ centerMainMenu() {
 void 
 handleMainMenuEvents() 
 {
-  int prev;
+  int prev = selectedButton;
   if(input_is_key_pressed(SDLK_DOWN)) {
     prev = selectedButton;
     selectedButton += SELECTION_SPEED;
     if(selectedButton >= 3) {
       selectedButton = 0;
     }
+  } else if (input_is_key_pressed(SDLK_UP)) {
+    selectedButton -= SELECTION_SPEED;
+    if (selectedButton < 0) {
+      selectedButton = 2.99;
+    }
+  }
 
-    if(selectedButton == prev) {
-      return;
-    }
-    switch((int) selectedButton) {
-      case 0:
-        graphic_setText(playButton, ">Play", 0, 0, textColor);
-        graphic_setText(quitButton, "Quit", 0, 0, textColor);
-        graphic_setText(highScoresButton, "High Scores", 0, 0, textColor);
-        break;
-      case 1:
-        graphic_setText(playButton, "Play", 0, 0, textColor);
-        graphic_setText(quitButton, ">Quit", 0, 0, textColor);
-        graphic_setText(highScoresButton, "High Scores", 0, 0, textColor);
-        break;
-      case 2:
-        graphic_setText(playButton, "Play", 0, 0, textColor);
-        graphic_setText(quitButton, "Quit", 0, 0, textColor);
-        graphic_setText(highScoresButton, ">High Scores", 0, 0, textColor);
-        break;
-    }
+  if(selectedButton == prev) {
+    return;
+  }
+  switch((int) selectedButton) {
+    case 0:
+      graphic_setText(playButton, ">New", 0, 0, textColor);
+      graphic_setText(quitButton, "Load", 0, 0, textColor);
+      graphic_setText(highScoresButton, "Quit", 0, 0, textColor);
+      break;
+    case 1:
+      graphic_setText(playButton, "New", 0, 0, textColor);
+      graphic_setText(quitButton, ">Load", 0, 0, textColor);
+      graphic_setText(highScoresButton, "Quit", 0, 0, textColor);
+      break;
+    case 2:
+      graphic_setText(playButton, "New", 0, 0, textColor);
+      graphic_setText(quitButton, "Load", 0, 0, textColor);
+      graphic_setText(highScoresButton, ">Quit", 0, 0, textColor);
+      break;
   }
 }
 

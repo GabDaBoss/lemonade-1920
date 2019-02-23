@@ -78,5 +78,8 @@ void graphic_centerSpriteOnScreenWithOffset(SpriteId id, int x, int y);
 void graphic_centerSpriteOnScreenWidthWithOffset(SpriteId id, int x);
 void graphic_centerSpriteOnScreenHeightWithOffse(SpriteId id, int y);
 
+void graphic_setBackgroundTexture(TextureId textureId);
+void graphic_resizeBackgroundToScreen();
+
 #endif /* RENDERER_H */
 

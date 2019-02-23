@@ -27,13 +27,13 @@ input_poll_inputs()
     while (SDL_PollEvent(&event) != 0) {
         SDL_Keycode code = event.key.keysym.sym;
         int i = flag_index(code);
-        int pos = (event.key.keysym.sym & MASK) - (FLAGS_PER_WORD * i);
+        int pos = (code & MASK) - (FLAGS_PER_WORD * i);
         switch (event.type) {
             case SDL_QUIT:
                 state.quit = true;
                 break;
             case SDL_KEYDOWN:
-                state.key_pressed[i] |= 1 << pos;
+                state.key_pressed[i] |= (long) 1 << pos;
                 break;
             case SDL_KEYUP:
                 state.key_pressed[i] &= ~(1 << pos);
