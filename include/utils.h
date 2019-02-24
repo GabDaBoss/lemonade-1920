@@ -94,11 +94,11 @@ do \
 } \
 while( 0 )
 
-#define DELETE_DOD_ELEMENT_BY_ID(strct, id, index, last) \
+#define DELETE_DOD_ELEMENT_BY_INDEX(strct, id, index, last) \
 do \
 { \
-  GET_INDEX_FROM_ID(strct, id, index); \
   last = --strct.total; \
+  id = strct.ids[index]; \
   strct.indexes[id] = strct.next_free_index; \
   strct.next_free_index = id; \
   if(strct.ids[index] == strct.ids[last]) { \
@@ -107,6 +107,14 @@ do \
   strct.ids[index] = strct.ids[last]; \
   strct.indexes[strct.ids[index]] = index; \
 } while(0)
+
+#define DELETE_DOD_ELEMENT_BY_ID(strct, id, index, last) \
+do \
+{ \
+  GET_INDEX_FROM_ID(strct, id, index); \
+  DELETE_DOD_ELEMENT_BY_INDEX(strct, id, index, last); \
+} while(0)
+
 
 #define GET_INDEX_FROM_ID(strct, id, index) \
 do \

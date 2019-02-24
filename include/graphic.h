@@ -48,21 +48,17 @@ void graphic_setPosition(Id id, int x, int y);
 void graphic_deleteSprite(Id id);
 void graphic_deleteSpriteAndAttachedTexture(Id id);
 
-Id 
-graphic_createText(
-    const char * const text, 
-    int x, 
-    int y,
-    SDL_Color color
-);
+Id graphic_createText(const char * const text, int x, int y, SDL_Color color);
 
-void graphic_setText(
-  Id id, 
-  const char* const text,
-  int x,
-  int y,
-  SDL_Color color
-);
+Id graphic_createTextCentered(const char * const text, 
+                              SDL_Rect zone, 
+                              SDL_Color color);
+
+void graphic_setText(Id id, 
+                     const char* const text, 
+                     int x, 
+                     int y, 
+                     SDL_Color color);
 
 void graphic_deleteText(Id id);
 
@@ -80,6 +76,7 @@ void graphic_resizeBackgroundToScreen();
 Id graphic_createSolidTexture(Uint32 color);
 void graphic_queryBackgroundDest(SDL_Rect *rect);
 void graphic_querySpriteDest(Id id, SDL_Rect *rect);
+void graphic_deleteTexture(Id id);
 
 #endif /* RENDERER_H */
 

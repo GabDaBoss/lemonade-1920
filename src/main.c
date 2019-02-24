@@ -15,6 +15,7 @@ static Id highScoresButton;
 static double selectedButton;
 static const double SELECTION_SPEED = 0.10;
 static const SDL_Color textColor = {255, 255, 0, 255};
+static const SDL_Color greenTextColor = { 0x22, 0x55, 0, 0xFF };
 
 static Id backgroundTextureId;
 
@@ -28,6 +29,7 @@ static struct {
   Id bottomBorder;
   Id rightBorder;
   Id topBar;
+  Id topText;
   Id firstLevelButton;
   struct  {
     int value;
@@ -38,6 +40,7 @@ static struct {
   } selectedLevelButton;
 } levelSelector = { 
   false,
+  VOID_ID,
   VOID_ID,
   VOID_ID,
   VOID_ID,
@@ -247,9 +250,17 @@ openLevelSelector()
     levelSelector.topBar = 
       graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
 
+    SDL_Rect topTextZone;
+    topTextZone.x = backgroundDest.x;
+    topTextZone.y = backgroundDest.y + 20;
+    topTextZone.w = backgroundDest.w;
+    topTextZone.h = 40;
+    levelSelector.topText =
+      graphic_createTextCentered("Select Level", topTextZone, greenTextColor);
+
     SDL_Rect firstLevelButtonDest;
     firstLevelButtonDest.x = backgroundDest.x + backgroundDest.w * 0.05;
-    firstLevelButtonDest.y = backgroundDest.y + backgroundDest.h * 0.05;
+    firstLevelButtonDest.y = backgroundDest.y + 60;
     firstLevelButtonDest.w = backgroundDest.w * 0.2;
     firstLevelButtonDest.h = backgroundDest.w * 0.2;
 
@@ -286,11 +297,13 @@ closeLevelSelector()
   graphic_deleteSprite(levelSelector.selectedLevelButton.bottomBorder);
   graphic_deleteSprite(levelSelector.selectedLevelButton.rightBorder);
   graphic_deleteSprite(levelSelector.selectedLevelButton.topBorder);
+  graphic_deleteText(levelSelector.topText);
   levelSelector.background = VOID_ID;
   levelSelector.leftBorder = VOID_ID;
   levelSelector.bottomBorder = VOID_ID;
   levelSelector.rightBorder = VOID_ID;
   levelSelector.topBar = VOID_ID;
+  levelSelector.topText = VOID_ID;
   levelSelector.firstLevelButton = VOID_ID;
   levelSelector.selectedLevelButton.leftBorder = VOID_ID;
   levelSelector.selectedLevelButton.bottomBorder = VOID_ID;
