@@ -18,6 +18,8 @@ static const SDL_Color textColor = {255, 255, 0, 255};
 static const SDL_Color greenTextColor = { 0x22, 0x55, 0, 0xFF };
 
 static Id backgroundTextureId;
+static Id okButtonTextureId;
+static Id backButtonTextureId;
 
 static Id lightScreenSolidTextureId = VOID_ID;
 static Id greenSolidTextureId = VOID_ID;
@@ -31,6 +33,8 @@ static struct {
   Id topBar;
   Id topText;
   Id firstLevelButton;
+  Id okButton;
+  Id backButton;
   struct  {
     int value;
     Id leftBorder;
@@ -40,6 +44,8 @@ static struct {
   } selectedLevelButton;
 } levelSelector = { 
   false,
+  VOID_ID,
+  VOID_ID,
   VOID_ID,
   VOID_ID,
   VOID_ID,
@@ -59,7 +65,7 @@ static struct {
 
 void createMainMenu();
 void centerMainMenu();
-void handleMainMenuEvents();
+bool handleMainMenuEvents();
 void openLevelSelector();
 void closeLevelSelector();
 void setBorderAroundSelectedButton();
@@ -77,6 +83,8 @@ main()
   lightScreenSolidTextureId = graphic_createSolidTexture(0xEEFFAA);
   greenSolidTextureId = graphic_createSolidTexture(0x225500);
   backgroundTextureId = graphic_loadTexture("background.png");
+  okButtonTextureId = graphic_loadTexture("ok.png");
+  backButtonTextureId = graphic_loadTexture("back.png");
   graphic_setBackgroundTexture(backgroundTextureId);
 
   createMainMenu();
@@ -96,7 +104,7 @@ main()
     {
       input_poll_inputs();
       running = !input_is_quit_pressed();
-      handleMainMenuEvents();
+      running = handleMainMenuEvents();
       centerMainMenu();
       runs++;
       lag -= MS_PER_UPDATE;
@@ -131,13 +139,12 @@ centerMainMenu()
   graphic_centerSpriteOnScreenWithOffset(highScoresButton, 0, 20);
 }
 
-void 
+bool 
 handleMainMenuEvents() 
 {
   if (levelSelector.opened) 
   {
-    if (input_is_key_released(SDLK_RETURN) || 
-        input_is_key_released(SDLK_RETURN2)) 
+    if (input_is_key_released(SDLK_ESCAPE)) 
     {
       closeLevelSelector();
     }
@@ -151,6 +158,11 @@ handleMainMenuEvents()
       {
         case 0:
           openLevelSelector();
+          break;
+        case 1:
+          break;
+        case 2:
+          return false;
           break;
       }
     } 
@@ -177,7 +189,7 @@ handleMainMenuEvents()
 
       if(selectedButton == prev) 
       {
-        return;
+        return true;
       }
 
       switch((int) selectedButton) 
@@ -200,6 +212,8 @@ handleMainMenuEvents()
       }
     }
   }
+
+  return true;
 }
 
 void
@@ -279,6 +293,22 @@ openLevelSelector()
 
     levelSelector.selectedLevelButton.value = 0;
     setBorderAroundSelectedButton();
+
+    SDL_Rect okButton;
+    okButton.x = backgroundDest.x + backgroundDest.w - 80;
+    okButton.y = backgroundDest.y + backgroundDest.h - 30;
+    okButton.w = 40;
+    okButton.h = 25;
+    levelSelector.okButton =
+      graphic_createFullTextureSprite(okButtonTextureId, okButton);
+
+    SDL_Rect backButton;
+    backButton.x = backgroundDest.x + backgroundDest.w - 45;
+    backButton.y = backgroundDest.y + backgroundDest.h - 30;
+    backButton.w = 40;
+    backButton.h = 25;
+    levelSelector.backButton =
+      graphic_createFullTextureSprite(backButtonTextureId, backButton);
   }
 }
 
@@ -298,12 +328,16 @@ closeLevelSelector()
   graphic_deleteSprite(levelSelector.selectedLevelButton.rightBorder);
   graphic_deleteSprite(levelSelector.selectedLevelButton.topBorder);
   graphic_deleteText(levelSelector.topText);
+  graphic_deleteSprite(levelSelector.okButton);
+  graphic_deleteSprite(levelSelector.backButton);
   levelSelector.background = VOID_ID;
   levelSelector.leftBorder = VOID_ID;
   levelSelector.bottomBorder = VOID_ID;
   levelSelector.rightBorder = VOID_ID;
   levelSelector.topBar = VOID_ID;
   levelSelector.topText = VOID_ID;
+  levelSelector.okButton = VOID_ID;
+  levelSelector.backButton = VOID_ID;
   levelSelector.firstLevelButton = VOID_ID;
   levelSelector.selectedLevelButton.leftBorder = VOID_ID;
   levelSelector.selectedLevelButton.bottomBorder = VOID_ID;
