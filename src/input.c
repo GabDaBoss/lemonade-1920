@@ -77,6 +77,9 @@ input_poll_inputs()
                 state.x = event.button.x;
                 state.y = event.button.y;
                 break;
+            case SDL_MOUSEMOTION:
+                state.x = event.motion.x;
+                state.y = event.motion.y;
         }
     }
 }
@@ -115,4 +118,12 @@ bool input_isZoneClicked(SDL_Rect zone, MouseButton buttons)
   }
 
   return false;
+}
+
+bool input_isMouseOverZone(SDL_Rect zone)
+{
+  return state.x >= zone.x && 
+         state.x <= zone.x + zone.w &&
+         state.y >= zone.y &&
+         state.y <= zone.y + zone.h;
 }

@@ -9,9 +9,9 @@
 #define MS_PER_UPDATE 8
 
 static Id mainMenuTitle;
-static Id playButton;
+static Id newButton;
+static Id loadButton;
 static Id quitButton;
-static Id highScoresButton;
 static double selectedButton;
 static const double SELECTION_SPEED = 0.10;
 static const SDL_Color textColor = {255, 255, 0, 255};
@@ -125,25 +125,24 @@ void
 createMainMenu() 
 {
   mainMenuTitle = graphic_createText("Lemonade 5000", 0, 40, textColor);
-  playButton = graphic_createText(">New", 0, 0, textColor);
-  quitButton = graphic_createText("Load", 0, 0, textColor);
-  highScoresButton = graphic_createText("Quit", 0, 0, textColor);
+  newButton = graphic_createText(">New", 0, 0, textColor);
+  loadButton = graphic_createText("Load", 0, 0, textColor);
+  quitButton = graphic_createText("Quit", 0, 0, textColor);
 }
 
 void 
 centerMainMenu() 
 {
   graphic_centerSpriteOnScreenWidth(mainMenuTitle);
-  graphic_centerSpriteOnScreenWithOffset(playButton, 0, -20);
-  graphic_centerSpriteOnScreenWithOffset(quitButton, 0, 0);
-  graphic_centerSpriteOnScreenWithOffset(highScoresButton, 0, 20);
+  graphic_centerSpriteOnScreenWithOffset(newButton, 0, -20);
+  graphic_centerSpriteOnScreenWithOffset(loadButton, 0, 0);
+  graphic_centerSpriteOnScreenWithOffset(quitButton, 0, 20);
 }
 
 bool 
 handleMainMenuEvents() 
 {
-  if (levelSelector.opened) 
-  {
+  if (levelSelector.opened) {
     SDL_Rect okButtonRect, backButtonRect;
     graphic_querySpriteDest(levelSelector.okButton, &okButtonRect);
     graphic_querySpriteDest(levelSelector.backButton, &backButtonRect);
@@ -154,14 +153,10 @@ handleMainMenuEvents()
     } else if(input_isZoneClicked(backButtonRect, LeftMouseButton)) {
       closeLevelSelector();
     }
-  } 
-  else 
-  {
+  } else {
     if (input_is_key_released(SDLK_RETURN) ||
-        input_is_key_released(SDLK_RETURN2)) 
-    {
-      switch((int) selectedButton) 
-      {
+        input_is_key_released(SDLK_RETURN2)) {
+      switch((int) selectedButton) {
         case 0:
           openLevelSelector();
           break;
@@ -171,49 +166,52 @@ handleMainMenuEvents()
           return false;
           break;
       }
-    } 
-    else 
-    {
+    } else {
       int prev = selectedButton;
-      if (input_is_key_pressed(SDLK_DOWN)) 
-      {
+
+      SDL_Rect newButtonRect, loadButtonRect, quitButtonRect;
+      graphic_querySpriteDest(newButton, &newButtonRect);
+      graphic_querySpriteDest(loadButton, &loadButtonRect);
+      graphic_querySpriteDest(quitButton, &quitButtonRect);
+
+      if (input_is_key_pressed(SDLK_DOWN)) {
         prev = selectedButton;
         selectedButton += SELECTION_SPEED;
-        if (selectedButton >= 3) 
-        {
-            selectedButton = 0;
+        if (selectedButton >= 3) {
+          selectedButton = 0;
         }
-      } 
-      else if (input_is_key_pressed(SDLK_UP)) 
-      {
+      } else if (input_is_key_pressed(SDLK_UP)) {
         selectedButton -= SELECTION_SPEED;
-        if (selectedButton < 0) 
-        {
-            selectedButton = 2.99;
+        if (selectedButton < 0) {
+          selectedButton = 2.99;
         }
+      } else if (input_isMouseOverZone(newButtonRect)) {
+        selectedButton = 0;
+      } else if (input_isMouseOverZone(loadButtonRect)) {
+        selectedButton = 1;
+      } else if (input_isMouseOverZone(quitButtonRect)) {
+        selectedButton = 2;
       }
 
-      if(selectedButton == prev) 
-      {
+      if(selectedButton == prev) {
         return true;
       }
 
-      switch((int) selectedButton) 
-      {
+      switch((int) selectedButton) {
         case 0:
-          graphic_setText(playButton, ">New", 0, 0, textColor);
-          graphic_setText(quitButton, "Load", 0, 0, textColor);
-          graphic_setText(highScoresButton, "Quit", 0, 0, textColor);
+          graphic_setText(newButton, ">New", 0, 0, textColor);
+          graphic_setText(loadButton, "Load", 0, 0, textColor);
+          graphic_setText(quitButton, "Quit", 0, 0, textColor);
           break;
         case 1:
-          graphic_setText(playButton, "New", 0, 0, textColor);
-          graphic_setText(quitButton, ">Load", 0, 0, textColor);
-          graphic_setText(highScoresButton, "Quit", 0, 0, textColor);
+          graphic_setText(newButton, "New", 0, 0, textColor);
+          graphic_setText(loadButton, ">Load", 0, 0, textColor);
+          graphic_setText(quitButton, "Quit", 0, 0, textColor);
           break;
         case 2:
-          graphic_setText(playButton, "New", 0, 0, textColor);
-          graphic_setText(quitButton, "Load", 0, 0, textColor);
-          graphic_setText(highScoresButton, ">Quit", 0, 0, textColor);
+          graphic_setText(newButton, "New", 0, 0, textColor);
+          graphic_setText(loadButton, "Load", 0, 0, textColor);
+          graphic_setText(quitButton, ">Quit", 0, 0, textColor);
           break;
       }
     }
