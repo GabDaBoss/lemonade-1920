@@ -35,13 +35,20 @@ static struct {
   Id firstLevelButton;
   Id okButton;
   Id backButton;
-  struct  {
-    int value;
+  struct {
+    Id id;
     Id leftBorder;
     Id bottomBorder;
     Id rightBorder;
     Id topBorder;
   } selectedLevelButton;
+  struct {
+    Id id;
+    Id leftBorder;
+    Id bottomBorder;
+    Id rightBorder;
+    Id topBorder;
+  } hoveredButton;
 } levelSelector = { 
   false,
   VOID_ID,
@@ -54,7 +61,14 @@ static struct {
   VOID_ID,
   VOID_ID,
   {
-    0,
+    VOID_ID,
+    VOID_ID,
+    VOID_ID,
+    VOID_ID,
+    VOID_ID,
+  },
+  {
+    VOID_ID,
     VOID_ID,
     VOID_ID,
     VOID_ID,
@@ -69,6 +83,11 @@ bool handleMainMenuEvents();
 void openLevelSelector();
 void closeLevelSelector();
 void setBorderAroundSelectedButton();
+void setBorderAroundRect(SDL_Rect rect, 
+                         Id *leftBorder,
+                         Id *bottomBorder,
+                         Id *rightBorder,
+                         Id *topBorder);
 
 int
 main() 
@@ -153,6 +172,52 @@ handleMainMenuEvents()
     } else if(input_isZoneClicked(backButtonRect, LeftMouseButton)) {
       closeLevelSelector();
     }
+
+    if (input_isMouseOverZone(okButtonRect)) {
+      if (levelSelector.hoveredButton.id != levelSelector.okButton) {
+        if(levelSelector.hoveredButton.id != VOID_ID) {
+          graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
+        }
+
+      levelSelector.hoveredButton.id = levelSelector.okButton;
+      setBorderAroundRect(okButtonRect, 
+                          &levelSelector.hoveredButton.leftBorder,
+                          &levelSelector.hoveredButton.bottomBorder,
+                          &levelSelector.hoveredButton.rightBorder,
+                          &levelSelector.hoveredButton.topBorder);
+      }
+    } else if (input_isMouseOverZone(backButtonRect)) {
+      if (levelSelector.hoveredButton.id != levelSelector.backButton) {
+        if(levelSelector.hoveredButton.id != VOID_ID) {
+          graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
+          graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
+        }
+
+        levelSelector.hoveredButton.id = levelSelector.backButton;
+        setBorderAroundRect(backButtonRect, 
+                            &levelSelector.hoveredButton.leftBorder,
+                            &levelSelector.hoveredButton.bottomBorder,
+                            &levelSelector.hoveredButton.rightBorder,
+                            &levelSelector.hoveredButton.topBorder);
+      }
+    } else if (levelSelector.hoveredButton.id != VOID_ID) {
+      levelSelector.hoveredButton.id = VOID_ID;
+      printf("leaving, %d, %d, %d, %d\n", 
+             levelSelector.hoveredButton.leftBorder,
+             levelSelector.hoveredButton.bottomBorder,
+             levelSelector.hoveredButton.rightBorder,
+             levelSelector.hoveredButton.topBorder);
+      graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
+      graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
+      graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
+      graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
+    }
+
   } else {
     if (input_is_key_released(SDLK_RETURN) ||
         input_is_key_released(SDLK_RETURN2)) {
@@ -295,7 +360,7 @@ openLevelSelector()
                                   firstLevelButtonSrc, 
                                   firstLevelButtonDest);
 
-    levelSelector.selectedLevelButton.value = 0;
+    levelSelector.selectedLevelButton.id = levelSelector.firstLevelButton;
     setBorderAroundSelectedButton();
 
     SDL_Rect okButton;
@@ -321,6 +386,7 @@ void
 closeLevelSelector()
 {
   levelSelector.opened = false;
+  printf("closing %d\n", levelSelector.background);
   graphic_deleteSprite(levelSelector.background);
   graphic_deleteSprite(levelSelector.leftBorder);
   graphic_deleteSprite(levelSelector.bottomBorder);
@@ -334,6 +400,14 @@ closeLevelSelector()
   graphic_deleteText(levelSelector.topText);
   graphic_deleteSprite(levelSelector.okButton);
   graphic_deleteSprite(levelSelector.backButton);
+
+  if (levelSelector.hoveredButton.id != VOID_ID) {
+    graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
+    graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
+    graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
+    graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
+  }
+
   levelSelector.background = VOID_ID;
   levelSelector.leftBorder = VOID_ID;
   levelSelector.bottomBorder = VOID_ID;
@@ -347,48 +421,61 @@ closeLevelSelector()
   levelSelector.selectedLevelButton.bottomBorder = VOID_ID;
   levelSelector.selectedLevelButton.rightBorder = VOID_ID;
   levelSelector.selectedLevelButton.topBorder = VOID_ID;
+  levelSelector.hoveredButton.id = VOID_ID;
+  levelSelector.hoveredButton.leftBorder = VOID_ID;
+  levelSelector.hoveredButton.bottomBorder = VOID_ID;
+  levelSelector.hoveredButton.rightBorder = VOID_ID;
+  levelSelector.hoveredButton.topBorder = VOID_ID;
 }
 
 void
 setBorderAroundSelectedButton()
 {
   SDL_Rect selectedButtonDest;
-  switch (levelSelector.selectedLevelButton.value)
-  {
-    case 0:
-      graphic_querySpriteDest(levelSelector.firstLevelButton, &selectedButtonDest);
-      break;
-  }
+  graphic_querySpriteDest(levelSelector.firstLevelButton, &selectedButtonDest);
 
+  setBorderAroundRect(selectedButtonDest, 
+                      &levelSelector.selectedLevelButton.leftBorder,
+                      &levelSelector.selectedLevelButton.bottomBorder,
+                      &levelSelector.selectedLevelButton.rightBorder,
+                      &levelSelector.selectedLevelButton.topBorder);
+}
+
+void setBorderAroundRect(SDL_Rect rect, 
+                         Id *leftBorder,
+                         Id *bottomBorder,
+                         Id *rightBorder,
+                         Id *topBorder)
+{
   SDL_Rect leftBorderDest;
-  leftBorderDest.x = selectedButtonDest.x;
-  leftBorderDest.y = selectedButtonDest.y;
+  leftBorderDest.x = rect.x;
+  leftBorderDest.y = rect.y;
   leftBorderDest.w = 2;
-  leftBorderDest.h = selectedButtonDest.h;
-  levelSelector.selectedLevelButton.leftBorder = 
+  leftBorderDest.h = rect.h;
+  *leftBorder = 
     graphic_createFullTextureSprite(greenSolidTextureId, leftBorderDest);
 
   SDL_Rect bottomBorderDest;
-  bottomBorderDest.x = selectedButtonDest.x;
-  bottomBorderDest.y = selectedButtonDest.y + selectedButtonDest.h - 2;
-  bottomBorderDest.w = selectedButtonDest.w;
+  bottomBorderDest.x = rect.x;
+  bottomBorderDest.y = rect.y + rect.h - 2;
+  bottomBorderDest.w = rect.w;
   bottomBorderDest.h = 2;
-  levelSelector.selectedLevelButton.bottomBorder = 
+  *bottomBorder = 
     graphic_createFullTextureSprite(greenSolidTextureId, bottomBorderDest);
 
   SDL_Rect rightBorderDest;
-  rightBorderDest.x = selectedButtonDest.x + selectedButtonDest.w - 2;
-  rightBorderDest.y = selectedButtonDest.y;
+  rightBorderDest.x = rect.x + rect.w - 2;
+  rightBorderDest.y = rect.y;
   rightBorderDest.w = 2;
-  rightBorderDest.h = selectedButtonDest.h;
-  levelSelector.selectedLevelButton.rightBorder = 
+  rightBorderDest.h = rect.h;
+  *rightBorder = 
     graphic_createFullTextureSprite(greenSolidTextureId, rightBorderDest);
 
   SDL_Rect topBarDest;
-  topBarDest.x = selectedButtonDest.x;
-  topBarDest.y = selectedButtonDest.y;
-  topBarDest.w = selectedButtonDest.w;
+  topBarDest.x = rect.x;
+  topBarDest.y = rect.y;
+  topBarDest.w = rect.w;
   topBarDest.h = 2;
-  levelSelector.selectedLevelButton.topBorder = 
+  *topBorder = 
     graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
 }

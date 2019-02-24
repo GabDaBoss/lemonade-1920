@@ -31,6 +31,7 @@ input_poll_inputs()
     }
 
     state.mouseButtonReleased = 0;
+    SDL_GetMouseState(&state.x, &state.y);
 
     while (SDL_PollEvent(&event) != 0) {
         SDL_Keycode code = event.key.keysym.sym;
@@ -59,8 +60,6 @@ input_poll_inputs()
                     state.mouseButtonPressed |= MiddleMouseButton;
                     break;
                 }
-                state.x = event.button.x;
-                state.y = event.button.y;
                 break;
             case SDL_MOUSEBUTTONUP:
                 switch (event.button.button) {
@@ -74,12 +73,7 @@ input_poll_inputs()
                     state.mouseButtonReleased |= MiddleMouseButton;
                     break;
                 }
-                state.x = event.button.x;
-                state.y = event.button.y;
                 break;
-            case SDL_MOUSEMOTION:
-                state.x = event.motion.x;
-                state.y = event.motion.y;
         }
     }
 }
