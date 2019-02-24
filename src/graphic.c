@@ -521,3 +521,11 @@ graphic_queryBackgroundDest(SDL_Rect *rect)
 {
   *rect = backgroundDest;
 }
+
+void
+graphic_querySpriteDest(Id id, SDL_Rect *rect)
+{
+    unsigned int index;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    *rect = sprites.dest[index];
+}

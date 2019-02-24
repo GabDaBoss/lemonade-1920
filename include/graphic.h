@@ -43,7 +43,7 @@ void graphic_clear();
 
 void graphic_setSpriteSize(Id id, int w, int h);
 void graphic_translateSprite(Id id, int x, int y);
-void graphic_queryPosition(Id id, int * x, int* y);
+void graphic_queryPosition(Id id, int* x, int* y);
 void graphic_setPosition(Id id, int x, int y);
 void graphic_deleteSprite(Id id);
 void graphic_deleteSpriteAndAttachedTexture(Id id);
@@ -79,6 +79,7 @@ void graphic_resizeBackgroundToScreen();
 
 Id graphic_createSolidTexture(Uint32 color);
 void graphic_queryBackgroundDest(SDL_Rect *rect);
+void graphic_querySpriteDest(Id id, SDL_Rect *rect);
 
 #endif /* RENDERER_H */
 
