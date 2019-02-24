@@ -103,8 +103,8 @@ main()
     while (lag >= MS_PER_UPDATE && runs < 5 && running) 
     {
       input_poll_inputs();
-      running = !input_is_quit_pressed();
-      running = handleMainMenuEvents();
+      running = !input_is_quit_pressed() &&
+                handleMainMenuEvents();
       centerMainMenu();
       runs++;
       lag -= MS_PER_UPDATE;
@@ -144,8 +144,14 @@ handleMainMenuEvents()
 {
   if (levelSelector.opened) 
   {
-    if (input_is_key_released(SDLK_ESCAPE)) 
-    {
+    SDL_Rect okButtonRect, backButtonRect;
+    graphic_querySpriteDest(levelSelector.okButton, &okButtonRect);
+    graphic_querySpriteDest(levelSelector.backButton, &backButtonRect);
+    if (input_is_key_released(SDLK_ESCAPE)) {
+      closeLevelSelector();
+    } else if(input_isZoneClicked(okButtonRect, LeftMouseButton)) {
+      closeLevelSelector();
+    } else if(input_isZoneClicked(backButtonRect, LeftMouseButton)) {
       closeLevelSelector();
     }
   } 
