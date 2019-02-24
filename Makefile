@@ -1,7 +1,8 @@
 CC := gcc
 SRCDIR := src
 BUILDDIR := build
-TARGET := bin/runner
+TARGETDIR := bin
+TARGET := runner
 
 SRCEXT := c
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
@@ -10,9 +11,10 @@ CFLAGS := -g -Wall -Wextra
 LIB := -lm -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 INC := -I include
 
-$(TARGET): $(OBJECTS)
+$(TARGETDIR)/$(TARGET): $(OBJECTS)
 	@echo " Linking..."
-	@echo " $(CC) $^ -o $(TARGET) $(LIB)"; $(CC) $^ -o $(TARGET) $(LIB)
+	@mkdir -p $(TARGETDIR)
+	@echo " $(CC) $^ -o $(TARGETDIR)/$(TARGET) $(LIB)"; $(CC) $^ -o $(TARGETDIR)/$(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
