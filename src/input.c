@@ -8,6 +8,10 @@ static struct {
     bool quit;
     unsigned long key_pressed[FLAGS_NUM]; 
     unsigned long key_released[FLAGS_NUM]; 
+    int x;
+    int y;
+    bool leftClick;
+    bool rightClick;
 } state;
 
 static inline int
@@ -39,6 +43,8 @@ input_poll_inputs()
                 state.key_pressed[i] &= ~(1 << pos);
                 state.key_released[i] |= 1 << pos;
                 break;
+            case SDL_MOUSEBUTTONUP:
+                event.motion.
         }
     }
 }
@@ -63,4 +69,9 @@ bool
 input_is_quit_pressed()
 {
     return state.quit;
+}
+
+bool input_is_zone_clicked(SDL_Rect zone)
+{
+
 }
