@@ -207,11 +207,6 @@ handleMainMenuEvents()
       }
     } else if (levelSelector.hoveredButton.id != VOID_ID) {
       levelSelector.hoveredButton.id = VOID_ID;
-      printf("leaving, %d, %d, %d, %d\n", 
-             levelSelector.hoveredButton.leftBorder,
-             levelSelector.hoveredButton.bottomBorder,
-             levelSelector.hoveredButton.rightBorder,
-             levelSelector.hoveredButton.topBorder);
       graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
       graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
       graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
@@ -219,6 +214,11 @@ handleMainMenuEvents()
     }
 
   } else {
+    SDL_Rect newButtonRect, loadButtonRect, quitButtonRect;
+    graphic_querySpriteDest(newButton, &newButtonRect);
+    graphic_querySpriteDest(loadButton, &loadButtonRect);
+    graphic_querySpriteDest(quitButton, &quitButtonRect);
+
     if (input_is_key_released(SDLK_RETURN) ||
         input_is_key_released(SDLK_RETURN2)) {
       switch((int) selectedButton) {
@@ -231,13 +231,15 @@ handleMainMenuEvents()
           return false;
           break;
       }
+    } else if (input_isZoneClicked(newButtonRect, LeftMouseButton)) {
+      openLevelSelector();
+    } else if (input_isZoneClicked(loadButtonRect, LeftMouseButton)) {
+      // Load
+    } else if (input_isZoneClicked(quitButtonRect, LeftMouseButton)) {
+      return false;
     } else {
       int prev = selectedButton;
 
-      SDL_Rect newButtonRect, loadButtonRect, quitButtonRect;
-      graphic_querySpriteDest(newButton, &newButtonRect);
-      graphic_querySpriteDest(loadButton, &loadButtonRect);
-      graphic_querySpriteDest(quitButton, &quitButtonRect);
 
       if (input_is_key_pressed(SDLK_DOWN)) {
         prev = selectedButton;
@@ -386,7 +388,6 @@ void
 closeLevelSelector()
 {
   levelSelector.opened = false;
-  printf("closing %d\n", levelSelector.background);
   graphic_deleteSprite(levelSelector.background);
   graphic_deleteSprite(levelSelector.leftBorder);
   graphic_deleteSprite(levelSelector.bottomBorder);
