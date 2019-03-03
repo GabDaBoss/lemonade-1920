@@ -4,6 +4,10 @@
 
 #define MAX_TEXTURES 1024
 
+typedef enum {
+  SPRITE_VISIBLE = 0,
+  SPRITE_INVISIBLE = 1 << 0,
+} SpriteState;
 
 static SDL_Window* window;
 static SDL_Renderer* renderer;
@@ -11,16 +15,21 @@ static TTF_Font* font;
 
 static struct {
     SDL_Texture* textures[MAX_TEXTURES];
-    unsigned int w[MAX_TEXTURES];
-    unsigned int h[MAX_TEXTURES];
     SET_STRUCT_FOR_DOD(Id, MAX_TEXTURES);
 } textures;
 
+typedef struct {
+    SDL_Texture* texture;
+    SDL_Rect src;
+    SDL_Rect dest;
+} Sprite;
+
 static struct {
-    Index texture_index[MAX_SPRITES];
-    SDL_Rect src[MAX_SPRITES];
-    SDL_Rect dest[MAX_SPRITES];
-    SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
+  SpriteState state[MAX_SPRITES];
+  Sprite sprite[MAX_SPRITES];
+  unsigned int visibleSpriteTotal;
+  unsigned int invisibleSpriteTotal;
+  SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } sprites;
 
 static Id backgroundTextureIndex;
@@ -28,8 +37,10 @@ static SDL_Rect backgroundSrc;
 static SDL_Rect backgroundDest;
 
 void deleteTextureByIndex(Index index);
+Id createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest);
 
-Index createTextTexture(const char * const text, SDL_Color color);
+SDL_Texture*
+createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h);
 
 bool graphic_init(const char * const title, int w, int h, int font_size)
 {
@@ -101,12 +112,12 @@ graphic_render()
         );
     }
 
-    for (unsigned int i = 0; i < sprites.total; i++) {
+    for (unsigned int i = 0; i < sprites.visibleSpriteTotal; i++) {
         SDL_RenderCopy(
             renderer,
-            textures.textures[sprites.texture_index[i]],
-            &sprites.src[i],
-            &sprites.dest[i]);
+            sprites.sprite[i].texture,
+            &sprites.sprite[i].src,
+            &sprites.sprite[i].dest);
     }
 
     SDL_RenderPresent(renderer);
@@ -120,7 +131,6 @@ graphic_loadTexture(const char* const filename)
     SDL_SetColorKey(surface, SDL_TRUE, colorkey);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    unsigned int w = surface->w, h = surface->h;
     SDL_FreeSurface(surface);
     if (texture == NULL) {
         fprintf(stderr, "Texture %s could not be loaded! SDL_Error: %s\n", filename, SDL_GetError());
@@ -131,8 +141,32 @@ graphic_loadTexture(const char* const filename)
     Id id;
     GET_NEXT_ID(textures, id, index, MAX_TEXTURES);
     textures.textures[index] = texture;
-    textures.w[index] = w;
-    textures.h[index] = h;
+
+    return id;
+}
+
+Id 
+createTilesetSprite( 
+    SDL_Texture* texture, 
+    SDL_Rect src, 
+    SDL_Rect dest) 
+{
+    Index index;
+    Id id;
+    GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
+
+    if (sprites.visibleSpriteTotal < index) {
+      sprites.sprite[index] = sprites.sprite[sprites.visibleSpriteTotal];
+      sprites.indexes[sprites.ids[sprites.visibleSpriteTotal]] = index;
+      sprites.ids[sprites.visibleSpriteTotal] = id;
+      sprites.state[index] = SPRITE_INVISIBLE;
+    }
+
+    sprites.sprite[sprites.visibleSpriteTotal].src = src;
+    sprites.sprite[sprites.visibleSpriteTotal].dest = dest;
+    sprites.sprite[sprites.visibleSpriteTotal].texture = texture;
+    sprites.state[sprites.visibleSpriteTotal] = SPRITE_VISIBLE;
+    sprites.visibleSpriteTotal++;
 
     return id;
 }
@@ -146,16 +180,7 @@ graphic_createTilesetSprite(
     Index texture_index;
     GET_INDEX_FROM_ID(textures, texture_id, texture_index);
 
-    Index index;
-    Id id;
-    GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
-
-    sprites.texture_index[index] = texture_index;
-
-    sprites.src[index] = src;
-    sprites.dest[index] = dest;
-
-    return id;
+    return createTilesetSprite(textures.textures[texture_index], src, dest);
 }
 
 Id 
@@ -163,49 +188,82 @@ graphic_createFullTextureSprite(
     Id texture_id, 
     SDL_Rect dest) 
 {
-    Id texture_index = textures.indexes[texture_id];
+    SDL_Rect src;
+    src.x = 0;
+    src.y = 0;
+    graphic_queryTextureSize(texture_id, &src.w, &src.h);
 
-    Index index;
-    Id id;
-    GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
-
-    sprites.texture_index[index] = texture_index;
-
-    SDL_Rect src = {0};
-    src.w = textures.w[texture_index];
-    src.h = textures.h[texture_index];
-    sprites.src[index] = src;
-    sprites.dest[index] = dest;
-
-    return id;
+    return graphic_createTilesetSprite(texture_id, src, dest);
 }
 
 void
 graphic_setSpriteSize(Id id, int w, int h)
 {
-    Index index;
-    GET_INDEX_FROM_ID(sprites, id, index);
-    sprites.dest[index].w = w;
-    sprites.dest[index].h = h;
+  Index index;
+  GET_INDEX_FROM_ID(sprites, id, index);
+  sprites.sprite[index].dest.w = w;
+  sprites.sprite[index].dest.h = h;
 }
 
 void
 graphic_translateSprite(Id id, int x, int y)
 {
-    Index index;
-    GET_INDEX_FROM_ID(sprites, id, index);
-    sprites.dest[index].x += x;
-    sprites.dest[index].y += y;
+  Index index;
+  GET_INDEX_FROM_ID(sprites, id, index);
+
+  sprites.sprite[index].dest.x += x;
+  sprites.sprite[index].dest.y += y;
 }
 
 void
-graphic_deleteSprite(Id id) {
+graphic_deleteSprite(Id id) 
+{
     Index index, last;
-    DELETE_DOD_ELEMENT_BY_ID(sprites, id, index, last);
+    GET_INDEX_FROM_ID(sprites, id, index);
+    last = --sprites.total;
+    id = sprites.ids[index];
+    sprites.indexes[id] = sprites.next_free_index;
+    sprites.next_free_index = id;
+    if (sprites.ids[index] != sprites.ids[last]) {
+        sprites.ids[index] = sprites.ids[last];
+        sprites.indexes[sprites.ids[index]] = index;
+    }
 
-    sprites.texture_index[index] = sprites.texture_index[last];
-    sprites.dest[index] = sprites.dest[last];
-    sprites.src[index] = sprites.src[last];
+    sprites.sprite[index] = sprites.sprite[last];
+    sprites.state[index] = sprites.state[last];
+    sprites.visibleSpriteTotal = sprites.total;
+
+    /*
+    GET_INDEX_FROM_ID(sprites, id, index);
+    if (index < sprites.visibleSpriteTotal - 1) {
+        if (index < sprites.total - 1) {
+            last = sprites.visibleSpriteTotal - 1;
+            sprites.sprite[index] = sprites.sprite[last];
+            sprites.ids[index] = sprites.ids[last];
+            sprites.indexes[sprites.ids[last]] = index;
+
+            if (sprites.total - sprites.visibleSpriteTotal > 1) {
+                sprites.sprite[last] = sprites.sprite[sprites.total - 1];
+                sprites.state[last] = SPRITE_INVISIBLE;
+                sprites.ids[last] = sprites.ids[sprites.total - 1];
+                sprites.indexes[sprites.ids[sprites.total - 1]] = last;
+            }
+        }
+        sprites.visibleSpriteTotal--;
+    } else {
+        if (index < sprites.total - 1) {
+            last = sprites.total - 1;
+            sprites.sprite[index] = sprites.sprite[last];
+            sprites.state[index] = sprites.state[last];
+            sprites.ids[index] = sprites.ids[last];
+            sprites.indexes[sprites.ids[last]] = index;
+        }
+    }
+    sprites.total--;
+
+    sprites.indexes[id] = sprites.next_free_index;
+    sprites.next_free_index = id;
+    */
 }
 
 void 
@@ -245,48 +303,58 @@ void graphic_queryPosition(Id id, int * x, int* y)
 {
     Index index;
     GET_INDEX_FROM_ID(sprites, id, index);
-    (*x) = sprites.dest[index].x;
-    (*y) = sprites.dest[index].y;
+    (*x) = sprites.sprite[index].dest.x;
+    (*y) = sprites.sprite[index].dest.y;
 }
 
 void graphic_setPosition(Id id, int x, int y)
 {
     Index index;
     GET_INDEX_FROM_ID(sprites, id, index);
-    sprites.dest[index].x = x;
-    sprites.dest[index].y = y;
+    sprites.sprite[index].dest.x = x;
+    sprites.sprite[index].dest.y = y;
 }
 
-Index
-createTextTexture(const char * const text, SDL_Color color)
+SDL_Texture*
+createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h)
 {
     SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
 
     if (!surface) {
         fprintf(stderr, "TTF ERROR: %s\n", TTF_GetError());
-        return VOID_INDEX;
+        return NULL;
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface); 
 
-    SDL_Rect src = {0};
-    src.w = surface->w;
-    src.h = surface->h;
+    if (w) {
+      *w = surface->w;
+    }
+
+    if (h) {
+      *h = surface->h;
+    }
+
     SDL_FreeSurface(surface);
 
     if (!texture) {
         fprintf(stderr, "SDL_ERROR: %s\n", SDL_GetError());
-        return VOID_INDEX;
+        return NULL;
     }
+
+    return texture;
+}
+
+Id 
+graphic_createTextTexture(const char * const text, SDL_Color color)
+{
 
     Index index;
     Id id;
     GET_NEXT_ID(textures, id, index, MAX_TEXTURES);
 
-    textures.textures[index] = texture;
-    textures.w[index] = src.w;
-    textures.h[index] = src.h;
-    return index;
+    textures.textures[index] = createTextTexture(text, color, NULL, NULL);
+    return id;
 }
 
 Id 
@@ -296,47 +364,39 @@ graphic_createText(
     int y,
     SDL_Color color) 
 { 
-  Index textureIndex = createTextTexture(text, color);
-  Index index;
-  Id id;
-  GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
+  SDL_Rect src, dest;
+  unsigned int w, h;
+  SDL_Texture* texture = createTextTexture(text, color, &w, &h);
 
-  sprites.texture_index[index] = textureIndex;
-  sprites.src[index].x = 0;
-  sprites.src[index].y = 0;
-  sprites.src[index].w = textures.w[textureIndex];
-  sprites.src[index].h = textures.h[textureIndex];
-  sprites.dest[index].x = x;
-  sprites.dest[index].y = y;
-  sprites.dest[index].w = textures.w[textureIndex];
-  sprites.dest[index].h = textures.h[textureIndex];
-
-  return id;
+  src.x = 0;
+  src.y = 0;
+  src.w = w;
+  src.h = h;
+  dest.x = x;
+  dest.y = y;
+  dest.w = w;
+  dest.h = h;
+  return createTilesetSprite(texture, src, dest);
 }
 
 Id graphic_createTextCentered(const char * const text, 
                               SDL_Rect zone, 
                               SDL_Color color)
 {
-  Index textureIndex = createTextTexture(text, color);
-  Index index;
-  Id id;
-  GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
+  Id texture = graphic_createTextTexture(text, color);
+  SDL_Rect src, dest;
+  int w, h;
+  graphic_queryTextureSize(texture, &w, &h);
 
-  int textureWidth = textures.w[textureIndex];
-  int textureHeight = textures.h[textureIndex];
-
-  sprites.texture_index[index] = textureIndex;
-  sprites.src[index].x = 0;
-  sprites.src[index].y = 0;
-  sprites.src[index].w = textureWidth;
-  sprites.src[index].h = textureHeight;
-  sprites.dest[index].x = zone.x + zone.w / 2 - textureWidth / 2;
-  sprites.dest[index].y = zone.y + zone.h / 2 - textureHeight / 2;
-  sprites.dest[index].w = textureWidth;
-  sprites.dest[index].h = textureHeight;
-
-  return id;
+  src.x = 0;
+  src.y = 0;
+  src.w = w;
+  src.h = h;
+  dest.x = zone.x + zone.w / 2 - w / 2;
+  dest.y = zone.y + zone.h / 2 - h / 2;
+  dest.w = w;
+  dest.h = h;
+  return graphic_createTilesetSprite(texture, src, dest);
 }
 
 void 
@@ -350,48 +410,31 @@ graphic_setText(
     Index index;
     GET_INDEX_FROM_ID(sprites, id, index);
 
-    Index  texture_index = sprites.texture_index[index];
-    SDL_DestroyTexture(textures.textures[texture_index]); 
-    SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
-    if (!surface) {
-        return;
-    }
-
-    SDL_Texture* text_texture = SDL_CreateTextureFromSurface(renderer, surface); 
+    SDL_DestroyTexture(sprites.sprite[index].texture); 
 
     SDL_Rect src;
     src.x = 0;
     src.y = 0;
-    src.w = surface->w;
-    src.h = surface->h;
-    SDL_FreeSurface(surface);
-
-    if (!text_texture) {
-        return;
-    }
-
-    textures.textures[texture_index] = text_texture;
-    textures.w[texture_index] = src.w;
-    textures.h[texture_index] = src.h;
-
-    sprites.src[index] = src;
-    sprites.dest[index].x = x;
-    sprites.dest[index].y = y;
-    sprites.dest[index].w = src.w;
-    sprites.dest[index].h = src.h;
+    sprites.sprite[index].texture = createTextTexture(text, 
+                                                      color, 
+                                                      (unsigned int*) &src.w,
+                                                      (unsigned int*) &src.h);
+    sprites.sprite[index].src = src;
+    sprites.sprite[index].dest.x = x;
+    sprites.sprite[index].dest.y = y;
+    sprites.sprite[index].dest.w = src.w;
+    sprites.sprite[index].dest.h = src.h;
 }
 
 void 
 graphic_deleteText(Id id)
 {
-  Index index, last;
-  DELETE_DOD_ELEMENT_BY_ID(sprites, id, index, last);
-  
-  deleteTextureByIndex(sprites.texture_index[index]);
+  Index index;
+  GET_INDEX_FROM_ID(sprites, id, index);
 
-  sprites.texture_index[index] = sprites.texture_index[last];
-  sprites.dest[index] = sprites.dest[last];
-  sprites.src[index] = sprites.src[last];
+  SDL_DestroyTexture(sprites.sprite[index].texture);
+
+  graphic_deleteSprite(id);
 }
 
 void
@@ -408,7 +451,7 @@ graphic_set_src_rect(
 {
     Index index;
     GET_INDEX_FROM_ID(sprites, id, index);
-    sprites.src[index] = src;
+    sprites.sprite[index].src = src;
 }
 
 void 
@@ -420,7 +463,7 @@ graphic_centerSpriteOnScreen(Id id)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->x = w / 2 - dest->w / 2;
     dest->y = h / 2 - dest->h / 2;
 }
@@ -434,7 +477,7 @@ graphic_centerSpriteOnScreenWidth(Id id)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->x = w / 2 - dest->w / 2;
 }
 
@@ -447,7 +490,7 @@ graphic_centerSpriteOnScreenHeight(Id id)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->y = h / 2 - dest->h / 2;
 }
 
@@ -460,7 +503,7 @@ graphic_centerSpriteOnScreenWithOffset(Id id, int x, int y)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->x = w / 2 - dest->w / 2 + x;
     dest->y = h / 2 - dest->h / 2 + y;
 }
@@ -474,7 +517,7 @@ graphic_centerSpriteOnScreenWidthWithOffset(Id id, int x)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->x = w / 2 - dest->w / 2 + x;
 }
 
@@ -487,7 +530,7 @@ graphic_centerSpriteOnScreenHeightWithOffse(Id id, int y)
     int w, h;
     graphic_queryWindowSize(&w, &h);
 
-    SDL_Rect* dest = &sprites.dest[index];
+    SDL_Rect* dest = &sprites.sprite[index].dest;
     dest->y = h / 2 - dest->h / 2 + y;
 }
 
@@ -499,14 +542,22 @@ graphic_setBackgroundTexture(Id textureId)
     backgroundTextureIndex = index;
     backgroundSrc.x = 0;
     backgroundSrc.y = 0;
-    backgroundSrc.w = textures.w[index];
-    backgroundSrc.h = textures.h[index];
+    SDL_QueryTexture(textures.textures[index], 
+                     NULL, 
+                     NULL, 
+                     &backgroundSrc.w,
+                     &backgroundSrc.h);
 }
 
 void graphic_resizeBackgroundToScreen()
 {
-    int backgroundTextureWidth = textures.w[backgroundTextureIndex];
-    int backgroundTextureHeight = textures.h[backgroundTextureIndex];
+    int backgroundTextureWidth;
+    int backgroundTextureHeight;
+    SDL_QueryTexture(textures.textures[backgroundTextureIndex], 
+                     NULL, 
+                     NULL, 
+                     &backgroundTextureWidth,
+                     &backgroundTextureHeight);
     double ratio = (double) backgroundTextureWidth / backgroundTextureHeight;
     int windowWidth, windowHeight;
     graphic_queryWindowSize(&windowWidth, &windowHeight);
@@ -550,8 +601,6 @@ graphic_createSolidTexture(Uint32 color)
   Index textureIndex;
   GET_NEXT_ID(textures, textureId, textureIndex, MAX_TEXTURES);
   textures.textures[textureIndex] = texture;
-  textures.w[textureIndex] = 1;
-  textures.h[textureIndex] = 1;
 
   return textureId;
 }
@@ -567,33 +616,6 @@ graphic_querySpriteDest(Id id, SDL_Rect *rect)
 {
   unsigned int index;
   GET_INDEX_FROM_ID(sprites, id, index);
-  *rect = sprites.dest[index];
+  *rect = sprites.sprite[index].dest;
 }
 
-void
-graphic_deleteTexture(Id id)
-{
-  unsigned int index;
-  GET_INDEX_FROM_ID(textures, id, index);
-  deleteTextureByIndex(index);
-}
-
-void
-deleteTextureByIndex(Index index)
-{
-  Id id;
-  Index last;
-  DELETE_DOD_ELEMENT_BY_INDEX(textures, id, index, last);
-
-  textures.textures[index] = textures.textures[last];
-  textures.w[index] = textures.w[last];
-  textures.h[index] = textures.h[last];
-
-  for (Index i = sprites.total; --i;)
-  {
-    if(sprites.texture_index[i] == last) {
-      sprites.texture_index[i] = index;
-      break;
-    }
-  }
-}

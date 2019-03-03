@@ -89,13 +89,14 @@ void setBorderAroundRect(SDL_Rect rect,
                          Id *rightBorder,
                          Id *topBorder);
 
+void clear();
+
 int
 main() 
 {
   bool running = true;
 
-  if (!graphic_init("Lemonade 5000", 1200, 400, 24)) 
-  {
+  if (!graphic_init("Lemonade 5000", 1280, 720, 24)) {
     return(EXIT_FAILURE);
   };
 
@@ -109,8 +110,7 @@ main()
   createMainMenu();
 
   Uint32 current = 0, previous = 0, lag = 0;
-  while (running) 
-  {
+  while (running) {
 
     current = SDL_GetTicks();
     Uint32 elapsed = current - previous;
@@ -119,8 +119,7 @@ main()
     lag += elapsed;
 
     int runs = 0;
-    while (lag >= MS_PER_UPDATE && runs < 5 && running) 
-    {
+    while (lag >= MS_PER_UPDATE && runs < 5 && running) {
       input_poll_inputs();
       running = !input_is_quit_pressed() &&
                 handleMainMenuEvents();
@@ -165,6 +164,7 @@ handleMainMenuEvents()
     SDL_Rect okButtonRect, backButtonRect;
     graphic_querySpriteDest(levelSelector.okButton, &okButtonRect);
     graphic_querySpriteDest(levelSelector.backButton, &backButtonRect);
+
     if (input_is_key_released(SDLK_ESCAPE)) {
       closeLevelSelector();
     } else if(input_isZoneClicked(okButtonRect, LeftMouseButton)) {
@@ -182,12 +182,12 @@ handleMainMenuEvents()
           graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
         }
 
-      levelSelector.hoveredButton.id = levelSelector.okButton;
-      setBorderAroundRect(okButtonRect, 
-                          &levelSelector.hoveredButton.leftBorder,
-                          &levelSelector.hoveredButton.bottomBorder,
-                          &levelSelector.hoveredButton.rightBorder,
-                          &levelSelector.hoveredButton.topBorder);
+        levelSelector.hoveredButton.id = levelSelector.okButton;
+        setBorderAroundRect(okButtonRect, 
+                            &levelSelector.hoveredButton.leftBorder,
+                            &levelSelector.hoveredButton.bottomBorder,
+                            &levelSelector.hoveredButton.rightBorder,
+                            &levelSelector.hoveredButton.topBorder);
       }
     } else if (input_isMouseOverZone(backButtonRect)) {
       if (levelSelector.hoveredButton.id != levelSelector.backButton) {
@@ -442,11 +442,12 @@ setBorderAroundSelectedButton()
                       &levelSelector.selectedLevelButton.topBorder);
 }
 
-void setBorderAroundRect(SDL_Rect rect, 
-                         Id *leftBorder,
-                         Id *bottomBorder,
-                         Id *rightBorder,
-                         Id *topBorder)
+void
+setBorderAroundRect(SDL_Rect rect, 
+                    Id *leftBorder,
+                    Id *bottomBorder,
+                    Id *rightBorder,
+                    Id *topBorder)
 {
   SDL_Rect leftBorderDest;
   leftBorderDest.x = rect.x;
@@ -479,4 +480,9 @@ void setBorderAroundRect(SDL_Rect rect,
   topBarDest.h = 2;
   *topBorder = 
     graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
+}
+
+void
+clear()
+{
 }

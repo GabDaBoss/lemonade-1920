@@ -17,9 +17,6 @@ typedef enum TextureIds {
     TotalTextureIds
 } TextureIds;
 
-typedef struct {
-} Sprite;
-
 bool graphic_init(const char * const title, int w, int h, int font_size);
 void graphic_quit();
 
@@ -77,6 +74,7 @@ Id graphic_createSolidTexture(Uint32 color);
 void graphic_queryBackgroundDest(SDL_Rect *rect);
 void graphic_querySpriteDest(Id id, SDL_Rect *rect);
 void graphic_deleteTexture(Id id);
+Id graphic_createTextTexture(const char * const text, SDL_Color color);
 
 #endif /* RENDERER_H */
 
