@@ -88,7 +88,7 @@ do \
 { \
   if( !HAS_ID( strct, id ) ) \
   { \
-    fprintf( stderr, "Trying to access invalid id: %d for: %s\n", id , #strct ); \
+    fprintf( stderr, "Trying to access invalid id: %d for: %s at: %s, %d\n", id , #strct, __FILE__, __LINE__ ); \
     exit( EXIT_FAILURE ); \
   } \
 } \

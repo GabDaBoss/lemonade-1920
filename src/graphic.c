@@ -219,51 +219,32 @@ void
 graphic_deleteSprite(Id id) 
 {
     Index index, last;
+
     GET_INDEX_FROM_ID(sprites, id, index);
-    last = --sprites.total;
-    id = sprites.ids[index];
+
     sprites.indexes[id] = sprites.next_free_index;
     sprites.next_free_index = id;
-    if (sprites.ids[index] != sprites.ids[last]) {
-        sprites.ids[index] = sprites.ids[last];
-        sprites.indexes[sprites.ids[index]] = index;
-    }
 
+    if (index < sprites.visibleSpriteTotal) {
+        last = --sprites.visibleSpriteTotal;
+        if (id != sprites.ids[last]) {
+            sprites.ids[index] = sprites.ids[last];
+            sprites.indexes[sprites.ids[last]] = index;
+        }
+        sprites.sprite[index] = sprites.sprite[last];
+        sprites.state[index] = sprites.state[last];
+        index = last;
+        id = sprites.ids[last];
+    } 
+
+
+    last = --sprites.total;
+    if (id != sprites.ids[last]) {
+        sprites.ids[index] = sprites.ids[last];
+        sprites.indexes[sprites.ids[last]] = index;
+    }
     sprites.sprite[index] = sprites.sprite[last];
     sprites.state[index] = sprites.state[last];
-    sprites.visibleSpriteTotal = sprites.total;
-
-    /*
-    GET_INDEX_FROM_ID(sprites, id, index);
-    if (index < sprites.visibleSpriteTotal - 1) {
-        if (index < sprites.total - 1) {
-            last = sprites.visibleSpriteTotal - 1;
-            sprites.sprite[index] = sprites.sprite[last];
-            sprites.ids[index] = sprites.ids[last];
-            sprites.indexes[sprites.ids[last]] = index;
-
-            if (sprites.total - sprites.visibleSpriteTotal > 1) {
-                sprites.sprite[last] = sprites.sprite[sprites.total - 1];
-                sprites.state[last] = SPRITE_INVISIBLE;
-                sprites.ids[last] = sprites.ids[sprites.total - 1];
-                sprites.indexes[sprites.ids[sprites.total - 1]] = last;
-            }
-        }
-        sprites.visibleSpriteTotal--;
-    } else {
-        if (index < sprites.total - 1) {
-            last = sprites.total - 1;
-            sprites.sprite[index] = sprites.sprite[last];
-            sprites.state[index] = sprites.state[last];
-            sprites.ids[index] = sprites.ids[last];
-            sprites.indexes[sprites.ids[last]] = index;
-        }
-    }
-    sprites.total--;
-
-    sprites.indexes[id] = sprites.next_free_index;
-    sprites.next_free_index = id;
-    */
 }
 
 void 
