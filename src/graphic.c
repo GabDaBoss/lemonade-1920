@@ -4,11 +4,6 @@
 
 #define MAX_TEXTURES 1024
 
-typedef enum {
-  SPRITE_VISIBLE = 0,
-  SPRITE_INVISIBLE = 1 << 0,
-} SpriteState;
-
 static SDL_Window* window;
 static SDL_Renderer* renderer;
 static TTF_Font* font;
@@ -25,10 +20,8 @@ typedef struct {
 } Sprite;
 
 static struct {
-  SpriteState state[MAX_SPRITES];
   Sprite sprite[MAX_SPRITES];
   unsigned int visibleSpriteTotal;
-  unsigned int invisibleSpriteTotal;
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } sprites;
 
@@ -36,11 +29,10 @@ static Id backgroundTextureIndex;
 static SDL_Rect backgroundSrc;
 static SDL_Rect backgroundDest;
 
-void deleteTextureByIndex(Index index);
-Id createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest);
-
-SDL_Texture*
-createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h);
+static void deleteTextureByIndex(Index index);
+static Id createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest);
+static SDL_Texture* createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h);
+static void queryTextureSize(SDL_Texture* texture, int* w, int* h);
 
 bool graphic_init(const char * const title, int w, int h, int font_size)
 {
@@ -159,13 +151,11 @@ createTilesetSprite(
       sprites.sprite[index] = sprites.sprite[sprites.visibleSpriteTotal];
       sprites.indexes[sprites.ids[sprites.visibleSpriteTotal]] = index;
       sprites.ids[sprites.visibleSpriteTotal] = id;
-      sprites.state[index] = SPRITE_INVISIBLE;
     }
 
     sprites.sprite[sprites.visibleSpriteTotal].src = src;
     sprites.sprite[sprites.visibleSpriteTotal].dest = dest;
     sprites.sprite[sprites.visibleSpriteTotal].texture = texture;
-    sprites.state[sprites.visibleSpriteTotal] = SPRITE_VISIBLE;
     sprites.visibleSpriteTotal++;
 
     return id;
@@ -191,7 +181,7 @@ graphic_createFullTextureSprite(
     SDL_Rect src;
     src.x = 0;
     src.y = 0;
-    graphic_queryTextureSize(texture_id, &src.w, &src.h);
+    queryTextureSize(texture_id, &src.w, &src.h);
 
     return graphic_createTilesetSprite(texture_id, src, dest);
 }
@@ -232,7 +222,6 @@ graphic_deleteSprite(Id id)
             sprites.indexes[sprites.ids[last]] = index;
         }
         sprites.sprite[index] = sprites.sprite[last];
-        sprites.state[index] = sprites.state[last];
         index = last;
         id = sprites.ids[last];
     } 
@@ -244,7 +233,12 @@ graphic_deleteSprite(Id id)
         sprites.indexes[sprites.ids[last]] = index;
     }
     sprites.sprite[index] = sprites.sprite[last];
-    sprites.state[index] = sprites.state[last];
+}
+
+void 
+queryTextureSize(SDL_Texture* texture, int* w, int* h)
+{
+    SDL_QueryTexture(texture, NULL, NULL, w, h);
 }
 
 void 
@@ -378,6 +372,12 @@ Id graphic_createTextCentered(const char * const text,
   dest.w = w;
   dest.h = h;
   return graphic_createTilesetSprite(texture, src, dest);
+}
+
+Id graphic_createInvisbleText(char * const text, SDL_Color color)
+{
+  Id texture = graphic_createTextTexture(text, color);
+  return graphic_createInvisibleSprite(texture);
 }
 
 void 
@@ -598,5 +598,121 @@ graphic_querySpriteDest(Id id, SDL_Rect *rect)
   unsigned int index;
   GET_INDEX_FROM_ID(sprites, id, index);
   *rect = sprites.sprite[index].dest;
+}
+
+void 
+graphic_setSpriteToInvisible(Id id)
+{
+    Index index, last;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    if (index >= sprites.visibleSpriteTotal) {
+        return;
+    }
+
+    last = --sprites.visibleSpriteTotal;
+    if (id != sprites.ids[last]) {
+        // Swap ids and indexes
+        sprites.ids[index] = sprites.ids[last];
+        sprites.indexes[sprites.ids[last]] = index;
+        sprites.ids[last] = id;
+        sprites.indexes[id] = last;
+    }
+    Sprite tmp = sprites.sprite[last];
+    sprites.sprite[last] = sprites.sprite[index];
+    sprites.sprite[index] = tmp;
+}
+
+void 
+graphic_setSpriteToVisible(Id id)
+{
+    Index index, last;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    if (index < sprites.visibleSpriteTotal) {
+        return;
+    }
+
+    last = sprites.visibleSpriteTotal++;
+    if (id != sprites.ids[last]) {
+        // Swap ids and indexes
+        sprites.ids[index] = sprites.ids[last];
+        sprites.indexes[sprites.ids[last]] = index;
+        sprites.ids[last] = id;
+        sprites.indexes[id] = last;
+    }
+    Sprite tmp = sprites.sprite[last];
+    sprites.sprite[last] = sprites.sprite[index];
+    sprites.sprite[index] = tmp;
+}
+
+void
+graphic_setSpriteDest(Id id, SDL_Rect dest)
+{
+    Index index;
+    GET_INDEX_FROM_ID(sprites, id, index);
+
+    sprites.sprite[index].dest = dest;
+}
+
+void
+graphic_centerSpriteInRect(Id id, SDL_Rect rect)
+{
+    Index index;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    int w, h;
+    queryTextureSize(sprites.sprite[index].texture, &w, &h);
+    SDL_Rect dest;
+
+    dest.x = rect.x + rect.w / 2 - w / 2;
+    dest.y = rect.y + rect.h / 2 - h / 2;
+    dest.w = w;
+    dest.h = h;
+
+    sprites.sprite[index].dest = dest;
+}
+
+void
+graphic_centerSpriteInRectButKeepRatio(Id id, SDL_Rect rect)
+{
+    Index index;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    int w, h;
+    queryTextureSize(sprites.sprite[index].texture, &w, &h);
+    SDL_Rect dest;
+
+    dest.x = rect.x + rect.w / 2 - w / 2;
+    dest.y = rect.y + rect.h / 2 - h / 2;
+    dest.w = w;
+    dest.h = h;
+
+    SDL_Rect src;
+    src.x = (w - h) / 2;
+    src.y = 0;
+    src.w = src.h;
+    sprites.sprite[index].src = src;
+    sprites.sprite[index].dest = dest;
+}
+
+Id
+graphic_createInvisibleSprite(Id textureId)
+{
+    Index index;
+    Id id;
+    GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
+    
+    Index textureIndex;
+    GET_INDEX_FROM_ID(textures, textureId, textureIndex);
+
+    sprites.sprite[index].src.x = 0;
+    sprites.sprite[index].src.y = 0;
+    sprites.sprite[index].texture = textures.textures[textureIndex];
+    queryTextureSize(textures.textures[textureIndex], &sprites.sprite[index].src.w, &sprites.sprite[index].src.h);
+
+    sprites.sprite[index].dest.x = 0;
+    sprites.sprite[index].dest.y = 0;
+    sprites.sprite[index].dest.w = 0;
+    sprites.sprite[index].dest.h = 0;
+
+
+    return id;
 }
 

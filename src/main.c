@@ -81,13 +81,9 @@ void createMainMenu();
 void centerMainMenu();
 bool handleMainMenuEvents();
 void openLevelSelector();
+void createLevelSelector();
 void closeLevelSelector();
-void setBorderAroundSelectedButton();
-void setBorderAroundRect(SDL_Rect rect, 
-                         Id *leftBorder,
-                         Id *bottomBorder,
-                         Id *rightBorder,
-                         Id *topBorder);
+void setBorderAroundHoveredButton();
 
 void clear();
 
@@ -146,6 +142,7 @@ createMainMenu()
   newButton = graphic_createText(">New", 0, 0, textColor);
   loadButton = graphic_createText("Load", 0, 0, textColor);
   quitButton = graphic_createText("Quit", 0, 0, textColor);
+  createLevelSelector();
 }
 
 void 
@@ -162,8 +159,10 @@ handleMainMenuEvents()
 {
   if (levelSelector.opened) {
     SDL_Rect okButtonRect, backButtonRect;
+    printf("bug?\n");
     graphic_querySpriteDest(levelSelector.okButton, &okButtonRect);
     graphic_querySpriteDest(levelSelector.backButton, &backButtonRect);
+    printf("no-bug\n");
 
     if (input_is_key_released(SDLK_ESCAPE)) {
       closeLevelSelector();
@@ -175,42 +174,20 @@ handleMainMenuEvents()
 
     if (input_isMouseOverZone(okButtonRect)) {
       if (levelSelector.hoveredButton.id != levelSelector.okButton) {
-        if(levelSelector.hoveredButton.id != VOID_ID) {
-          graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
-        }
-
         levelSelector.hoveredButton.id = levelSelector.okButton;
-        setBorderAroundRect(okButtonRect, 
-                            &levelSelector.hoveredButton.leftBorder,
-                            &levelSelector.hoveredButton.bottomBorder,
-                            &levelSelector.hoveredButton.rightBorder,
-                            &levelSelector.hoveredButton.topBorder);
+        setBorderAroundHoveredButton();
       }
     } else if (input_isMouseOverZone(backButtonRect)) {
       if (levelSelector.hoveredButton.id != levelSelector.backButton) {
-        if(levelSelector.hoveredButton.id != VOID_ID) {
-          graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
-          graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
-        }
-
         levelSelector.hoveredButton.id = levelSelector.backButton;
-        setBorderAroundRect(backButtonRect, 
-                            &levelSelector.hoveredButton.leftBorder,
-                            &levelSelector.hoveredButton.bottomBorder,
-                            &levelSelector.hoveredButton.rightBorder,
-                            &levelSelector.hoveredButton.topBorder);
+        setBorderAroundHoveredButton();
       }
     } else if (levelSelector.hoveredButton.id != VOID_ID) {
       levelSelector.hoveredButton.id = VOID_ID;
-      graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
-      graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
-      graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
-      graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
+      graphic_setSpriteToInvisible(levelSelector.hoveredButton.leftBorder);
+      graphic_setSpriteToInvisible(levelSelector.hoveredButton.bottomBorder);
+      graphic_setSpriteToInvisible(levelSelector.hoveredButton.rightBorder);
+      graphic_setSpriteToInvisible(levelSelector.hoveredButton.topBorder);
     }
 
   } else {
@@ -287,11 +264,35 @@ handleMainMenuEvents()
   return true;
 }
 
+
+void
+createLevelSelector()
+{
+    SDL_Rect backgroundDest;
+    graphic_queryBackgroundDest(&backgroundDest);
+
+    levelSelector.background = graphic_createInvisibleSprite(lightScreenSolidTextureId); 
+    levelSelector.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId); 
+    levelSelector.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.topBar = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.topText = graphic_createInvisbleText("Select Level", greenTextColor);
+    levelSelector.firstLevelButton = graphic_createInvisibleSprite(backgroundTextureId);
+    levelSelector.selectedLevelButton.id = levelSelector.firstLevelButton;
+    levelSelector.selectedLevelButton.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.selectedLevelButton.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.selectedLevelButton.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.selectedLevelButton.topBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.okButton = graphic_createInvisibleSprite(okButtonTextureId);
+    levelSelector.backButton = graphic_createInvisibleSprite(backButtonTextureId);
+
+}
+
 void
 openLevelSelector()
 {
-  levelSelector.opened = true;
-  if (levelSelector.background == VOID_ID) {
+    levelSelector.opened = true;
+
     SDL_Rect backgroundDest;
     graphic_queryBackgroundDest(&backgroundDest);
 
@@ -299,88 +300,99 @@ openLevelSelector()
     backgroundDest.y += backgroundDest.h * 0.1;
     backgroundDest.w = backgroundDest.w * 0.8;
     backgroundDest.h = backgroundDest.h * 0.8;
-    levelSelector.background = 
-      graphic_createFullTextureSprite(lightScreenSolidTextureId, 
-                                      backgroundDest); 
-
+    graphic_setSpriteDest(levelSelector.background, backgroundDest);
+    
     SDL_Rect leftBorderDest;
     leftBorderDest.x = backgroundDest.x;
     leftBorderDest.y = backgroundDest.y;
     leftBorderDest.w = 2;
     leftBorderDest.h = backgroundDest.h;
-    levelSelector.leftBorder = 
-      graphic_createFullTextureSprite(greenSolidTextureId, leftBorderDest);
+    graphic_setSpriteDest(levelSelector.leftBorder, leftBorderDest);
 
     SDL_Rect bottomBorderDest;
     bottomBorderDest.x = backgroundDest.x;
     bottomBorderDest.y = backgroundDest.y + backgroundDest.h - 2;
     bottomBorderDest.w = backgroundDest.w;
     bottomBorderDest.h = 2;
-    levelSelector.bottomBorder = 
-      graphic_createFullTextureSprite(greenSolidTextureId, bottomBorderDest);
+    graphic_setSpriteDest(levelSelector.bottomBorder, bottomBorderDest);
 
     SDL_Rect rightBorderDest;
     rightBorderDest.x = backgroundDest.x + backgroundDest.w - 2;
     rightBorderDest.y = backgroundDest.y;
     rightBorderDest.w = 2;
     rightBorderDest.h = backgroundDest.h;
-    levelSelector.rightBorder = 
-      graphic_createFullTextureSprite(greenSolidTextureId, rightBorderDest);
+    graphic_setSpriteDest(levelSelector.rightBorder, rightBorderDest);
 
     SDL_Rect topBarDest;
     topBarDest.x = backgroundDest.x;
     topBarDest.y = backgroundDest.y;
     topBarDest.w = backgroundDest.w;
     topBarDest.h = 10;
-    levelSelector.topBar = 
-      graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
+    graphic_setSpriteDest(levelSelector.topBar, topBarDest);
 
     SDL_Rect topTextZone;
     topTextZone.x = backgroundDest.x;
     topTextZone.y = backgroundDest.y + 20;
     topTextZone.w = backgroundDest.w;
     topTextZone.h = 40;
-    levelSelector.topText =
-      graphic_createTextCentered("Select Level", topTextZone, greenTextColor);
+    graphic_centerSpriteInRect(levelSelector.topText, topTextZone);
 
     SDL_Rect firstLevelButtonDest;
     firstLevelButtonDest.x = backgroundDest.x + backgroundDest.w * 0.05;
     firstLevelButtonDest.y = backgroundDest.y + 60;
     firstLevelButtonDest.w = backgroundDest.w * 0.2;
     firstLevelButtonDest.h = backgroundDest.w * 0.2;
+    graphic_centerSpriteInRectButKeepRatio(levelSelector.firstLevelButton, firstLevelButtonDest);
 
-    SDL_Rect firstLevelButtonSrc;
-    graphic_queryTextureSize(backgroundTextureId, 
-                             &firstLevelButtonSrc.w, 
-                             &firstLevelButtonSrc.h);
+    leftBorderDest.x = firstLevelButtonDest.x;
+    leftBorderDest.y = firstLevelButtonDest.y;
+    leftBorderDest.w = 2;
+    leftBorderDest.h = firstLevelButtonDest.h;
+    bottomBorderDest.x = firstLevelButtonDest.x;
+    bottomBorderDest.y = firstLevelButtonDest.y + firstLevelButtonDest.h - 2;
+    bottomBorderDest.w = firstLevelButtonDest.w;
+    bottomBorderDest.h = 2;
+    rightBorderDest.x = firstLevelButtonDest.x + firstLevelButtonDest.w - 2;
+    rightBorderDest.y = firstLevelButtonDest.y;
+    rightBorderDest.w = 2;
+    rightBorderDest.h = firstLevelButtonDest.h;
+    topBarDest.x = firstLevelButtonDest.x;
+    topBarDest.y = firstLevelButtonDest.y;
+    topBarDest.w = firstLevelButtonDest.w;
+    topBarDest.h = 2;
 
-    firstLevelButtonSrc.x = (firstLevelButtonSrc.w - firstLevelButtonSrc.h) /2;
-    firstLevelButtonSrc.y = 0;
-    firstLevelButtonSrc.w = firstLevelButtonSrc.h;
-    levelSelector.firstLevelButton = 
-      graphic_createTilesetSprite(backgroundTextureId,
-                                  firstLevelButtonSrc, 
-                                  firstLevelButtonDest);
-
-    levelSelector.selectedLevelButton.id = levelSelector.firstLevelButton;
-    setBorderAroundSelectedButton();
+    graphic_setSpriteDest(levelSelector.selectedLevelButton.leftBorder, leftBorderDest);
+    graphic_setSpriteDest(levelSelector.selectedLevelButton.bottomBorder, bottomBorderDest);
+    graphic_setSpriteDest(levelSelector.selectedLevelButton.rightBorder, rightBorderDest);
+    graphic_setSpriteDest(levelSelector.selectedLevelButton.topBorder, topBarDest);
 
     SDL_Rect okButton;
     okButton.x = backgroundDest.x + backgroundDest.w - 80;
     okButton.y = backgroundDest.y + backgroundDest.h - 30;
     okButton.w = 40;
     okButton.h = 25;
-    levelSelector.okButton =
-      graphic_createFullTextureSprite(okButtonTextureId, okButton);
+    graphic_setSpriteDest(levelSelector.okButton, okButton);
 
     SDL_Rect backButton;
     backButton.x = backgroundDest.x + backgroundDest.w - 45;
     backButton.y = backgroundDest.y + backgroundDest.h - 30;
     backButton.w = 40;
     backButton.h = 25;
-    levelSelector.backButton =
-      graphic_createFullTextureSprite(backButtonTextureId, backButton);
-  }
+    graphic_setSpriteDest(levelSelector.backButton, backButton);
+
+    graphic_setSpriteToVisible(levelSelector.background);
+    graphic_setSpriteToVisible(levelSelector.leftBorder);
+    graphic_setSpriteToVisible(levelSelector.bottomBorder);
+    graphic_setSpriteToVisible(levelSelector.rightBorder);
+    graphic_setSpriteToVisible(levelSelector.topBar);
+    graphic_setSpriteToVisible(levelSelector.topText);
+    graphic_setSpriteToVisible(levelSelector.firstLevelButton);
+    graphic_setSpriteToVisible(levelSelector.okButton);
+    graphic_setSpriteToVisible(levelSelector.backButton);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.leftBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.bottomBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.rightBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.topBorder);
 }
 
 
@@ -388,6 +400,24 @@ void
 closeLevelSelector()
 {
   levelSelector.opened = false;
+  graphic_setSpriteToInvisible(levelSelector.background);
+  graphic_setSpriteToInvisible(levelSelector.leftBorder);
+  graphic_setSpriteToInvisible(levelSelector.bottomBorder);
+  graphic_setSpriteToInvisible(levelSelector.rightBorder);
+  graphic_setSpriteToInvisible(levelSelector.topBar);
+  graphic_setSpriteToInvisible(levelSelector.topText);
+  graphic_setSpriteToInvisible(levelSelector.firstLevelButton);
+  graphic_setSpriteToInvisible(levelSelector.okButton);
+  graphic_setSpriteToInvisible(levelSelector.backButton);
+  graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.leftBorder);
+  graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.bottomBorder);
+  graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.rightBorder);
+  graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.topBorder);
+}
+
+void
+clear()
+{
   graphic_deleteSprite(levelSelector.background);
   graphic_deleteSprite(levelSelector.leftBorder);
   graphic_deleteSprite(levelSelector.bottomBorder);
@@ -429,60 +459,51 @@ closeLevelSelector()
   levelSelector.hoveredButton.topBorder = VOID_ID;
 }
 
-void
-setBorderAroundSelectedButton()
-{
-  SDL_Rect selectedButtonDest;
-  graphic_querySpriteDest(levelSelector.firstLevelButton, &selectedButtonDest);
-
-  setBorderAroundRect(selectedButtonDest, 
-                      &levelSelector.selectedLevelButton.leftBorder,
-                      &levelSelector.selectedLevelButton.bottomBorder,
-                      &levelSelector.selectedLevelButton.rightBorder,
-                      &levelSelector.selectedLevelButton.topBorder);
-}
 
 void
-setBorderAroundRect(SDL_Rect rect, 
-                    Id *leftBorder,
-                    Id *bottomBorder,
-                    Id *rightBorder,
-                    Id *topBorder)
+setBorderAroundHoveredButton()
 {
-  SDL_Rect leftBorderDest;
-  leftBorderDest.x = rect.x;
-  leftBorderDest.y = rect.y;
-  leftBorderDest.w = 2;
-  leftBorderDest.h = rect.h;
-  *leftBorder = 
+    SDL_Rect rect;
+    if (levelSelector.hoveredButton.id == levelSelector.okButton) {
+        printf("bug?\n");
+        graphic_querySpriteDest(levelSelector.okButton, &rect);
+        printf("no-bug\n");
+    } else {
+        printf("bug?\n");
+        graphic_querySpriteDest(levelSelector.backButton, &rect);
+        printf("no-bug\n");
+    }
+    SDL_Rect leftBorderDest;
+    leftBorderDest.x = rect.x;
+    leftBorderDest.y = rect.y;
+    leftBorderDest.w = 2;
+    leftBorderDest.h = rect.h;
     graphic_createFullTextureSprite(greenSolidTextureId, leftBorderDest);
 
-  SDL_Rect bottomBorderDest;
-  bottomBorderDest.x = rect.x;
-  bottomBorderDest.y = rect.y + rect.h - 2;
-  bottomBorderDest.w = rect.w;
-  bottomBorderDest.h = 2;
-  *bottomBorder = 
-    graphic_createFullTextureSprite(greenSolidTextureId, bottomBorderDest);
+    SDL_Rect bottomBorderDest;
+    bottomBorderDest.x = rect.x;
+    bottomBorderDest.y = rect.y + rect.h - 2;
+    bottomBorderDest.w = rect.w;
+    bottomBorderDest.h = 2;
 
-  SDL_Rect rightBorderDest;
-  rightBorderDest.x = rect.x + rect.w - 2;
-  rightBorderDest.y = rect.y;
-  rightBorderDest.w = 2;
-  rightBorderDest.h = rect.h;
-  *rightBorder = 
-    graphic_createFullTextureSprite(greenSolidTextureId, rightBorderDest);
+    SDL_Rect rightBorderDest;
+    rightBorderDest.x = rect.x + rect.w - 2;
+    rightBorderDest.y = rect.y;
+    rightBorderDest.w = 2;
+    rightBorderDest.h = rect.h;
+    SDL_Rect topBorderDest;
+    topBorderDest.x = rect.x;
+    topBorderDest.y = rect.y;
+    topBorderDest.w = rect.w;
+    topBorderDest.h = 2;
 
-  SDL_Rect topBarDest;
-  topBarDest.x = rect.x;
-  topBarDest.y = rect.y;
-  topBarDest.w = rect.w;
-  topBarDest.h = 2;
-  *topBorder = 
-    graphic_createFullTextureSprite(greenSolidTextureId, topBarDest);
-}
+    graphic_setSpriteDest(levelSelector.hoveredButton.leftBorder, leftBorderDest);
+    graphic_setSpriteDest(levelSelector.hoveredButton.bottomBorder, bottomBorderDest);
+    graphic_setSpriteDest(levelSelector.hoveredButton.rightBorder, rightBorderDest);
+    graphic_setSpriteDest(levelSelector.hoveredButton.topBorder, topBorderDest);
 
-void
-clear()
-{
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.leftBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.bottomBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.rightBorder);
+    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.topBorder);
 }
