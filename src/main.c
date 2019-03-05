@@ -159,10 +159,8 @@ handleMainMenuEvents()
 {
   if (levelSelector.opened) {
     SDL_Rect okButtonRect, backButtonRect;
-    printf("bug?\n");
     graphic_querySpriteDest(levelSelector.okButton, &okButtonRect);
     graphic_querySpriteDest(levelSelector.backButton, &backButtonRect);
-    printf("no-bug\n");
 
     if (input_is_key_released(SDLK_ESCAPE)) {
       closeLevelSelector();
@@ -286,6 +284,10 @@ createLevelSelector()
     levelSelector.okButton = graphic_createInvisibleSprite(okButtonTextureId);
     levelSelector.backButton = graphic_createInvisibleSprite(backButtonTextureId);
 
+    levelSelector.hoveredButton.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.hoveredButton.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.hoveredButton.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+    levelSelector.hoveredButton.topBorder = graphic_createInvisibleSprite(greenSolidTextureId);
 }
 
 void
@@ -413,6 +415,10 @@ closeLevelSelector()
   graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.bottomBorder);
   graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.rightBorder);
   graphic_setSpriteToInvisible(levelSelector.selectedLevelButton.topBorder);
+  graphic_setSpriteToInvisible(levelSelector.hoveredButton.leftBorder);
+  graphic_setSpriteToInvisible(levelSelector.hoveredButton.bottomBorder);
+  graphic_setSpriteToInvisible(levelSelector.hoveredButton.rightBorder);
+  graphic_setSpriteToInvisible(levelSelector.hoveredButton.topBorder);
 }
 
 void
@@ -431,13 +437,10 @@ clear()
   graphic_deleteText(levelSelector.topText);
   graphic_deleteSprite(levelSelector.okButton);
   graphic_deleteSprite(levelSelector.backButton);
-
-  if (levelSelector.hoveredButton.id != VOID_ID) {
-    graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
-    graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
-    graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
-    graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
-  }
+  graphic_deleteSprite(levelSelector.hoveredButton.leftBorder);
+  graphic_deleteSprite(levelSelector.hoveredButton.bottomBorder);
+  graphic_deleteSprite(levelSelector.hoveredButton.rightBorder);
+  graphic_deleteSprite(levelSelector.hoveredButton.topBorder);
 
   levelSelector.background = VOID_ID;
   levelSelector.leftBorder = VOID_ID;
@@ -465,20 +468,16 @@ setBorderAroundHoveredButton()
 {
     SDL_Rect rect;
     if (levelSelector.hoveredButton.id == levelSelector.okButton) {
-        printf("bug?\n");
         graphic_querySpriteDest(levelSelector.okButton, &rect);
-        printf("no-bug\n");
     } else {
-        printf("bug?\n");
         graphic_querySpriteDest(levelSelector.backButton, &rect);
-        printf("no-bug\n");
     }
+
     SDL_Rect leftBorderDest;
     leftBorderDest.x = rect.x;
     leftBorderDest.y = rect.y;
     leftBorderDest.w = 2;
     leftBorderDest.h = rect.h;
-    graphic_createFullTextureSprite(greenSolidTextureId, leftBorderDest);
 
     SDL_Rect bottomBorderDest;
     bottomBorderDest.x = rect.x;
@@ -502,8 +501,8 @@ setBorderAroundHoveredButton()
     graphic_setSpriteDest(levelSelector.hoveredButton.rightBorder, rightBorderDest);
     graphic_setSpriteDest(levelSelector.hoveredButton.topBorder, topBorderDest);
 
-    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.leftBorder);
-    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.bottomBorder);
-    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.rightBorder);
-    graphic_setSpriteToVisible(levelSelector.selectedLevelButton.topBorder);
+    graphic_setSpriteToVisible(levelSelector.hoveredButton.leftBorder);
+    graphic_setSpriteToVisible(levelSelector.hoveredButton.bottomBorder);
+    graphic_setSpriteToVisible(levelSelector.hoveredButton.rightBorder);
+    graphic_setSpriteToVisible(levelSelector.hoveredButton.topBorder);
 }

@@ -611,7 +611,6 @@ graphic_setSpriteToInvisible(Id id)
 
     last = --sprites.visibleSpriteTotal;
     if (id != sprites.ids[last]) {
-        // Swap ids and indexes
         sprites.ids[index] = sprites.ids[last];
         sprites.indexes[sprites.ids[last]] = index;
         sprites.ids[last] = id;
@@ -633,7 +632,6 @@ graphic_setSpriteToVisible(Id id)
 
     last = sprites.visibleSpriteTotal++;
     if (id != sprites.ids[last]) {
-        // Swap ids and indexes
         sprites.ids[index] = sprites.ids[last];
         sprites.indexes[sprites.ids[last]] = index;
         sprites.ids[last] = id;
@@ -679,15 +677,16 @@ graphic_centerSpriteInRectButKeepRatio(Id id, SDL_Rect rect)
     queryTextureSize(sprites.sprite[index].texture, &w, &h);
     SDL_Rect dest;
 
-    dest.x = rect.x + rect.w / 2 - w / 2;
-    dest.y = rect.y + rect.h / 2 - h / 2;
-    dest.w = w;
-    dest.h = h;
+    dest.x = rect.x;
+    dest.y = rect.y;
+    dest.w = rect.w;
+    dest.h = rect.h;
 
     SDL_Rect src;
     src.x = (w - h) / 2;
     src.y = 0;
-    src.w = src.h;
+    src.w = h;
+    src.h = h;
     sprites.sprite[index].src = src;
     sprites.sprite[index].dest = dest;
 }
@@ -711,7 +710,6 @@ graphic_createInvisibleSprite(Id textureId)
     sprites.sprite[index].dest.y = 0;
     sprites.sprite[index].dest.w = 0;
     sprites.sprite[index].dest.h = 0;
-
 
     return id;
 }
