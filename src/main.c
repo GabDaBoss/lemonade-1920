@@ -86,6 +86,7 @@ void closeLevelSelector();
 void setBorderAroundHoveredButton();
 
 void clear();
+void startGame();
 
 int
 main() 
@@ -164,8 +165,10 @@ handleMainMenuEvents()
 
     if (input_is_key_released(SDLK_ESCAPE)) {
       closeLevelSelector();
-    } else if(input_isZoneClicked(okButtonRect, LeftMouseButton)) {
+    } else if(input_isZoneClicked(okButtonRect, LeftMouseButton) ||
+        input_is_key_released(SDLK_RETURN)) {
       closeLevelSelector();
+      startGame();
     } else if(input_isZoneClicked(backButtonRect, LeftMouseButton)) {
       closeLevelSelector();
     }
@@ -505,4 +508,9 @@ setBorderAroundHoveredButton()
     graphic_setSpriteToVisible(levelSelector.hoveredButton.bottomBorder);
     graphic_setSpriteToVisible(levelSelector.hoveredButton.rightBorder);
     graphic_setSpriteToVisible(levelSelector.hoveredButton.topBorder);
+}
+
+void startGame()
+{
+  clear();
 }
