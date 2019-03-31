@@ -57,15 +57,15 @@ do { \
     strct.indexes[id]++; \
 } while (0)
 
-#define GET_NAME( var ) #var
+#define GET_NAME(var) #var
 
 #define GET_NEXT_ID(strct, id, index, max) \
 do \
 { \
-  if( strct.total == max - 1 ) \
+  if (strct.total == max - 1) \
   { \
-    fprintf( stderr, "%s limit is exceeding the maximum of %d\n", #strct , max ); \
-    exit( EXIT_FAILURE ); \
+    fprintf(stderr, "%s limit is exceeding the maximum of %d\n", #strct , max); \
+    exit(EXIT_FAILURE); \
   } \
   id = strct.next_free_index; \
   strct.next_free_index = strct.indexes[id]; \
@@ -75,24 +75,24 @@ do \
 
 #define INIT_STRUCT_FOR_DOD_FREE_LIST(strct, length) \
 do { \
-    for(unsigned long i = 0ul; i < (unsigned long) length; i++ ) { \
+    for(unsigned long i = 0ul; i < (unsigned long) length; i++) { \
         strct.indexes[i] = i + 1ul; \
     } \
-} while(0)
+} while (0)
 
 #define ARRAY_LENGTH(arr) sizeof(arr) / sizeof(arr[0])
 #define SHIFT_ONE_POSITION(arr, i, limit, type) memcpy(&arr[i + 1], &arr[i], (limit - i - 1) * sizeof(type))
 
-#define EXIT_IF_HAS_NOT_ID( strct, id ) \
+#define EXIT_IF_HAS_NOT_ID(strct, id) \
 do \
 { \
-  if( !HAS_ID( strct, id ) ) \
+  if (!HAS_ID(strct, id)) \
   { \
-    fprintf( stderr, "Trying to access invalid id: %d for: %s at: %s, %d\n", id , #strct, __FILE__, __LINE__ ); \
-    exit( EXIT_FAILURE ); \
+    fprintf(stderr, "Trying to access invalid id: %d for: %s at: %s, %d\n", id , #strct, __FILE__, __LINE__); \
+    exit(EXIT_FAILURE); \
   } \
 } \
-while( 0 )
+while (0)
 
 #define DELETE_DOD_ELEMENT_BY_INDEX(strct, id, index, last) \
 do \
@@ -101,28 +101,28 @@ do \
   id = strct.ids[index]; \
   strct.indexes[id] = strct.next_free_index; \
   strct.next_free_index = id; \
-  if(strct.ids[index] == strct.ids[last]) { \
+  if (strct.ids[index] == strct.ids[last]) { \
     break; \
   } \
   strct.ids[index] = strct.ids[last]; \
   strct.indexes[strct.ids[index]] = index; \
-} while(0)
+} while (0)
 
 #define DELETE_DOD_ELEMENT_BY_ID(strct, id, index, last) \
 do \
 { \
   GET_INDEX_FROM_ID(strct, id, index); \
   DELETE_DOD_ELEMENT_BY_INDEX(strct, id, index, last); \
-} while(0)
+} while (0)
 
 
 #define GET_INDEX_FROM_ID(strct, id, index) \
 do \
 { \
-  EXIT_IF_HAS_NOT_ID( strct, id ); \
+  EXIT_IF_HAS_NOT_ID(strct, id); \
   index = strct.indexes[id]; \
 } \
-while( 0 )
+while (0)
 
 double utils_random();
 

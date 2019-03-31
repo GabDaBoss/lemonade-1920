@@ -21,7 +21,7 @@ typedef struct {
 
 static struct {
   Sprite sprite[MAX_SPRITES];
-  unsigned int visibleSpriteTotal;
+  unsigned int totalVisible;
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } sprites;
 
@@ -104,7 +104,7 @@ graphic_render()
         );
     }
 
-    for (unsigned int i = 0; i < sprites.visibleSpriteTotal; i++) {
+    for (unsigned int i = 0; i < sprites.totalVisible; i++) {
         SDL_RenderCopy(
             renderer,
             sprites.sprite[i].texture,
@@ -147,16 +147,16 @@ createTilesetSprite(
     Id id;
     GET_NEXT_ID(sprites, id, index, MAX_SPRITES);
 
-    if (sprites.visibleSpriteTotal < index) {
-      sprites.sprite[index] = sprites.sprite[sprites.visibleSpriteTotal];
-      sprites.indexes[sprites.ids[sprites.visibleSpriteTotal]] = index;
-      sprites.ids[sprites.visibleSpriteTotal] = id;
+    if (sprites.totalVisible < index) {
+      sprites.sprite[index] = sprites.sprite[sprites.totalVisible];
+      sprites.indexes[sprites.ids[sprites.totalVisible]] = index;
+      sprites.ids[sprites.totalVisible] = id;
     }
 
-    sprites.sprite[sprites.visibleSpriteTotal].src = src;
-    sprites.sprite[sprites.visibleSpriteTotal].dest = dest;
-    sprites.sprite[sprites.visibleSpriteTotal].texture = texture;
-    sprites.visibleSpriteTotal++;
+    sprites.sprite[sprites.totalVisible].src = src;
+    sprites.sprite[sprites.totalVisible].dest = dest;
+    sprites.sprite[sprites.totalVisible].texture = texture;
+    sprites.totalVisible++;
 
     return id;
 }
@@ -215,8 +215,8 @@ graphic_deleteSprite(Id id)
     sprites.indexes[id] = sprites.next_free_index;
     sprites.next_free_index = id;
 
-    if (index < sprites.visibleSpriteTotal) {
-        last = --sprites.visibleSpriteTotal;
+    if (index < sprites.totalVisible) {
+        last = --sprites.totalVisible;
         if (id != sprites.ids[last]) {
             sprites.ids[index] = sprites.ids[last];
             sprites.indexes[sprites.ids[last]] = index;
@@ -255,7 +255,7 @@ graphic_quit()
 {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    for( int i = 0; i < MAX_TEXTURES; i++ ) {
+    for( Index i = 0; i < textures.total; i++ ) {
         if( textures.textures[i] ) {
             SDL_DestroyTexture( textures.textures[i] );
         }
@@ -396,10 +396,12 @@ graphic_setText(
     SDL_Rect src;
     src.x = 0;
     src.y = 0;
-    sprites.sprite[index].texture = createTextTexture(text, 
-                                                      color, 
-                                                      (unsigned int*) &src.w,
-                                                      (unsigned int*) &src.h);
+    sprites.sprite[index].texture = createTextTexture(
+      text, 
+      color, 
+      (unsigned int*) &src.w,
+      (unsigned int*) &src.h
+    );
     sprites.sprite[index].src = src;
     sprites.sprite[index].dest.x = x;
     sprites.sprite[index].dest.y = y;
@@ -422,7 +424,9 @@ void
 graphic_clear()
 {
     INIT_STRUCT_FOR_DOD_FREE_LIST(sprites, MAX_SPRITES);
+    INIT_STRUCT_FOR_DOD_FREE_LIST(textures, MAX_TEXTURES);
     sprites.total = 0;
+    textures.total = 0;
 }
 
 void
@@ -605,11 +609,11 @@ graphic_setSpriteToInvisible(Id id)
 {
     Index index, last;
     GET_INDEX_FROM_ID(sprites, id, index);
-    if (index >= sprites.visibleSpriteTotal) {
+    if (index >= sprites.totalVisible) {
         return;
     }
 
-    last = --sprites.visibleSpriteTotal;
+    last = --sprites.totalVisible;
     if (id != sprites.ids[last]) {
         sprites.ids[index] = sprites.ids[last];
         sprites.indexes[sprites.ids[last]] = index;
@@ -626,11 +630,11 @@ graphic_setSpriteToVisible(Id id)
 {
     Index index, last;
     GET_INDEX_FROM_ID(sprites, id, index);
-    if (index < sprites.visibleSpriteTotal) {
+    if (index < sprites.totalVisible) {
         return;
     }
 
-    last = sprites.visibleSpriteTotal++;
+    last = sprites.totalVisible++;
     if (id != sprites.ids[last]) {
         sprites.ids[index] = sprites.ids[last];
         sprites.indexes[sprites.ids[last]] = index;
@@ -712,5 +716,40 @@ graphic_createInvisibleSprite(Id textureId)
     sprites.sprite[index].dest.h = 0;
 
     return id;
+}
+
+void 
+graphic_deleteTexture(Id id)
+{
+    Index idx, last;
+    DELETE_DOD_ELEMENT_BY_ID(textures, id, idx, last);
+    SDL_Texture* ptr = textures.textures[idx];
+    SDL_DestroyTexture(ptr);
+    
+    for (Index i = 0; i < sprites.total; i++)
+    {
+        if (sprites.sprite[i].texture != ptr)
+        {
+            continue;
+        }
+
+        Index spriteId, spriteLast;
+        DELETE_DOD_ELEMENT_BY_INDEX(sprites, spriteId, i, spriteLast);
+        if (i < sprites.totalVisible - 1)
+        {
+            sprites.totalVisible--;
+            sprites.sprite[i] = sprites.sprite[sprites.totalVisible];
+            sprites.sprite[sprites.totalVisible] = sprites.sprite[spriteLast];
+        } 
+        else 
+        { 
+            if (i == sprites.totalVisible - 1) 
+            {
+                sprites.totalVisible--;
+            }
+            sprites.sprite[i] = sprites.sprite[spriteLast];
+        }
+        i--;
+    }
 }
 
