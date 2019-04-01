@@ -13,11 +13,7 @@ static UpdateFunc update;
 void 
 Scene_GameLoop()
 {
-  Uint32 current = 0, 
-         previous = 0, 
-         updateLag = 0, 
-         drawingLag = 0, 
-         delayLag = 0;
+  Uint32 current = 0, previous = 0, updateLag = 0, drawingLag = 0;
   while (true) 
   {
     current = SDL_GetTicks();
@@ -47,11 +43,7 @@ Scene_GameLoop()
       drawingLag -= MS_PER_FRAME;
     }
 
-    delayLag = SDL_GetTicks() - previous;
-    
-    if (MS_PER_UPDATE - delayLag > 0) {
-      SDL_Delay(MS_PER_UPDATE - delayLag);
-    }
+    SDL_Delay(1);
   }
 }
 

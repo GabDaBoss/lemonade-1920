@@ -425,6 +425,7 @@ graphic_clear()
 {
     INIT_STRUCT_FOR_DOD_FREE_LIST(sprites, MAX_SPRITES);
     INIT_STRUCT_FOR_DOD_FREE_LIST(textures, MAX_TEXTURES);
+    sprites.totalVisible = 0;
     sprites.total = 0;
     textures.total = 0;
 }

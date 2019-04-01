@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "graphic.h"
 #include "input.h"
+#include "game.h"
 
 static Id mainMenuTitle;
 static Id newButton;
@@ -45,32 +46,7 @@ static struct {
     Id rightBorder;
     Id topBorder;
   } hoveredButton;
-} levelSelector = { 
-  false,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  VOID_ID,
-  {
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-  },
-  {
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-    VOID_ID,
-  },
-};
+} levelSelector;
 
 
 void 
@@ -262,7 +238,9 @@ setBorderAroundHoveredButton()
 
 void startGame()
 {
-  //graphic_clear();
+  printf("test!?\n");
+  graphic_clear();
+  Game_Enter();
 }
 
 bool 
@@ -287,6 +265,7 @@ update()
     {
       closeLevelSelector();
       startGame();
+      return true;
     } 
     else if (input_isZoneClicked(backButtonRect, LeftMouseButton)) 
     {
@@ -410,6 +389,9 @@ update()
 void 
 MainMenu_Enter()
 {
+  levelSelector.opened = false; 
+  selectedButton = 0;
+
   lightScreenSolidTextureId = graphic_createSolidTexture(0xEEFFAA);
   greenSolidTextureId = graphic_createSolidTexture(0x225500);
   backgroundTextureId = graphic_loadTexture("background.png");
@@ -446,5 +428,7 @@ MainMenu_Enter()
   levelSelector.hoveredButton.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
   levelSelector.hoveredButton.topBorder = graphic_createInvisibleSprite(greenSolidTextureId);
 
+  printf("set!\n");
   Scene_SetUpdateTo(update);
+  centerMainMenu();
 }

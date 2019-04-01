@@ -30,6 +30,8 @@ input_poll_inputs()
         state.key_released[i] = 0;
     }
 
+    state.quit = false;
+
     state.mouseButtonReleased = 0;
     SDL_GetMouseState(&state.x, &state.y);
 
