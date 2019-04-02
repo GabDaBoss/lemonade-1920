@@ -20,6 +20,7 @@ static Id backButtonTextureId;
 
 static Id lightScreenSolidTextureId = VOID_ID;
 static Id greenSolidTextureId = VOID_ID;
+static Id background = VOID_ID;
 
 static struct {
   bool opened;
@@ -56,6 +57,7 @@ centerMainMenu()
   graphic_centerSpriteOnScreenWithOffset(newButton, 0, -20);
   graphic_centerSpriteOnScreenWithOffset(loadButton, 0, 0);
   graphic_centerSpriteOnScreenWithOffset(quitButton, 0, 20);
+  Graphic_ResizeSpriteToScreen(background);
 }
 
 void
@@ -64,7 +66,7 @@ openLevelSelector()
   levelSelector.opened = true;
 
   SDL_Rect backgroundDest;
-  graphic_queryBackgroundDest(&backgroundDest);
+  graphic_querySpriteDest(background, &backgroundDest);
 
   backgroundDest.x += backgroundDest.w * 0.1;
   backgroundDest.y += backgroundDest.h * 0.1;
@@ -238,7 +240,6 @@ setBorderAroundHoveredButton()
 
 void startGame()
 {
-  printf("test!?\n");
   graphic_clear();
   Game_Enter();
 }
@@ -398,37 +399,67 @@ MainMenu_Enter()
   okButtonTextureId = graphic_loadTexture("ok.png");
   backButtonTextureId = graphic_loadTexture("back.png");
 
-  graphic_setBackgroundTexture(backgroundTextureId);
+  SDL_Rect backgroundDest = {0};
+  background = graphic_createFullTextureSprite(backgroundTextureId, backgroundDest);
+  Graphic_ResizeSpriteToScreen(background);
 
+  graphic_centerSpriteOnScreen(background);
   mainMenuTitle = graphic_createText("Lemonade 5000", 0, 40, textColor);
   newButton = graphic_createText(">New", 0, 0, textColor);
   loadButton = graphic_createText("Load", 0, 0, textColor);
   quitButton = graphic_createText("Quit", 0, 0, textColor);
 
-  SDL_Rect backgroundDest;
-  graphic_queryBackgroundDest(&backgroundDest);
-
-  levelSelector.background = graphic_createInvisibleSprite(lightScreenSolidTextureId); 
-  levelSelector.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId); 
-  levelSelector.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.topBar = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.topText = graphic_createInvisbleText("Select Level", greenTextColor);
-  levelSelector.firstLevelButton = graphic_createInvisibleSprite(backgroundTextureId);
+  levelSelector.background = graphic_createInvisibleSprite(
+    lightScreenSolidTextureId
+  ); 
+  levelSelector.leftBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  ); 
+  levelSelector.bottomBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.rightBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.topBar = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.topText = graphic_createInvisbleText(
+    "Select Level", 
+    greenTextColor
+  );
+  levelSelector.firstLevelButton = graphic_createInvisibleSprite(
+    backgroundTextureId
+  );
   levelSelector.selectedLevelButton.id = levelSelector.firstLevelButton;
-  levelSelector.selectedLevelButton.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.selectedLevelButton.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.selectedLevelButton.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.selectedLevelButton.topBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+  levelSelector.selectedLevelButton.leftBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.selectedLevelButton.bottomBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.selectedLevelButton.rightBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.selectedLevelButton.topBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
   levelSelector.okButton = graphic_createInvisibleSprite(okButtonTextureId);
   levelSelector.backButton = graphic_createInvisibleSprite(backButtonTextureId);
 
-  levelSelector.hoveredButton.leftBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.hoveredButton.bottomBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.hoveredButton.rightBorder = graphic_createInvisibleSprite(greenSolidTextureId);
-  levelSelector.hoveredButton.topBorder = graphic_createInvisibleSprite(greenSolidTextureId);
+  levelSelector.hoveredButton.leftBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.hoveredButton.bottomBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.hoveredButton.rightBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
+  levelSelector.hoveredButton.topBorder = graphic_createInvisibleSprite(
+    greenSolidTextureId
+  );
 
-  printf("set!\n");
   Scene_SetUpdateTo(update);
   centerMainMenu();
 }

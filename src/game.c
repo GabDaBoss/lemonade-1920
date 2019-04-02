@@ -9,11 +9,8 @@ update(void)
 {
   if (input_is_quit_pressed())
   {
-    printf("bye!\n");
-    // return false;
-    // graphic_clear();
+    graphic_clear();
     MainMenu_Enter();
-    // printf("bye!");
   }
 
   return true;

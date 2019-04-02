@@ -25,10 +25,6 @@ static struct {
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } sprites;
 
-static Id backgroundTextureIndex;
-static SDL_Rect backgroundSrc;
-static SDL_Rect backgroundDest;
-
 static void deleteTextureByIndex(Index index);
 static Id createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest);
 static SDL_Texture* createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h);
@@ -94,15 +90,6 @@ graphic_render()
 {
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderClear(renderer);
-
-    if (backgroundTextureIndex != VOID_INDEX) { 
-        SDL_RenderCopy(
-            renderer,
-            textures.textures[backgroundTextureIndex],
-            &backgroundSrc,
-            &backgroundDest
-        );
-    }
 
     for (unsigned int i = 0; i < sprites.totalVisible; i++) {
         SDL_RenderCopy(
@@ -178,10 +165,12 @@ graphic_createFullTextureSprite(
     Id texture_id, 
     SDL_Rect dest) 
 {
+    Index texture_index;
+    GET_INDEX_FROM_ID(textures, texture_id, texture_index);
     SDL_Rect src;
     src.x = 0;
     src.y = 0;
-    queryTextureSize(texture_id, &src.w, &src.h);
+    queryTextureSize(textures.textures[texture_index], &src.w, &src.h);
 
     return graphic_createTilesetSprite(texture_id, src, dest);
 }
@@ -508,7 +497,7 @@ graphic_centerSpriteOnScreenWidthWithOffset(Id id, int x)
 }
 
 void
-graphic_centerSpriteOnScreenHeightWithOffse(Id id, int y)
+graphic_centerSpriteOnScreenHeightWithOffset(Id id, int y)
 {
     Index index;
     GET_INDEX_FROM_ID(sprites, id, index);
@@ -520,30 +509,20 @@ graphic_centerSpriteOnScreenHeightWithOffse(Id id, int y)
     dest->y = h / 2 - dest->h / 2 + y;
 }
 
-void
-graphic_setBackgroundTexture(Id textureId)
+void 
+Graphic_ResizeSpriteToScreen(Id id)
 {
-    unsigned int index;
-    GET_INDEX_FROM_ID(textures, textureId, index);
-    backgroundTextureIndex = index;
-    backgroundSrc.x = 0;
-    backgroundSrc.y = 0;
-    SDL_QueryTexture(textures.textures[index], 
-                     NULL, 
-                     NULL, 
-                     &backgroundSrc.w,
-                     &backgroundSrc.h);
-}
-
-void graphic_resizeBackgroundToScreen()
-{
-    int backgroundTextureWidth;
-    int backgroundTextureHeight;
-    SDL_QueryTexture(textures.textures[backgroundTextureIndex], 
-                     NULL, 
-                     NULL, 
-                     &backgroundTextureWidth,
-                     &backgroundTextureHeight);
+  Index index;
+  GET_INDEX_FROM_ID(sprites, id, index);
+  int backgroundTextureWidth;
+  int backgroundTextureHeight;
+    SDL_QueryTexture(
+      sprites.sprite[index].texture, 
+      NULL, 
+      NULL, 
+      &backgroundTextureWidth,
+      &backgroundTextureHeight
+    );
     double ratio = (double) backgroundTextureWidth / backgroundTextureHeight;
     int windowWidth, windowHeight;
     graphic_queryWindowSize(&windowWidth, &windowHeight);
@@ -551,31 +530,32 @@ void graphic_resizeBackgroundToScreen()
     int diff = (windowWidth - windowHeight * ratio) / 2;
     if (diff < 0) 
     {
-      backgroundSrc.x = -diff;
-      backgroundSrc.w = windowWidth;
-      backgroundDest.x = 0;
-      backgroundDest.w = windowWidth;
+      sprites.sprite[index].src.x = -diff;
+      sprites.sprite[index].src.w = windowWidth;
+      sprites.sprite[index].dest.x = 0;
+      sprites.sprite[index].dest.w = windowWidth;
     }
     else
     {
-      backgroundSrc.x = 0;
-      backgroundSrc.w = backgroundTextureWidth;
-      backgroundDest.x = diff;
-      backgroundDest.w = windowHeight * ratio;
+      sprites.sprite[index].src.x = 0;
+      sprites.sprite[index].src.w = backgroundTextureWidth;
+      sprites.sprite[index].dest.x = diff;
+      sprites.sprite[index].dest.w = windowHeight * ratio;
     }
-    backgroundDest.y = 0;
-    backgroundDest.h = windowHeight;
+    sprites.sprite[index].dest.y = 0;
+    sprites.sprite[index].dest.h = windowHeight;
 }
 
 Id
 graphic_createSolidTexture(Uint32 color)
 {
-  SDL_Surface* surface = 
-    SDL_CreateRGBSurfaceWithFormat(0,
-                                   1,
-                                   1,
-                                   8,
-                                   SDL_PIXELFORMAT_RGB888);
+  SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(
+    0,
+    1,
+    1,
+    8,
+    SDL_PIXELFORMAT_RGB888
+  );
 
   SDL_Rect rect = {0, 0, 1, 1}; 
   SDL_FillRect(surface, &rect, color);
@@ -589,12 +569,6 @@ graphic_createSolidTexture(Uint32 color)
   textures.textures[textureIndex] = texture;
 
   return textureId;
-}
-
-void
-graphic_queryBackgroundDest(SDL_Rect *rect)
-{
-  *rect = backgroundDest;
 }
 
 void

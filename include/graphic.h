@@ -34,15 +34,13 @@ void graphic_centerSpriteOnScreenWidth(Id id);
 void graphic_centerSpriteOnScreenHeight(Id id);
 void graphic_centerSpriteOnScreenWithOffset(Id id, int x, int y);
 void graphic_centerSpriteOnScreenWidthWithOffset(Id id, int x);
-void graphic_centerSpriteOnScreenHeightWithOffse(Id id, int y);
-void graphic_resizeBackgroundToScreen();
-void graphic_queryBackgroundDest(SDL_Rect *rect);
+void graphic_centerSpriteOnScreenHeightWithOffset(Id id, int y);
 void graphic_querySpriteDest(Id id, SDL_Rect *rect);
+void Graphic_ResizeSpriteToScreen(Id id);
 
 void graphic_setText(Id id, const char* const text, int x, int y, SDL_Color color);
 void graphic_setSpriteSize(Id id, int w, int h);
 void graphic_set_src_rect(Id id, SDL_Rect src);
-void graphic_setBackgroundTexture(Id textureId);
 void graphic_setPosition(Id id, int x, int y);
 void graphic_setSpriteToInvisible(Id id);
 void graphic_setSpriteToVisible(Id id);

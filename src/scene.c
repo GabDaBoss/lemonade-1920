@@ -13,7 +13,7 @@ static UpdateFunc update;
 void 
 Scene_GameLoop()
 {
-  Uint32 current = 0, previous = 0, updateLag = 0, drawingLag = 0;
+  Uint32 current = 0, previous = 0, updateLag = 0;
   while (true) 
   {
     current = SDL_GetTicks();
@@ -34,15 +34,7 @@ Scene_GameLoop()
       updateLag -= MS_PER_UPDATE;
     }
 
-    graphic_resizeBackgroundToScreen();
-
-    drawingLag += elapsed;
-    if (drawingLag >= MS_PER_FRAME)
-    {
-      graphic_render();
-      drawingLag -= MS_PER_FRAME;
-    }
-
+    graphic_render();
     SDL_Delay(1);
   }
 }
