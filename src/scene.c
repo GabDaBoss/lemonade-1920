@@ -6,6 +6,7 @@
 #include "input.h"
 
 static UpdateFunc update;
+static bool running = true;
 
 #define MS_PER_UPDATE 8
 #define MS_PER_FRAME 16
@@ -14,7 +15,8 @@ void
 Scene_GameLoop()
 {
   Uint32 current = 0, previous = 0, updateLag = 0;
-  while (true) 
+  running = true;
+  while (running) 
   {
     current = SDL_GetTicks();
     Uint32 elapsed = current - previous;
@@ -26,10 +28,8 @@ Scene_GameLoop()
     while (updateLag >= MS_PER_UPDATE && runs < 5) 
     {
       input_poll_inputs();
-      if (!update())
-      {
-        return;
-      }
+      update();
+
       runs++;
       updateLag -= MS_PER_UPDATE;
     }
@@ -45,3 +45,7 @@ Scene_SetUpdateTo(UpdateFunc func)
   update = func;
 }
 
+void
+Scene_Quit() {
+  running = false;
+}

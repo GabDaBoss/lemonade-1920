@@ -4,7 +4,7 @@
 #include "graphic.h"
 #include "main-menu.h"
 
-static bool 
+static void 
 update(void)
 {
   if (input_is_quit_pressed())
@@ -12,8 +12,6 @@ update(void)
     graphic_clear();
     MainMenu_Enter();
   }
-
-  return true;
 }
 
 void 

@@ -244,12 +244,12 @@ void startGame()
   Game_Enter();
 }
 
-bool 
+static void 
 update() 
 {
   if (input_is_quit_pressed())
   {
-    return false;
+    Scene_Quit();
   }
 
   if (levelSelector.opened) 
@@ -266,7 +266,7 @@ update()
     {
       closeLevelSelector();
       startGame();
-      return true;
+      return;
     } 
     else if (input_isZoneClicked(backButtonRect, LeftMouseButton)) 
     {
@@ -312,7 +312,7 @@ update()
       {
         case 0: openLevelSelector(); break;
         case 1: break;
-        case 2: return false;
+        case 2: Scene_Quit(); break;
       }
     } 
     else if (input_isZoneClicked(newButtonRect, LeftMouseButton)) 
@@ -325,7 +325,8 @@ update()
     } 
     else if (input_isZoneClicked(quitButtonRect, LeftMouseButton)) 
     {
-      return false;
+      Scene_Quit();
+      return;
     } 
     else 
     {
@@ -359,32 +360,30 @@ update()
       {
         selectedButton = 2;
       }
-      if (selectedButton == prev) 
+      if (selectedButton != prev) 
       {
-        return true;
-      }
-      switch((int) selectedButton) 
-      {
-        case 0:
-          graphic_setText(newButton, ">New", 0, 0, textColor);
-          graphic_setText(loadButton, "Load", 0, 0, textColor);
-          graphic_setText(quitButton, "Quit", 0, 0, textColor);
-          break;
-        case 1:
-          graphic_setText(newButton, "New", 0, 0, textColor);
-          graphic_setText(loadButton, ">Load", 0, 0, textColor);
-          graphic_setText(quitButton, "Quit", 0, 0, textColor);
-          break;
-        case 2:
-          graphic_setText(newButton, "New", 0, 0, textColor);
-          graphic_setText(loadButton, "Load", 0, 0, textColor);
-          graphic_setText(quitButton, ">Quit", 0, 0, textColor);
-          break;
+        switch((int) selectedButton) 
+        {
+          case 0:
+            graphic_setText(newButton, ">New", 0, 0, textColor);
+            graphic_setText(loadButton, "Load", 0, 0, textColor);
+            graphic_setText(quitButton, "Quit", 0, 0, textColor);
+            break;
+          case 1:
+            graphic_setText(newButton, "New", 0, 0, textColor);
+            graphic_setText(loadButton, ">Load", 0, 0, textColor);
+            graphic_setText(quitButton, "Quit", 0, 0, textColor);
+            break;
+          case 2:
+            graphic_setText(newButton, "New", 0, 0, textColor);
+            graphic_setText(loadButton, "Load", 0, 0, textColor);
+            graphic_setText(quitButton, ">Quit", 0, 0, textColor);
+            break;
+        }
       }
     }
   }
   centerMainMenu();
-  return true;
 }
 
 void 
