@@ -7,7 +7,7 @@ TARGET := runner
 SRCEXT := c
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g -Wall -Wextra
+CFLAGS := -std=c11 -g -Wall -Wextra
 LIB := -lm -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 INC := -I include
 

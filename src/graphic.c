@@ -25,7 +25,6 @@ static struct {
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } sprites;
 
-static void deleteTextureByIndex(Index index);
 static Id createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest);
 static SDL_Texture* createTextTexture(const char * const text, SDL_Color color, unsigned int *w, unsigned int *h);
 static void queryTextureSize(SDL_Texture* texture, int* w, int* h);
@@ -728,3 +727,11 @@ graphic_deleteTexture(Id id)
     }
 }
 
+void
+Graphic_TranslateAllSprite(int dx, int dy)
+{
+  for (Index i = 0; i < sprites.totalVisible; i++) {
+    sprites.sprite[i].dest.x += dx;
+    sprites.sprite[i].dest.y += dy;
+  }
+}

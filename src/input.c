@@ -16,6 +16,8 @@ static struct {
     MouseButton mouseButtonClicked;
 } state;
 
+static int _dx, _dy;
+
 static inline int
 flag_index(SDL_Keycode code)
 {
@@ -33,7 +35,10 @@ input_poll_inputs()
     state.quit = false;
 
     state.mouseButtonReleased = 0;
+    int prevX = state.x, prevY = state.y;
     SDL_GetMouseState(&state.x, &state.y);
+    _dx = state.x - prevX;
+    _dy = state.y - prevY;
 
     while (SDL_PollEvent(&event) != 0) {
         SDL_Keycode code = event.key.keysym.sym;
@@ -122,4 +127,17 @@ bool input_isMouseOverZone(SDL_Rect zone)
          state.x <= zone.x + zone.w &&
          state.y >= zone.y &&
          state.y <= zone.y + zone.h;
+}
+
+void
+Input_QueryMouseTranslation(int* dx, int* dy)
+{
+  *dx = _dx;
+  *dy = _dy;
+}
+
+void Input_QueryMousePosition(int* x, int* y)
+{
+  *x = state.x;
+  *y = state.y;
 }

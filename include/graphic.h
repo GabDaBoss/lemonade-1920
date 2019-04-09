@@ -23,6 +23,7 @@ void graphic_render();
 void graphic_queryTextureSize(Id texture_id, int* w, int* h);
 void graphic_queryWindowSize(int* w, int* h);
 void graphic_clear();
+void Graphic_TranslateAllSprite(int dx, int dy);
 void graphic_translateSprite(Id id, int x, int y);
 void graphic_queryPosition(Id id, int* x, int* y);
 void graphic_deleteSprite(Id id);

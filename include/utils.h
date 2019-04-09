@@ -63,7 +63,7 @@ do { \
 #define GET_NEXT_ID(strct, id, index, max) \
 do \
 { \
-  assert(strct.total < max - 1) \
+  assert(strct.total < max - 1); \
   id = strct.next_free_index; \
   strct.next_free_index = strct.indexes[id]; \
   index = strct.indexes[id] = strct.total++; \
@@ -81,7 +81,7 @@ do { \
 #define SHIFT_ONE_POSITION(arr, i, limit, type) memcpy(&arr[i + 1], &arr[i], (limit - i - 1) * sizeof(type))
 
 #define EXIT_IF_HAS_NOT_ID(strct, id) \
-  assert(!HAS_ID(strct, id))
+  assert(HAS_ID(strct, id))
 
 #define DELETE_DOD_ELEMENT_BY_INDEX(strct, id, index, last) \
 do \
