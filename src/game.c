@@ -46,15 +46,12 @@ static GameTiles objectTiles[tilemapHeight][tilemapWidth];
 static Id tilesSpriteId [tilemapHeight][tilemapWidth];
 static double cameraDx;
 static double cameraDy;
+static struct {
+  int x, y, w, h;
+} map;
 
 static void 
-update(void)
-{
-  if (input_is_quit_pressed()) {
-    graphic_clear();
-    MainMenu_Enter();
-  }
-
+handleCamera() {
   int x, y, w, h;
   Input_QueryMousePosition(&x, &y);
   graphic_queryWindowSize(&w, &h);
@@ -79,10 +76,41 @@ update(void)
       cameraDy++;
     }
 
-    if (dx || dy) {
-      Graphic_TranslateAllSprite(dx, dy);
+    if (dx > 0 && map.x >= 0) {
+      dx = 0;
     }
+
+    if (dx < 0 && map.x <= w - map.w) {
+      dx = 0;
+    }
+
+    if (dy > 0 && map.y >= 0) {
+      dy = 0;
+    }
+
+    if (dy < 0 && map.y <= h - map.h) {
+      dy = 0;
+    }
+
+    if (!dx && !dy) {
+      return;
+    }
+
+    map.x += dx;
+    map.y += dy;
+    Graphic_TranslateAllSprite(dx, dy);
   }
+}
+
+static void 
+update(void)
+{
+  if (input_is_quit_pressed()) {
+    graphic_clear();
+    MainMenu_Enter();
+  }
+
+  handleCamera();
 }
 
 void 
@@ -91,6 +119,16 @@ Game_Enter(void)
   Scene_SetUpdateTo(update);
 
   spriteSheetId = graphic_loadTexture("sprite-sheet.bmp");
+
+  int w, h, dx, dy;
+  graphic_queryWindowSize(&w, &h);
+
+  map.w = (double) (tilemapWidth + tilemapHeight) / 2 * tileWidth;
+  map.h = (double) (tilemapWidth + tilemapHeight) / 2 * tileHeight;
+  map.x = (double) (w - map.w) / 2;
+  map.y = (double) (h - map.h) / 2;
+  dx = map.x + (double) (tilemapHeight - 1) / 2 * tileWidth;
+  dy = map.y;
 
   for (int y = 0; y < tilemapHeight; y++) 
   {
@@ -243,8 +281,8 @@ Game_Enter(void)
           break;
       }
       
-      dest.x = x * tileWidth / 2 - y * tileWidth / 2;
-      dest.y = x * tileHeight / 2 + y * tileHeight / 2;
+      dest.x = x * (double) tileWidth / 2 - y * (double) tileWidth / 2 + dx;
+      dest.y = x * (double) tileHeight / 2 + y * (double) tileHeight / 2 + dy;
       dest.w = src.w;
       dest.h = src.h;
 
