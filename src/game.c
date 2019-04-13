@@ -29,26 +29,37 @@ typedef enum {
   GameTile_WalkingCharacterLeft2,
 } GameTiles;
 
-/*
-static const unsigned char tilemapWidth = 100;
-static const unsigned char tilemapHeight = 100;
-static const unsigned char tileWidth = 14;
-static const unsigned char tileHeight = 8;
-*/
-
 #define tilemapWidth 100
 #define tilemapHeight 100
-#define tileWidth 14
-#define tileHeight 8
+#define DEFAULT_TILE_WIDTH 14
+#define DEFAULT_TILE_HEIGHT 8
 
 static GameTiles groundTiles[tilemapHeight][tilemapWidth];
 static GameTiles objectTiles[tilemapHeight][tilemapWidth];
 static Id tilesSpriteId [tilemapHeight][tilemapWidth];
+static Id tilesObjectSpriteId [tilemapHeight][tilemapWidth];
+
 static double cameraDx;
 static double cameraDy;
 static struct {
   int x, y, w, h;
 } map;
+
+static int zoom;
+static int tileWidth;
+static int tileHeight;
+
+static void
+calculateTileWidth()
+{
+   tileWidth = DEFAULT_TILE_WIDTH * zoom;
+}
+
+static void 
+calculateTileHeight()
+{
+  tileHeight = DEFAULT_TILE_HEIGHT * zoom;
+}
 
 static void 
 handleCamera() {
@@ -98,7 +109,7 @@ handleCamera() {
 
     map.x += dx;
     map.y += dy;
-    Graphic_TranslateAllSprite(dx, dy);
+    Graphic_TranslateAllSprite(dx * zoom, dy * zoom);
   }
 }
 
@@ -113,10 +124,177 @@ update(void)
   handleCamera();
 }
 
+static void
+setSrcForTile(GameTiles tile, SDL_Rect* src)
+{
+  switch (tile)
+  {
+    case GameTile_Empty:
+      src->x = src->y = src->w = src->h = 0;
+      break;
+    case GameTile_Grass:
+      src->x = 0;
+      src->y = 0;
+      src->w = 14;
+      src->h = 8;
+      break;
+    case GameTile_SideWalk:
+      src->x = 14;
+      src->y = 0;
+      src->w = 14;
+      src->h = 8;
+      break;
+    case GameTile_Road:
+      src->x = 28;
+      src->y = 0;
+      src->w = 14;
+      src->h = 8;
+      break;
+    case GameTile_StandLeft:
+      src->x = 0;
+      src->y = 8;
+      src->w = 14;
+      src->h = 47;
+      break;
+    case GameTile_StandCenter:
+      src->x = 14;
+      src->y = 8;
+      src->w = 14;
+      src->h = 47;
+      break;
+    case GameTile_StandRight:
+      src->x = 28;
+      src->y = 8;
+      src->w = 14;
+      src->h = 47;
+      break;
+    case GameTile_StandingCharacterDown:
+      src->x = 0;
+      src->y = 55;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_StandingCharacterRight:
+      src->x = 14;
+      src->y = 55;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_StandingCharacterUp:
+      src->x = 28;
+      src->y = 55;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_StandingCharacterLeft:
+      src->x = 42;
+      src->y = 55;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterDown1:
+      src->x = 0;
+      src->y = 95;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterRight1:
+      src->x = 14;
+      src->y = 95;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterUp1:
+      src->x = 28;
+      src->y = 95;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterLeft1:
+      src->x = 42;
+      src->y = 95;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterDown2:
+      src->x = 0;
+      src->y = 135;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterRight2:
+      src->x = 14;
+      src->y = 135;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterUp2:
+      src->x = 28; 
+      src->y = 135;
+      src->w = 14;
+      src->h = 40;
+      break;
+    case GameTile_WalkingCharacterLeft2:
+      src->x = 42;
+      src->y = 135;
+      src->w = 14;
+      src->h = 40;
+      break;
+  }
+}
+
+void
+createSpriteForTile(int x, int y, int dx, int dy)
+{
+  SDL_Rect src;
+  SDL_Rect dest;
+
+  setSrcForTile(groundTiles[y][x], &src);
+  
+  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + dx;
+  dest.y = x * (tileHeight / 2) + y * (tileHeight / 2) + dy;
+  dest.w = src.w * zoom;
+  dest.h = src.h * zoom;
+
+  tilesSpriteId[y][x] = graphic_createTilesetSprite(
+      spriteSheetId, 
+      src, 
+      dest
+  );
+}
+
+void
+createSpriteForTileObject(int x, int y, int dx, int dy)
+{
+  if (objectTiles[y][x] == GameTile_Empty) {
+    return;
+  }
+  SDL_Rect src;
+  SDL_Rect dest;
+
+  setSrcForTile(objectTiles[y][x], &src);
+  
+  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + dx;
+  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + dy -
+    src.h * zoom - tileHeight;
+  dest.w = src.w * zoom;
+  dest.h = src.h * zoom;
+
+  tilesObjectSpriteId[y][x] = graphic_createTilesetSprite(
+      spriteSheetId, 
+      src, 
+      dest
+  );
+}
+
 void 
 Game_Enter(void)
 {
   Scene_SetUpdateTo(update);
+
+  zoom = 3;
+  calculateTileWidth();
+  calculateTileHeight();
 
   spriteSheetId = graphic_loadTexture("sprite-sheet.bmp");
 
@@ -139,158 +317,32 @@ Game_Enter(void)
     }
   }
 
-  for (int y = 48; y < 56; y++)
+  for (int y = 0; y < tilemapHeight; y++)
   {
-    for (int x = 0; x < tilemapWidth; x++)
+    for (int x = 48; x < 56; x++)
     {
       groundTiles[y][x] = GameTile_Road;
     }
   }
 
-  for (int x = 0; x < tilemapWidth; x++)
+  for (int y = 0; y < tilemapHeight; y++)
   {
-    groundTiles[46][x] = GameTile_SideWalk;
-    groundTiles[47][x] = GameTile_SideWalk;
+    groundTiles[y][46] = GameTile_SideWalk;
+    groundTiles[y][47] = GameTile_SideWalk;
+    groundTiles[y][56] = GameTile_SideWalk;
+    groundTiles[y][57] = GameTile_SideWalk;
   }
 
-  for (int x = 0; x < tilemapWidth; x++)
-  {
-    groundTiles[56][x] = GameTile_SideWalk;
-    groundTiles[57][x] = GameTile_SideWalk;
-  }
+  objectTiles[40][46] = GameTile_StandLeft;
+  objectTiles[39][46] = GameTile_StandCenter;
+  objectTiles[38][46] = GameTile_StandRight;
 
   for (int y = 0; y < tilemapHeight; y++)
   {
     for (int x = 0; x < tilemapWidth; x++)
     {
-      SDL_Rect src;
-      SDL_Rect dest;
-
-      switch (groundTiles[y][x])
-      {
-        case GameTile_Empty:
-          src.x = src.y = src.w = src.h = 0;
-          break;
-        case GameTile_Grass:
-          src.x = 0;
-          src.y = 0;
-          src.w = 14;
-          src.h = 8;
-          break;
-        case GameTile_SideWalk:
-          src.x = 14;
-          src.y = 0;
-          src.w = 14;
-          src.h = 8;
-          break;
-        case GameTile_Road:
-          src.x = 28;
-          src.y = 0;
-          src.w = 14;
-          src.h = 8;
-          break;
-        case GameTile_StandLeft:
-          src.x = 0;
-          src.y = 8;
-          src.w = 14;
-          src.h = 47;
-          break;
-        case GameTile_StandCenter:
-          src.x = 14;
-          src.y = 8;
-          src.w = 14;
-          src.h = 47;
-          break;
-        case GameTile_StandRight:
-          src.x = 28;
-          src.y = 8;
-          src.w = 14;
-          src.h = 47;
-          break;
-        case GameTile_StandingCharacterDown:
-          src.x = 0;
-          src.y = 55;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_StandingCharacterRight:
-          src.x = 14;
-          src.y = 55;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_StandingCharacterUp:
-          src.x = 28;
-          src.y = 55;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_StandingCharacterLeft:
-          src.x = 42;
-          src.y = 55;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterDown1:
-          src.x = 0;
-          src.y = 95;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterRight1:
-          src.x = 14;
-          src.y = 95;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterUp1:
-          src.x = 28;
-          src.y = 95;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterLeft1:
-          src.x = 42;
-          src.y = 95;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterDown2:
-          src.x = 0;
-          src.y = 135;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterRight2:
-          src.x = 14;
-          src.y = 135;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterUp2:
-          src.x = 28;
-          src.y = 135;
-          src.w = 14;
-          src.h = 40;
-          break;
-        case GameTile_WalkingCharacterLeft2:
-          src.x = 42;
-          src.y = 135;
-          src.w = 14;
-          src.h = 40;
-          break;
-      }
-      
-      dest.x = x * (double) tileWidth / 2 - y * (double) tileWidth / 2 + dx;
-      dest.y = x * (double) tileHeight / 2 + y * (double) tileHeight / 2 + dy;
-      dest.w = src.w;
-      dest.h = src.h;
-
-      tilesSpriteId[y][x] = graphic_createTilesetSprite(
-          spriteSheetId, 
-          src, 
-          dest
-      );
+      createSpriteForTile(x, y, dx, dy);
+      createSpriteForTileObject(x, y, dx, dy);
     }
   }
 }
