@@ -418,6 +418,15 @@ graphic_clear()
     textures.total = 0;
 }
 
+void 
+Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest)
+{
+    Index index;
+    GET_INDEX_FROM_ID(sprites, id, index);
+    sprites.sprite[index].src = src;
+    sprites.sprite[index].dest = dest;
+}
+
 void
 graphic_set_src_rect(
     Id id, 

@@ -29,25 +29,35 @@ typedef enum {
   GameTile_WalkingCharacterLeft2,
 } GameTiles;
 
-#define tilemapWidth 100
-#define tilemapHeight 100
+#define MAP_WIDTH 100
+#define MAP_HEIGHT 100
 #define DEFAULT_TILE_WIDTH 14
 #define DEFAULT_TILE_HEIGHT 8
+#define MAX_CUSTOMERS 10
 
-static GameTiles groundTiles[tilemapHeight][tilemapWidth];
-static GameTiles objectTiles[tilemapHeight][tilemapWidth];
-static Id tilesSpriteId [tilemapHeight][tilemapWidth];
-static Id tilesObjectSpriteId [tilemapHeight][tilemapWidth];
+static GameTiles groundTiles[MAP_HEIGHT][MAP_WIDTH];
+static GameTiles objectTiles[MAP_HEIGHT][MAP_WIDTH];
+static Id tilesSpriteId [MAP_HEIGHT][MAP_WIDTH];
+static Id tilesObjectSpriteId [MAP_HEIGHT][MAP_WIDTH];
+
+typedef struct {
+  Id sprite;
+  int x, y;
+} Customer;
+
+static Customer customers[MAX_CUSTOMERS];
 
 static double cameraDx;
 static double cameraDy;
 static struct {
-  int x, y, w, h;
+  int x, y, w, h, dx, dy;
 } map;
 
 static int zoom;
 static int tileWidth;
 static int tileHeight;
+
+static int dt = 0;
 
 static void
 calculateTileWidth()
@@ -107,28 +117,20 @@ handleCamera() {
       return;
     }
 
-    map.x += dx;
-    map.y += dy;
+    printf("dx: %d, dy: %d, x: %d, y: %d\n", dx, dy, map.x, map.y);
+
+    map.x += dx * zoom;
+    map.y += dy * zoom;
+    map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * tileWidth;
+    map.dy = map.y;
     Graphic_TranslateAllSprite(dx * zoom, dy * zoom);
   }
-}
-
-static void 
-update(void)
-{
-  if (input_is_quit_pressed()) {
-    graphic_clear();
-    MainMenu_Enter();
-  }
-
-  handleCamera();
 }
 
 static void
 setSrcForTile(GameTiles tile, SDL_Rect* src)
 {
-  switch (tile)
-  {
+  switch (tile) {
     case GameTile_Empty:
       src->x = src->y = src->w = src->h = 0;
       break;
@@ -243,6 +245,51 @@ setSrcForTile(GameTiles tile, SDL_Rect* src)
   }
 }
 
+static void 
+update(void)
+{
+  if (input_is_quit_pressed()) {
+    graphic_clear();
+    MainMenu_Enter();
+  }
+
+
+  if (dt == 1000) {
+    for (int y = MAP_HEIGHT; y--;) {
+      if (objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
+        objectTiles[y][46] = GameTile_Empty;
+        int nextY = (y + 1) % MAP_HEIGHT;
+        objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
+        objectTiles[y][46] = GameTile_Empty;
+        SDL_Rect src;
+        SDL_Rect dest;
+
+        setSrcForTile(objectTiles[nextY][46], &src);
+    
+        printf("tileWidth: %d, tileHeight: %d, zoom: %d, y: %d, dx: %d, dy: %d\n", tileWidth, tileHeight, zoom, y, map.dx, map.dy);
+        dest.x = 46 * (tileWidth / 2 + zoom) - nextY * (tileWidth / 2 + zoom) + map.dx;
+        dest.y = 46 * (tileHeight / 2) + nextY * (tileHeight / 2) + map.dy;
+        dest.w = src.w * zoom;
+        dest.h = src.h * zoom;
+
+        printf("x: %d, y: %d, w: %d, h: %d\n", dest.x, dest.y, dest.w, dest.h);
+
+        Graphic_SetSpriteSrcAndDest(
+            tilesObjectSpriteId[y][46], 
+            src,
+            dest
+        );
+
+        tilesObjectSpriteId[nextY][46] = tilesObjectSpriteId[y][46];
+        tilesObjectSpriteId[y][46] = VOID_ID;
+      }
+    }
+    dt -= 1000;
+  }
+  dt++;
+  handleCamera();
+}
+
 void
 createSpriteForTile(int x, int y, int dx, int dy)
 {
@@ -275,8 +322,8 @@ createSpriteForTileObject(int x, int y, int dx, int dy)
   setSrcForTile(objectTiles[y][x], &src);
   
   dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + dx;
-  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + dy -
-    src.h * zoom - tileHeight;
+  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + dy
+    - (src.h - DEFAULT_TILE_HEIGHT) * zoom;
   dest.w = src.w * zoom;
   dest.h = src.h * zoom;
 
@@ -298,26 +345,26 @@ Game_Enter(void)
 
   spriteSheetId = graphic_loadTexture("sprite-sheet.bmp");
 
-  int w, h, dx, dy;
+  int w, h;
   graphic_queryWindowSize(&w, &h);
 
-  map.w = (double) (tilemapWidth + tilemapHeight) / 2 * tileWidth;
-  map.h = (double) (tilemapWidth + tilemapHeight) / 2 * tileHeight;
+  map.w = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * (tileWidth + zoom * 2);
+  map.h = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * tileHeight;
   map.x = (double) (w - map.w) / 2;
   map.y = (double) (h - map.h) / 2;
-  dx = map.x + (double) (tilemapHeight - 1) / 2 * tileWidth;
-  dy = map.y;
+  map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * (tileWidth + zoom * 2);
+  map.dy = map.y;
 
-  for (int y = 0; y < tilemapHeight; y++) 
+  for (int y = 0; y < MAP_HEIGHT; y++) 
   {
-    for (int x = 0; x < tilemapWidth; x++)
+    for (int x = 0; x < MAP_WIDTH; x++)
     {
       groundTiles[y][x] = GameTile_Grass;
       objectTiles[y][x] = GameTile_Empty;
     }
   }
 
-  for (int y = 0; y < tilemapHeight; y++)
+  for (int y = 0; y < MAP_HEIGHT; y++)
   {
     for (int x = 48; x < 56; x++)
     {
@@ -325,7 +372,7 @@ Game_Enter(void)
     }
   }
 
-  for (int y = 0; y < tilemapHeight; y++)
+  for (int y = 0; y < MAP_HEIGHT; y++)
   {
     groundTiles[y][46] = GameTile_SideWalk;
     groundTiles[y][47] = GameTile_SideWalk;
@@ -333,16 +380,18 @@ Game_Enter(void)
     groundTiles[y][57] = GameTile_SideWalk;
   }
 
-  objectTiles[40][46] = GameTile_StandLeft;
-  objectTiles[39][46] = GameTile_StandCenter;
-  objectTiles[38][46] = GameTile_StandRight;
+  objectTiles[40][45] = GameTile_StandLeft;
+  objectTiles[39][45] = GameTile_StandCenter;
+  objectTiles[38][45] = GameTile_StandRight;
 
-  for (int y = 0; y < tilemapHeight; y++)
+  objectTiles[0][46] = GameTile_WalkingCharacterDown1;
+
+  for (int y = 0; y < MAP_HEIGHT; y++)
   {
-    for (int x = 0; x < tilemapWidth; x++)
+    for (int x = 0; x < MAP_WIDTH; x++)
     {
-      createSpriteForTile(x, y, dx, dy);
-      createSpriteForTileObject(x, y, dx, dy);
+      createSpriteForTile(x, y, map.dx, map.dy);
+      createSpriteForTileObject(x, y, map.dx, map.dy);
     }
   }
 }
