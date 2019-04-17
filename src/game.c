@@ -251,8 +251,8 @@ static void moveCharacters(int x, int y, int newY)
 
   setSrcForTile(objectTiles[newY][x], &src);
   
-  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + map.dx;
-  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + map.dy
+  dest.x = x * (tileWidth / 2 + zoom) - newY * (tileWidth / 2 + zoom) + map.dx;
+  dest.y = x * tileHeight / 2 + newY * tileHeight / 2 + map.dy
     - (src.h - DEFAULT_TILE_HEIGHT) * zoom;
   dest.w = src.w * zoom;
   dest.h = src.h * zoom;
@@ -262,6 +262,7 @@ static void moveCharacters(int x, int y, int newY)
       src,
       dest
   );
+
   Graphic_SetSpriteToBeAfterAnother(
       tilesObjectSpriteId[y][x], 
       tilesSpriteId[newY][x]
