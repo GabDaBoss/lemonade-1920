@@ -744,3 +744,38 @@ Graphic_TranslateAllSprite(int dx, int dy)
     sprites.sprite[i].dest.y += dy;
   }
 }
+
+void 
+Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
+{
+  Index idx, otherIdx;
+  GET_INDEX_FROM_ID(sprites, id, idx);
+  GET_INDEX_FROM_ID(sprites, other, otherIdx);
+
+  Sprite sprite = sprites.sprite[idx];
+  if (idx == otherIdx) {
+    return;
+  }
+
+  if (idx < otherIdx) {
+    for (Index i = idx; i < otherIdx; i++) {
+      sprites.sprite[i] = sprites.sprite[i + 1];
+      sprites.ids[i] = sprites.ids[i + 1];
+      sprites.indexes[sprites.ids[i]] = i;
+    }
+
+    sprites.sprite[otherIdx] = sprite;
+    sprites.ids[otherIdx] = id;
+    sprites.indexes[id] = otherIdx;
+  } else {
+    for (Index i = idx; i > otherIdx + 1; i--) {
+      sprites.sprite[i] = sprites.sprite[i - 1];
+      sprites.ids[i] = sprites.ids[i - 1];
+      sprites.indexes[sprites.ids[i]] = i;
+    }
+
+    sprites.sprite[otherIdx + 1] = sprite;
+    sprites.ids[otherIdx + 1] = id;
+    sprites.indexes[id] = otherIdx + 1;
+  }
+}

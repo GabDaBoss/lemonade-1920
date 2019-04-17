@@ -38,8 +38,9 @@ void graphic_centerSpriteOnScreenWidthWithOffset(Id id, int x);
 void graphic_centerSpriteOnScreenHeightWithOffset(Id id, int y);
 void graphic_querySpriteDest(Id id, SDL_Rect *rect);
 void Graphic_ResizeSpriteToScreen(Id id);
-void Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest);
 
+void Graphic_SetSpriteToBeAfterAnother(Id id, Id other);
+void Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest);
 void graphic_setText(Id id, const char* const text, int x, int y, SDL_Color color);
 void graphic_setSpriteSize(Id id, int w, int h);
 void graphic_set_src_rect(Id id, SDL_Rect src);

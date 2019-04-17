@@ -117,11 +117,9 @@ handleCamera() {
       return;
     }
 
-    printf("dx: %d, dy: %d, x: %d, y: %d\n", dx, dy, map.x, map.y);
-
     map.x += dx * zoom;
     map.y += dy * zoom;
-    map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * tileWidth;
+    map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * (tileWidth + zoom * 2);
     map.dy = map.y;
     Graphic_TranslateAllSprite(dx * zoom, dy * zoom);
   }
@@ -245,6 +243,34 @@ setSrcForTile(GameTiles tile, SDL_Rect* src)
   }
 }
 
+static void moveCharacters(int x, int y, int newY)
+{
+  objectTiles[y][x] = GameTile_Empty;
+  SDL_Rect src;
+  SDL_Rect dest;
+
+  setSrcForTile(objectTiles[newY][x], &src);
+  
+  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + map.dx;
+  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + map.dy
+    - (src.h - DEFAULT_TILE_HEIGHT) * zoom;
+  dest.w = src.w * zoom;
+  dest.h = src.h * zoom;
+
+  Graphic_SetSpriteSrcAndDest(
+      tilesObjectSpriteId[y][x], 
+      src,
+      dest
+  );
+  Graphic_SetSpriteToBeAfterAnother(
+      tilesObjectSpriteId[y][x], 
+      tilesSpriteId[newY][x]
+  );
+
+  tilesObjectSpriteId[newY][x] = tilesObjectSpriteId[y][x];
+  tilesObjectSpriteId[y][x] = VOID_ID;
+}
+
 static void 
 update(void)
 {
@@ -254,37 +280,31 @@ update(void)
   }
 
 
-  if (dt == 1000) {
+  if (dt == 10) {
     for (int y = MAP_HEIGHT; y--;) {
+      int nextY = (y + 1) % MAP_HEIGHT;
       if (objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
-        objectTiles[y][46] = GameTile_Empty;
-        int nextY = (y + 1) % MAP_HEIGHT;
+        objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
+      } else if (objectTiles[y][46] == GameTile_WalkingCharacterDown2) {
         objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
-        objectTiles[y][46] = GameTile_Empty;
-        SDL_Rect src;
-        SDL_Rect dest;
-
-        setSrcForTile(objectTiles[nextY][46], &src);
-    
-        printf("tileWidth: %d, tileHeight: %d, zoom: %d, y: %d, dx: %d, dy: %d\n", tileWidth, tileHeight, zoom, y, map.dx, map.dy);
-        dest.x = 46 * (tileWidth / 2 + zoom) - nextY * (tileWidth / 2 + zoom) + map.dx;
-        dest.y = 46 * (tileHeight / 2) + nextY * (tileHeight / 2) + map.dy;
-        dest.w = src.w * zoom;
-        dest.h = src.h * zoom;
-
-        printf("x: %d, y: %d, w: %d, h: %d\n", dest.x, dest.y, dest.w, dest.h);
-
-        Graphic_SetSpriteSrcAndDest(
-            tilesObjectSpriteId[y][46], 
-            src,
-            dest
-        );
-
-        tilesObjectSpriteId[nextY][46] = tilesObjectSpriteId[y][46];
-        tilesObjectSpriteId[y][46] = VOID_ID;
+      } else {
+        continue;
       }
+      moveCharacters(46, y, nextY);
     }
-    dt -= 1000;
+
+    for (int y = 0; y < MAP_HEIGHT; y++) {
+      int nextY = y - 1 >= 0 ? y - 1 : MAP_HEIGHT - 1;
+      if (objectTiles[y][47] == GameTile_WalkingCharacterUp1) {
+        objectTiles[nextY][47] = GameTile_WalkingCharacterUp2;
+      } else if (objectTiles[y][47] == GameTile_WalkingCharacterUp2) {
+        objectTiles[nextY][47] = GameTile_WalkingCharacterUp1;
+      } else {
+        continue;
+      }
+      moveCharacters(47, y, nextY);
+    }
+    dt -= 10;
   }
   dt++;
   handleCamera();
@@ -385,6 +405,7 @@ Game_Enter(void)
   objectTiles[38][45] = GameTile_StandRight;
 
   objectTiles[0][46] = GameTile_WalkingCharacterDown1;
+  objectTiles[99][47] = GameTile_WalkingCharacterUp1;
 
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
