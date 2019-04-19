@@ -11,15 +11,14 @@
 int
 main() 
 {
-
-  if (!graphic_init("Lemonade 5000", 1280, 720, 24)) {
+  if (!Graphic_Init("Lemonade 5000", 1280, 720, 24)) {
     return(EXIT_FAILURE);
   };
   
   MainMenu_Enter();
   Scene_GameLoop();
 
-  graphic_quit();
+  Graphic_Quit();
 
   return(EXIT_SUCCESS);
 }

@@ -16,8 +16,7 @@ Scene_GameLoop()
 {
   Uint32 current = 0, previous = 0, updateLag = 0;
   running = true;
-  while (running) 
-  {
+  while (running) {
     current = SDL_GetTicks();
     Uint32 elapsed = current - previous;
     previous = current;
@@ -25,8 +24,7 @@ Scene_GameLoop()
     updateLag += elapsed;
 
     int runs = 0;
-    while (updateLag >= MS_PER_UPDATE && runs < 5) 
-    {
+    while (updateLag >= MS_PER_UPDATE && runs < 5) {
       input_poll_inputs();
       update();
 
@@ -34,7 +32,7 @@ Scene_GameLoop()
       updateLag -= MS_PER_UPDATE;
     }
 
-    graphic_render();
+    Graphic_Render();
     SDL_Delay(1);
   }
 }

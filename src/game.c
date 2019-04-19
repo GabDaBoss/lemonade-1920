@@ -35,81 +35,81 @@ typedef enum {
 #define DEFAULT_TILE_HEIGHT 8
 #define MAX_CUSTOMERS 10
 
-static GameTiles groundTiles[MAP_HEIGHT][MAP_WIDTH];
-static GameTiles objectTiles[MAP_HEIGHT][MAP_WIDTH];
-static Id tilesSpriteId [MAP_HEIGHT][MAP_WIDTH];
-static Id tilesObjectSpriteId [MAP_HEIGHT][MAP_WIDTH];
+static GameTiles _groundTiles[MAP_HEIGHT][MAP_WIDTH];
+static GameTiles _objectTiles[MAP_HEIGHT][MAP_WIDTH];
+static Id _tilesSpriteId[MAP_HEIGHT][MAP_WIDTH];
+static Id _tilesObjectSpriteId[MAP_HEIGHT][MAP_WIDTH];
 
 typedef struct {
   Id sprite;
   int x, y;
 } Customer;
 
-static Customer customers[MAX_CUSTOMERS];
+static Customer _customers[MAX_CUSTOMERS];
 
-static double cameraDx;
-static double cameraDy;
+static double _cameraDx;
+static double _cameraDy;
 static struct {
   int x, y, w, h, dx, dy;
-} map;
+} _map;
 
-static int zoom;
-static int tileWidth;
-static int tileHeight;
+static double _zoom;
+static int _tileWidth;
+static int _tileHeight;
 
-static int dt = 0;
+static int _dt = 0;
 
 static void
-calculateTileWidth()
+_calculateTileWidth()
 {
-   tileWidth = DEFAULT_TILE_WIDTH * zoom;
+   _tileWidth = DEFAULT_TILE_WIDTH * _zoom;
 }
 
 static void 
-calculateTileHeight()
+_calculateTileHeight()
 {
-  tileHeight = DEFAULT_TILE_HEIGHT * zoom;
+  _tileHeight = DEFAULT_TILE_HEIGHT * _zoom;
 }
 
 static void 
-handleCamera() {
+_handleCamera() {
   int x, y, w, h;
   Input_QueryMousePosition(&x, &y);
-  graphic_queryWindowSize(&w, &h);
+  Graphic_QueryWindowSize(&w, &h);
   if (x < w * .20 || x > w * .80 || y < h * .20 || y > h * .80) 
   {
-    cameraDx += (double) (x - w / 2) / (w / 2);
-    cameraDy += (double) (y - h / 2) / (h / 2);
+    _cameraDx += (double) (x - w / 2) / (w / 2);
+    _cameraDy += (double) (y - h / 2) / (h / 2);
     int dx = 0, dy = 0;
-    if (cameraDx >= 1) {
+    if (_cameraDx >= 1) {
       dx = -1;
-      cameraDx--;
-    } else if (cameraDx <= -1) {
+      _cameraDx--;
+    } else if (_cameraDx <= -1) {
       dx = 1;
-      cameraDx++;
+      _cameraDx++;
     }
 
-    if (cameraDy >= 1) {
+    if (_cameraDy >= 1) {
       dy = -1;
-      cameraDy--;
-    } else if (cameraDy <= -1) {
+      _cameraDy--;
+    } else if (_cameraDy <= -1) {
       dy = 1;
-      cameraDy++;
+      _cameraDy++;
     }
 
-    if (dx > 0 && map.x >= 0) {
+    if (dx > 0 && _map.x >= 0) {
       dx = 0;
     }
 
-    if (dx < 0 && map.x <= w - map.w) {
+    if (dx < 0 && _map.x <= w - _map.w) {
       dx = 0;
     }
 
-    if (dy > 0 && map.y >= 0) {
+    if (dy > 0 && _map.y >= 0) {
       dy = 0;
     }
 
-    if (dy < 0 && map.y <= h - map.h) {
+    if (dy < 0 && _map.y <= h - _map.h) {
       dy = 0;
     }
 
@@ -117,238 +117,258 @@ handleCamera() {
       return;
     }
 
-    map.x += dx * zoom;
-    map.y += dy * zoom;
-    map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * (tileWidth + zoom * 2);
-    map.dy = map.y;
-    Graphic_TranslateAllSprite(dx * zoom, dy * zoom);
+    _map.x += dx * _zoom;
+    _map.y += dy * _zoom;
+    _map.dx = _map.x + (double) (MAP_HEIGHT - 1) / 2 * (_tileWidth + _zoom * 2);
+    _map.dy = _map.y;
+    Graphic_TranslateAllSprite(dx * _zoom, dy * _zoom);
   }
 }
 
-static void
-setSrcForTile(GameTiles tile, SDL_Rect* src)
+static SDL_Rect
+_getSrcForTile(GameTiles tile)
 {
+  SDL_Rect src;
   switch (tile) {
     case GameTile_Empty:
-      src->x = src->y = src->w = src->h = 0;
+      src.x = src.y = src.w = src.h = 0;
       break;
     case GameTile_Grass:
-      src->x = 0;
-      src->y = 0;
-      src->w = 14;
-      src->h = 8;
+      src.x = 0;
+      src.y = 0;
+      src.w = 14;
+      src.h = 8;
       break;
     case GameTile_SideWalk:
-      src->x = 14;
-      src->y = 0;
-      src->w = 14;
-      src->h = 8;
+      src.x = 14;
+      src.y = 0;
+      src.w = 14;
+      src.h = 8;
       break;
     case GameTile_Road:
-      src->x = 28;
-      src->y = 0;
-      src->w = 14;
-      src->h = 8;
+      src.x = 28;
+      src.y = 0;
+      src.w = 14;
+      src.h = 8;
       break;
     case GameTile_StandLeft:
-      src->x = 0;
-      src->y = 8;
-      src->w = 14;
-      src->h = 47;
+      src.x = 0;
+      src.y = 8;
+      src.w = 14;
+      src.h = 47;
       break;
     case GameTile_StandCenter:
-      src->x = 14;
-      src->y = 8;
-      src->w = 14;
-      src->h = 47;
+      src.x = 14;
+      src.y = 8;
+      src.w = 14;
+      src.h = 47;
       break;
     case GameTile_StandRight:
-      src->x = 28;
-      src->y = 8;
-      src->w = 14;
-      src->h = 47;
+      src.x = 28;
+      src.y = 8;
+      src.w = 14;
+      src.h = 47;
       break;
     case GameTile_StandingCharacterDown:
-      src->x = 0;
-      src->y = 55;
-      src->w = 14;
-      src->h = 40;
+      src.x = 0;
+      src.y = 55;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_StandingCharacterRight:
-      src->x = 14;
-      src->y = 55;
-      src->w = 14;
-      src->h = 40;
+      src.x = 14;
+      src.y = 55;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_StandingCharacterUp:
-      src->x = 28;
-      src->y = 55;
-      src->w = 14;
-      src->h = 40;
+      src.x = 28;
+      src.y = 55;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_StandingCharacterLeft:
-      src->x = 42;
-      src->y = 55;
-      src->w = 14;
-      src->h = 40;
+      src.x = 42;
+      src.y = 55;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterDown1:
-      src->x = 0;
-      src->y = 95;
-      src->w = 14;
-      src->h = 40;
+      src.x = 0;
+      src.y = 95;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterRight1:
-      src->x = 14;
-      src->y = 95;
-      src->w = 14;
-      src->h = 40;
+      src.x = 14;
+      src.y = 95;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterUp1:
-      src->x = 28;
-      src->y = 95;
-      src->w = 14;
-      src->h = 40;
+      src.x = 28;
+      src.y = 95;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterLeft1:
-      src->x = 42;
-      src->y = 95;
-      src->w = 14;
-      src->h = 40;
+      src.x = 42;
+      src.y = 95;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterDown2:
-      src->x = 0;
-      src->y = 135;
-      src->w = 14;
-      src->h = 40;
+      src.x = 0;
+      src.y = 135;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterRight2:
-      src->x = 14;
-      src->y = 135;
-      src->w = 14;
-      src->h = 40;
+      src.x = 14;
+      src.y = 135;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterUp2:
-      src->x = 28; 
-      src->y = 135;
-      src->w = 14;
-      src->h = 40;
+      src.x = 28; 
+      src.y = 135;
+      src.w = 14;
+      src.h = 40;
       break;
     case GameTile_WalkingCharacterLeft2:
-      src->x = 42;
-      src->y = 135;
-      src->w = 14;
-      src->h = 40;
+      src.x = 42;
+      src.y = 135;
+      src.w = 14;
+      src.h = 40;
       break;
   }
+  return src;
 }
 
-static void moveCharacters(int x, int y, int newY)
+static SDL_Rect 
+_getTileSpriteDest(SDL_Rect src, int x, int y)
 {
-  objectTiles[y][x] = GameTile_Empty;
-  SDL_Rect src;
   SDL_Rect dest;
+  dest.x = x * (_tileWidth / 2 + _zoom) - y * (_tileWidth / 2 + _zoom) + _map.dx;
+  dest.y = x * (_tileHeight / 2) + y * (_tileHeight / 2) + _map.dy;
+  dest.w = src.w * _zoom;
+  dest.h = src.h * _zoom;
+  return dest;
+}
 
-  setSrcForTile(objectTiles[newY][x], &src);
-  
-  dest.x = x * (tileWidth / 2 + zoom) - newY * (tileWidth / 2 + zoom) + map.dx;
-  dest.y = x * tileHeight / 2 + newY * tileHeight / 2 + map.dy
-    - (src.h - DEFAULT_TILE_HEIGHT) * zoom;
-  dest.w = src.w * zoom;
-  dest.h = src.h * zoom;
+static SDL_Rect
+_getObjectSpriteDest(SDL_Rect src, int x, int y)
+{
+  SDL_Rect dest;
+  dest.x = x * (_tileWidth / 2 + _zoom) - y * (_tileWidth / 2 + _zoom) + _map.dx;
+  dest.y = x * _tileHeight / 2 + y * _tileHeight / 2 + _map.dy
+    - (src.h - DEFAULT_TILE_HEIGHT) * _zoom;
+  dest.w = src.w * _zoom;
+  dest.h = src.h * _zoom;
+  return dest;
+}
+
+static void 
+_moveCharacters(int x, int y, int newY)
+{
+  _objectTiles[y][x] = GameTile_Empty;
+
+  SDL_Rect src = _getSrcForTile(_objectTiles[newY][x]);
+  SDL_Rect dest = _getObjectSpriteDest(src, x, newY);
 
   Graphic_SetSpriteSrcAndDest(
-      tilesObjectSpriteId[y][x], 
+      _tilesObjectSpriteId[y][x], 
       src,
       dest
   );
 
   Graphic_SetSpriteToBeAfterAnother(
-      tilesObjectSpriteId[y][x], 
-      tilesSpriteId[newY][x]
+      _tilesObjectSpriteId[y][x], 
+      _tilesSpriteId[newY][x]
   );
 
-  tilesObjectSpriteId[newY][x] = tilesObjectSpriteId[y][x];
-  tilesObjectSpriteId[y][x] = VOID_ID;
+  _tilesObjectSpriteId[newY][x] = _tilesObjectSpriteId[y][x];
+  _tilesObjectSpriteId[y][x] = VOID_ID;
+}
+
+
+static void
+_resizeSprites()
+{
+  _calculateTileWidth();
+  _calculateTileHeight();
+  Graphic_ZoomSprites(_zoom);
 }
 
 static void 
-update(void)
+_update(void)
 {
   if (input_is_quit_pressed()) {
-    graphic_clear();
+    Graphic_Clear();
     MainMenu_Enter();
+  } else if (input_is_key_released(SDLK_EQUALS) && _zoom < 5) {
+    printf("+\n");
+    _zoom = 2;
+    _resizeSprites();
+  } else if (input_is_key_released(SDLK_MINUS) && _zoom > 1) {
+    printf("-\n");
+    _zoom = 0.5;
+    _resizeSprites();
   }
 
-
-  if (dt == 10) {
+  if (_dt == 10) {
     for (int y = MAP_HEIGHT; y--;) {
       int nextY = (y + 1) % MAP_HEIGHT;
-      if (objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
-        objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
-      } else if (objectTiles[y][46] == GameTile_WalkingCharacterDown2) {
-        objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
+      if (_objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
+        _objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
+      } else if (_objectTiles[y][46] == GameTile_WalkingCharacterDown2) {
+        _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
       } else {
         continue;
       }
-      moveCharacters(46, y, nextY);
+      _moveCharacters(46, y, nextY);
     }
 
     for (int y = 0; y < MAP_HEIGHT; y++) {
       int nextY = y - 1 >= 0 ? y - 1 : MAP_HEIGHT - 1;
-      if (objectTiles[y][47] == GameTile_WalkingCharacterUp1) {
-        objectTiles[nextY][47] = GameTile_WalkingCharacterUp2;
-      } else if (objectTiles[y][47] == GameTile_WalkingCharacterUp2) {
-        objectTiles[nextY][47] = GameTile_WalkingCharacterUp1;
+      if (_objectTiles[y][47] == GameTile_WalkingCharacterUp1) {
+        _objectTiles[nextY][47] = GameTile_WalkingCharacterUp2;
+      } else if (_objectTiles[y][47] == GameTile_WalkingCharacterUp2) {
+        _objectTiles[nextY][47] = GameTile_WalkingCharacterUp1;
       } else {
         continue;
       }
-      moveCharacters(47, y, nextY);
+      _moveCharacters(47, y, nextY);
     }
-    dt -= 10;
+    _dt -= 10;
   }
-  dt++;
-  handleCamera();
+  _dt++;
+  _handleCamera();
 }
 
-void
-createSpriteForTile(int x, int y, int dx, int dy)
+static void
+_createSpriteForTile(int x, int y)
 {
-  SDL_Rect src;
-  SDL_Rect dest;
-
-  setSrcForTile(groundTiles[y][x], &src);
+  SDL_Rect src = _getSrcForTile(_groundTiles[y][x]);
+  SDL_Rect dest = _getTileSpriteDest(src, x, y);
   
-  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + dx;
-  dest.y = x * (tileHeight / 2) + y * (tileHeight / 2) + dy;
-  dest.w = src.w * zoom;
-  dest.h = src.h * zoom;
-
-  tilesSpriteId[y][x] = graphic_createTilesetSprite(
+  _tilesSpriteId[y][x] = Graphic_CreateTilesetSprite(
       spriteSheetId, 
       src, 
       dest
   );
 }
 
-void
-createSpriteForTileObject(int x, int y, int dx, int dy)
+static void
+_createSpriteForTileObject(int x, int y)
 {
-  if (objectTiles[y][x] == GameTile_Empty) {
+  if (_objectTiles[y][x] == GameTile_Empty) {
     return;
   }
-  SDL_Rect src;
-  SDL_Rect dest;
+  SDL_Rect src = _getSrcForTile(_objectTiles[y][x]);
+  SDL_Rect dest = _getObjectSpriteDest(src, x, y);
 
-  setSrcForTile(objectTiles[y][x], &src);
-  
-  dest.x = x * (tileWidth / 2 + zoom) - y * (tileWidth / 2 + zoom) + dx;
-  dest.y = x * tileHeight / 2 + y * tileHeight / 2 + dy
-    - (src.h - DEFAULT_TILE_HEIGHT) * zoom;
-  dest.w = src.w * zoom;
-  dest.h = src.h * zoom;
-
-  tilesObjectSpriteId[y][x] = graphic_createTilesetSprite(
+  _tilesObjectSpriteId[y][x] = Graphic_CreateTilesetSprite(
       spriteSheetId, 
       src, 
       dest
@@ -358,30 +378,30 @@ createSpriteForTileObject(int x, int y, int dx, int dy)
 void 
 Game_Enter(void)
 {
-  Scene_SetUpdateTo(update);
+  Scene_SetUpdateTo(_update);
 
-  zoom = 3;
-  calculateTileWidth();
-  calculateTileHeight();
+  _zoom = 3;
+  _calculateTileWidth();
+  _calculateTileHeight();
 
-  spriteSheetId = graphic_loadTexture("sprite-sheet.bmp");
+  spriteSheetId = Graphic_LoadTexture("sprite-sheet.bmp");
 
   int w, h;
-  graphic_queryWindowSize(&w, &h);
+  Graphic_QueryWindowSize(&w, &h);
 
-  map.w = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * (tileWidth + zoom * 2);
-  map.h = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * tileHeight;
-  map.x = (double) (w - map.w) / 2;
-  map.y = (double) (h - map.h) / 2;
-  map.dx = map.x + (double) (MAP_HEIGHT - 1) / 2 * (tileWidth + zoom * 2);
-  map.dy = map.y;
+  _map.w = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * (_tileWidth + _zoom * 2);
+  _map.h = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * _tileHeight;
+  _map.x = (double) (w - _map.w) / 2;
+  _map.y = (double) (h - _map.h) / 2;
+  _map.dx = _map.x + (double) (MAP_HEIGHT - 1) / 2 * (_tileWidth + _zoom * 2);
+  _map.dy = _map.y;
 
   for (int y = 0; y < MAP_HEIGHT; y++) 
   {
     for (int x = 0; x < MAP_WIDTH; x++)
     {
-      groundTiles[y][x] = GameTile_Grass;
-      objectTiles[y][x] = GameTile_Empty;
+      _groundTiles[y][x] = GameTile_Grass;
+      _objectTiles[y][x] = GameTile_Empty;
     }
   }
 
@@ -389,31 +409,31 @@ Game_Enter(void)
   {
     for (int x = 48; x < 56; x++)
     {
-      groundTiles[y][x] = GameTile_Road;
+      _groundTiles[y][x] = GameTile_Road;
     }
   }
 
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
-    groundTiles[y][46] = GameTile_SideWalk;
-    groundTiles[y][47] = GameTile_SideWalk;
-    groundTiles[y][56] = GameTile_SideWalk;
-    groundTiles[y][57] = GameTile_SideWalk;
+    _groundTiles[y][46] = GameTile_SideWalk;
+    _groundTiles[y][47] = GameTile_SideWalk;
+    _groundTiles[y][56] = GameTile_SideWalk;
+    _groundTiles[y][57] = GameTile_SideWalk;
   }
 
-  objectTiles[40][45] = GameTile_StandLeft;
-  objectTiles[39][45] = GameTile_StandCenter;
-  objectTiles[38][45] = GameTile_StandRight;
+  _objectTiles[40][45] = GameTile_StandLeft;
+  _objectTiles[39][45] = GameTile_StandCenter;
+  _objectTiles[38][45] = GameTile_StandRight;
 
-  objectTiles[0][46] = GameTile_WalkingCharacterDown1;
-  objectTiles[99][47] = GameTile_WalkingCharacterUp1;
+  _objectTiles[0][46] = GameTile_WalkingCharacterDown1;
+  _objectTiles[99][47] = GameTile_WalkingCharacterUp1;
 
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
     for (int x = 0; x < MAP_WIDTH; x++)
     {
-      createSpriteForTile(x, y, map.dx, map.dy);
-      createSpriteForTileObject(x, y, map.dx, map.dy);
+      _createSpriteForTile(x, y);
+      _createSpriteForTileObject(x, y);
     }
   }
 }

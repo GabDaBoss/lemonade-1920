@@ -52,8 +52,8 @@ input_poll_inputs()
                 state.key_pressed[i] |= (long) 1 << pos;
                 break;
             case SDL_KEYUP:
-                state.key_pressed[i] &= ~(1 << pos);
-                state.key_released[i] |= 1 << pos;
+                state.key_pressed[i] &= (long) ~((long)1 << pos);
+                state.key_released[i] |= (long) 1 << pos;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 switch (event.button.button) {
@@ -98,7 +98,7 @@ input_is_key_released(SDL_Keycode code)
 {
     int i = flag_index(code);
     int pos = (code & MASK) - (FLAGS_PER_WORD * i);
-    return state.key_released[i] & 1 << pos;
+    return state.key_released[i] & (long) 1 << pos;
 }
 
 bool
