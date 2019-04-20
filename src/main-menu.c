@@ -352,6 +352,7 @@ update()
 void 
 MainMenu_Enter()
 {
+  Graphic_InitCamera();
   levelSelector.opened = false; 
   selectedButton = 0;
 

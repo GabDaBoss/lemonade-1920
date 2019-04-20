@@ -75,6 +75,8 @@ _applyCameraToDest(SDL_Rect dest)
 {
   // dest.x -= _camera.bounds.x / _camera.zoom;
   // dest.y -= _camera.bounds.y / _camera.zoom;
+  dest.x -= _camera.x;
+  dest.y -= _camera.y;
   dest.x *= _camera.zoom;
   dest.y *= _camera.zoom;
   dest.w *= _camera.zoom;
@@ -361,16 +363,16 @@ void Graphic_QueryPosition(Id id, int * x, int* y)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
-  (*x) = _sprites.sprite[index].dest.x / _camera.zoom;
-  (*y) = _sprites.sprite[index].dest.y / _camera.zoom;
+  (*x) = _sprites.sprite[index].dest.x / _camera.zoom + _camera.x;
+  (*y) = _sprites.sprite[index].dest.y / _camera.zoom + _camera.x;
 }
 
 void Graphic_SetPosition(Id id, int x, int y)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
-  _sprites.sprite[index].dest.x = x * _camera.zoom;
-  _sprites.sprite[index].dest.y = y * _camera.zoom;
+  _sprites.sprite[index].dest.x = (x - _camera.x) * _camera.zoom;
+  _sprites.sprite[index].dest.y = (y - _camera.y) * _camera.zoom;
   _camera.bounds.dirty = true;
 }
 
@@ -402,8 +404,8 @@ Graphic_CreateText(
   src.y = 0;
   src.w = w;
   src.h = h;
-  dest.x = x * _camera.zoom;
-  dest.y = y * _camera.zoom;
+  dest.x = (x - _camera.x) * _camera.zoom;
+  dest.y = (y - _camera.x) * _camera.zoom;
   dest.w = w * _camera.zoom;
   dest.h = h * _camera.zoom;
   _camera.bounds.dirty = true;
@@ -425,8 +427,8 @@ Graphic_CreateTextCentered(
   src.y = 0;
   src.w = w;
   src.h = h;
-  dest.x = (zone.x + zone.w / 2 - w / 2) * _camera.zoom;
-  dest.y = (zone.y + zone.h / 2 - h / 2) * _camera.zoom;
+  dest.x = (zone.x + zone.w / 2 - w / 2 - _camera.x) * _camera.zoom;
+  dest.y = (zone.y + zone.h / 2 - h / 2 - _camera.y) * _camera.zoom;
   dest.w = w * _camera.zoom;
   dest.h = h * _camera.zoom;
   _camera.bounds.dirty = true;
@@ -463,8 +465,8 @@ Graphic_SetText(
     (unsigned int*) &src.h
   );
   _sprites.sprite[index].src = src;
-  _sprites.sprite[index].dest.x = x * _camera.zoom;
-  _sprites.sprite[index].dest.y = y * _camera.zoom;
+  _sprites.sprite[index].dest.x = (x - _camera.x) * _camera.zoom;
+  _sprites.sprite[index].dest.y = (y - _camera.x) * _camera.zoom;
   _sprites.sprite[index].dest.w = src.w * _camera.zoom;
   _sprites.sprite[index].dest.h = src.h * _camera.zoom;
   _camera.bounds.dirty = true;
@@ -670,6 +672,8 @@ Graphic_QuerySpriteDest(Id id, SDL_Rect *rect)
   rect->y /= _camera.zoom;
   rect->w /= _camera.zoom;
   rect->h /= _camera.zoom;
+  rect->x += _camera.x;
+  rect->y += _camera.y;
 }
 
 void 
@@ -722,7 +726,7 @@ Graphic_SetSpriteDest(Id id, SDL_Rect dest)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
 
-  _sprites.sprite[index].dest = dest;
+  _sprites.sprite[index].dest = _applyCameraToDest(dest);
   _camera.bounds.dirty = true;
 }
 
@@ -741,10 +745,10 @@ Graphic_CenterSpriteInRect(Id id, SDL_Rect rect)
   );
   SDL_Rect dest;
 
-  dest.x = rect.x + rect.w / 2 - w / 2;
-  dest.y = rect.y + rect.h / 2 - h / 2;
-  dest.w = w;
-  dest.h = h;
+  dest.x = (rect.x + rect.w / 2 - w / 2 - _camera.x) * _camera.zoom;
+  dest.y = (rect.y + rect.h / 2 - h / 2 - _camera.y) * _camera.zoom;
+  dest.w = w * _camera.zoom;
+  dest.h = h * _camera.zoom;
 
   _sprites.sprite[index].dest = dest;
   _camera.bounds.dirty = true;
@@ -765,8 +769,8 @@ Graphic_CenterSpriteInRectButKeepRatio(Id id, SDL_Rect rect)
   );
   SDL_Rect dest;
 
-  dest.x = rect.x;
-  dest.y = rect.y;
+  dest.x = (rect.x - _camera.x) * _camera.zoom;
+  dest.y = (rect.y - _camera.y) * _camera.zoom;
   dest.w = rect.w;
   dest.h = rect.h;
 
@@ -951,7 +955,9 @@ Graphic_MoveCamera(int dx, int dy)
   if (!dx && !dy) {
     return;
   }
-
+  
+  _camera.x -= dx;
+  _camera.y -= dy;
   Graphic_TranslateAllSprite(dx, dy);
 }
 

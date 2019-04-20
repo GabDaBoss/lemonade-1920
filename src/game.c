@@ -251,10 +251,13 @@ _moveCharacters(int x, int y, int newY)
   _objectTiles[y][x] = GameTile_Empty;
 
   SDL_Rect src = _getSrcForTile(_objectTiles[newY][x]);
+  SDL_Rect dest = _getObjectSpriteDest(src, x, newY);
+  /*
   SDL_Rect dest;
   Graphic_QuerySpriteDest(_tilesSpriteId[newY][x], &dest);
   dest.y -= src.h - DEFAULT_TILE_HEIGHT;
   dest.h = src.h;
+  */
 
   Graphic_SetSpriteSrcAndDest(
       _tilesObjectSpriteId[y][x], 
@@ -360,6 +363,7 @@ void
 Game_Enter(void)
 {
   Scene_SetUpdateTo(_update);
+  Graphic_InitCamera();
 
   _calculateTileWidth();
   _calculateTileHeight();
