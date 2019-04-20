@@ -11,12 +11,12 @@ typedef enum {
   MiddleMouseButton = 1 << 2,
 } MouseButton;
 
-void input_poll_inputs();
-bool input_is_key_pressed(SDL_Keycode code);
-bool input_is_key_released(SDL_Keycode code);
-bool input_is_quit_pressed();
-bool input_isZoneClicked(SDL_Rect zone, MouseButton buttons);
-bool input_isMouseOverZone(SDL_Rect zone);
+void Input_PollInputs();
+bool Input_IsKeyPressed(SDL_Keycode code);
+bool Input_IsKeyReleased(SDL_Keycode code);
+bool Input_IsQuitPressed();
+bool Input_IsZoneClicked(SDL_Rect zone, MouseButton buttons);
+bool Input_IsMouseOverZone(SDL_Rect zone);
 void Input_QueryMouseTranslation(int* dx, int* dy);
 void Input_QueryMousePosition(int* x, int* y);
 

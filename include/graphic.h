@@ -18,6 +18,7 @@ typedef enum TextureIds {
 } TextureIds;
 
 bool Graphic_Init(const char * const title, int w, int h, int font_size);
+
 void Graphic_Quit();
 void Graphic_Render();
 void Graphic_QueryTextureSize(Id texture_id, int* w, int* h);
@@ -39,7 +40,8 @@ void Graphic_CenterSpriteOnScreenHeightWithOffset(Id id, int y);
 void Graphic_QuerySpriteDest(Id id, SDL_Rect *rect);
 void Graphic_ResizeSpriteToScreen(Id id);
 void Graphic_ZoomSprites(double zoom);
-void Graphic_ApplyZoomSprites(double zoom);
+void Graphic_MoveCamera(int dx, int dy);
+void Graphic_InitCamera();
 
 void Graphic_SetSpriteToBeAfterAnother(Id id, Id other);
 void Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest);
@@ -62,6 +64,8 @@ Id Graphic_CreateSolidTexture(Uint32 color);
 Id Graphic_CreateTextTexture(const char * const text, SDL_Color color);
 Id Graphic_CreateInactiveSprite(Id textureId);
 Id Graphic_CreateInactiveText(char * const text, SDL_Color color);
+
+double Graphic_GetCameraZoom();
 
 #endif /* RENDERER_H */
 

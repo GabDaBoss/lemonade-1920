@@ -28,10 +28,63 @@ static struct {
 static struct {
   int x, y;
   double zoom;
+  struct {
+    int x, y, w, h;
+    bool dirty;
+  } bounds;
 } _camera;
 
+static void
+_updateCameraBoundLeft(int x)
+{
+  if (x < _camera.bounds.x) {
+    _camera.bounds.w += _camera.bounds.x - x;
+    _camera.bounds.x = x;
+  } 
+}
+
+static void
+_updateCameraBoundRight(int x, int w)
+{
+  int dw = (x + w) - (_camera.bounds.x + _camera.bounds.w);
+  if (dw > 0) {
+    _camera.bounds.w += dw;
+  }
+}
+
+static void
+_updateCameraBoundTop(int y)
+{
+  if (y < _camera.bounds.x) {
+    _camera.bounds.h += _camera.bounds.y - y;
+    _camera.bounds.y = y;
+  } 
+}
+
+static void
+_updateCameraBoundBottom(int y, int h)
+{
+  int dh = (y + h) - (_camera.bounds.y + _camera.bounds.h);
+  if (dh > 0) {
+    _camera.bounds.h += dh;
+  }
+}
+
+static SDL_Rect 
+_applyCameraToDest(SDL_Rect dest)
+{
+  dest.x -= _camera.x;
+  dest.y -= _camera.y;
+  dest.x *= _camera.zoom;
+  dest.y *= _camera.zoom;
+  dest.w *= _camera.zoom;
+  dest.h *= _camera.zoom;
+
+  return dest;
+}
+
 static Id 
-createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest) 
+_createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest) 
 {
   Index index;
   Id id;
@@ -44,7 +97,7 @@ createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
   }
 
   _sprites.sprite[_sprites.totalActive].src = src;
-  _sprites.sprite[_sprites.totalActive].dest = dest;
+  _sprites.sprite[_sprites.totalActive].dest = _applyCameraToDest(dest);
   _sprites.sprite[_sprites.totalActive].texture = texture;
   _sprites.totalActive++;
 
@@ -52,7 +105,7 @@ createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
 }
 
 static SDL_Texture*
-createTextTexture(
+_createTextTexture(
   const char * const text, 
   SDL_Color color, 
   unsigned int *w, 
@@ -193,7 +246,8 @@ Graphic_CreateTilesetSprite(Id texture_id, SDL_Rect src, SDL_Rect dest)
   Index texture_index;
   GET_INDEX_FROM_ID(_textures, texture_id, texture_index);
 
-  return createTilesetSprite(_textures.textures[texture_index], src, dest);
+  _camera.bounds.dirty = true;
+  return _createTilesetSprite(_textures.textures[texture_index], src, dest);
 }
 
 Id 
@@ -212,6 +266,7 @@ Graphic_CreateFullTextureSprite(Id texture_id, SDL_Rect dest)
     &src.h
   );
 
+  _camera.bounds.dirty = true;
   return Graphic_CreateTilesetSprite(texture_id, src, dest);
 }
 
@@ -220,8 +275,10 @@ Graphic_SetSpriteSize(Id id, int w, int h)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
-  _sprites.sprite[index].dest.w = w;
-  _sprites.sprite[index].dest.h = h;
+
+  _sprites.sprite[index].dest.w = w * _camera.zoom;
+  _sprites.sprite[index].dest.h = h * _camera.zoom;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -230,8 +287,9 @@ Graphic_TranslateSprite(Id id, int x, int y)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
 
-  _sprites.sprite[index].dest.x += x;
-  _sprites.sprite[index].dest.y += y;
+  _sprites.sprite[index].dest.x += x * _camera.zoom;
+  _sprites.sprite[index].dest.y += y * _camera.zoom;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -262,6 +320,7 @@ Graphic_DeleteSprite(Id id)
     _sprites.indexes[_sprites.ids[last]] = index;
   }
   _sprites.sprite[index] = _sprites.sprite[last];
+  _camera.bounds.dirty = true;
 }
 
 
@@ -302,16 +361,17 @@ void Graphic_QueryPosition(Id id, int * x, int* y)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
-  (*x) = _sprites.sprite[index].dest.x;
-  (*y) = _sprites.sprite[index].dest.y;
+  (*x) = _sprites.sprite[index].dest.x / _camera.zoom;
+  (*y) = _sprites.sprite[index].dest.y / _camera.zoom;
 }
 
 void Graphic_SetPosition(Id id, int x, int y)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
-  _sprites.sprite[index].dest.x = x;
-  _sprites.sprite[index].dest.y = y;
+  _sprites.sprite[index].dest.x = x * _camera.zoom;
+  _sprites.sprite[index].dest.y = y * _camera.zoom;
+  _camera.bounds.dirty = true;
 }
 
 
@@ -322,7 +382,8 @@ Graphic_CreateTextTexture(const char * const text, SDL_Color color)
   Id id;
   GET_NEXT_ID(_textures, id, index, MAX_TEXTURES);
 
-  _textures.textures[index] = createTextTexture(text, color, NULL, NULL);
+  _textures.textures[index] = _createTextTexture(text, color, NULL, NULL);
+  _camera.bounds.dirty = true;
   return id;
 }
 
@@ -335,17 +396,18 @@ Graphic_CreateText(
 { 
   SDL_Rect src, dest;
   unsigned int w, h;
-  SDL_Texture* texture = createTextTexture(text, color, &w, &h);
+  SDL_Texture* texture = _createTextTexture(text, color, &w, &h);
 
   src.x = 0;
   src.y = 0;
   src.w = w;
   src.h = h;
-  dest.x = x;
-  dest.y = y;
-  dest.w = w;
-  dest.h = h;
-  return createTilesetSprite(texture, src, dest);
+  dest.x = x * _camera.zoom;
+  dest.y = y * _camera.zoom;
+  dest.w = w * _camera.zoom;
+  dest.h = h * _camera.zoom;
+  _camera.bounds.dirty = true;
+  return _createTilesetSprite(texture, src, dest);
 }
 
 Id 
@@ -363,10 +425,11 @@ Graphic_CreateTextCentered(
   src.y = 0;
   src.w = w;
   src.h = h;
-  dest.x = zone.x + zone.w / 2 - w / 2;
-  dest.y = zone.y + zone.h / 2 - h / 2;
-  dest.w = w;
-  dest.h = h;
+  dest.x = (zone.x + zone.w / 2 - w / 2) * _camera.zoom;
+  dest.y = (zone.y + zone.h / 2 - h / 2) * _camera.zoom;
+  dest.w = w * _camera.zoom;
+  dest.h = h * _camera.zoom;
+  _camera.bounds.dirty = true;
   return Graphic_CreateTilesetSprite(texture, src, dest);
 }
 
@@ -393,17 +456,18 @@ Graphic_SetText(
   SDL_Rect src;
   src.x = 0;
   src.y = 0;
-  _sprites.sprite[index].texture = createTextTexture(
+  _sprites.sprite[index].texture = _createTextTexture(
     text, 
     color, 
     (unsigned int*) &src.w,
     (unsigned int*) &src.h
   );
   _sprites.sprite[index].src = src;
-  _sprites.sprite[index].dest.x = x;
-  _sprites.sprite[index].dest.y = y;
-  _sprites.sprite[index].dest.w = src.w;
-  _sprites.sprite[index].dest.h = src.h;
+  _sprites.sprite[index].dest.x = x * _camera.zoom;
+  _sprites.sprite[index].dest.y = y * _camera.zoom;
+  _sprites.sprite[index].dest.w = src.w * _camera.zoom;
+  _sprites.sprite[index].dest.h = src.h * _camera.zoom;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -415,6 +479,7 @@ Graphic_DeleteText(Id id)
   SDL_DestroyTexture(_sprites.sprite[index].texture);
 
   Graphic_DeleteSprite(id);
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -425,6 +490,7 @@ Graphic_Clear()
   _sprites.totalActive = 0;
   _sprites.total = 0;
   _textures.total = 0;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -433,7 +499,8 @@ Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
   _sprites.sprite[index].src = src;
-  _sprites.sprite[index].dest = dest;
+  _sprites.sprite[index].dest = _applyCameraToDest(dest);
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -456,6 +523,7 @@ Graphic_CenterSpriteOnScreen(Id id)
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2;
   dest->y = h / 2 - dest->h / 2;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -469,6 +537,7 @@ Graphic_CenterSpriteOnScreenWidth(Id id)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -482,6 +551,7 @@ Graphic_CenterSpriteOnScreenHeight(Id id)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->y = h / 2 - dest->h / 2;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -496,6 +566,7 @@ Graphic_CenterSpriteOnScreenWithOffset(Id id, int x, int y)
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2 + x;
   dest->y = h / 2 - dest->h / 2 + y;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -509,6 +580,7 @@ Graphic_CenterSpriteOnScreenWidthWithOffset(Id id, int x)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2 + x;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -522,6 +594,7 @@ Graphic_CenterSpriteOnScreenHeightWithOffset(Id id, int y)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->y = h / 2 - dest->h / 2 + y;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -559,6 +632,7 @@ Graphic_ResizeSpriteToScreen(Id id)
   }
   _sprites.sprite[index].dest.y = 0;
   _sprites.sprite[index].dest.h = windowHeight;
+  _camera.bounds.dirty = true;
 }
 
 Id
@@ -592,6 +666,10 @@ Graphic_QuerySpriteDest(Id id, SDL_Rect *rect)
   unsigned int index;
   GET_INDEX_FROM_ID(_sprites, id, index);
   *rect = _sprites.sprite[index].dest;
+  rect->x /= _camera.zoom;
+  rect->y /= _camera.zoom;
+  rect->w /= _camera.zoom;
+  rect->h /= _camera.zoom;
 }
 
 void 
@@ -613,6 +691,7 @@ Graphic_SetSpriteToInactive(Id id)
   Sprite tmp = _sprites.sprite[last];
   _sprites.sprite[last] = _sprites.sprite[index];
   _sprites.sprite[index] = tmp;
+  _camera.bounds.dirty = true;
 }
 
 void 
@@ -634,6 +713,7 @@ Graphic_SetSpriteToActive(Id id)
   Sprite tmp = _sprites.sprite[last];
   _sprites.sprite[last] = _sprites.sprite[index];
   _sprites.sprite[index] = tmp;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -643,6 +723,7 @@ Graphic_SetSpriteDest(Id id, SDL_Rect dest)
   GET_INDEX_FROM_ID(_sprites, id, index);
 
   _sprites.sprite[index].dest = dest;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -666,6 +747,7 @@ Graphic_CenterSpriteInRect(Id id, SDL_Rect rect)
   dest.h = h;
 
   _sprites.sprite[index].dest = dest;
+  _camera.bounds.dirty = true;
 }
 
 void
@@ -695,6 +777,7 @@ Graphic_CenterSpriteInRectButKeepRatio(Id id, SDL_Rect rect)
   src.h = h;
   _sprites.sprite[index].src = src;
   _sprites.sprite[index].dest = dest;
+  _camera.bounds.dirty = true;
 }
 
 Id
@@ -758,15 +841,18 @@ Graphic_DeleteTexture(Id id)
       _sprites.sprite[i] = _sprites.sprite[spriteLast];
     }
     i--;
+    _camera.bounds.dirty = true;
   }
 }
 
 void
 Graphic_TranslateAllSprite(int dx, int dy)
 {
+  _camera.bounds.x += dx;
+  _camera.bounds.y += dy;
   for (Index i = 0; i < _sprites.totalActive; i++) {
-    _sprites.sprite[i].dest.x += dx;
-    _sprites.sprite[i].dest.y += dy;
+    _sprites.sprite[i].dest.x += dx * _camera.zoom;
+    _sprites.sprite[i].dest.y += dy * _camera.zoom;
   }
 }
 
@@ -808,10 +894,82 @@ Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
 void 
 Graphic_ZoomSprites(double zoom)
 {
+  printf("zoom: %f\n", zoom);
+  _camera.zoom *= zoom;
   for (Index i = 0; i < _sprites.total; i++) {
     _sprites.sprite[i].dest.x *= zoom;
     _sprites.sprite[i].dest.y *= zoom;
     _sprites.sprite[i].dest.w *= zoom;
     _sprites.sprite[i].dest.h *= zoom;
   }
+}
+
+void 
+Graphic_MoveCamera(int dx, int dy)
+{
+  if (_camera.bounds.dirty) {
+    _camera.bounds.x = 0;
+    _camera.bounds.y = 0;
+    _camera.bounds.w = 0;
+    _camera.bounds.h = 0;
+    _camera.bounds.dirty = false;
+
+    for (Index i = 0; i < _sprites.totalActive; i++) {
+      _updateCameraBoundLeft(_sprites.sprite[i].dest.x / _camera.zoom);
+      _updateCameraBoundRight(
+        _sprites.sprite[i].dest.x / _camera.zoom,
+        _sprites.sprite[i].dest.w / _camera.zoom
+      );
+      _updateCameraBoundTop(_sprites.sprite[i].dest.y / _camera.zoom);
+      _updateCameraBoundBottom(
+        _sprites.sprite[i].dest.y / _camera.zoom, 
+        _sprites.sprite[i].dest.h / _camera.zoom
+      );
+    }
+  }
+  
+  int w, h;
+  Graphic_QueryWindowSize(&w, &h);
+  w /= _camera.zoom;
+  h /= _camera.zoom;
+  printf("x: %d, y: %d, w: %d, h: %d\n", 
+      _camera.bounds.x, 
+      _camera.bounds.y,
+      _camera.bounds.w,
+      _camera.bounds.h);
+
+  if ((_camera.bounds.x >= 0 && dx > 0) ||
+      (_camera.bounds.x + _camera.bounds.w <= w && dx < 0)) {
+    dx = 0;
+  }
+
+  if ((_camera.bounds.y >= 0 && dy > 0) ||
+      (_camera.bounds.y + _camera.bounds.h <= h && dy < 0)) {
+    dy = 0;
+  }
+
+  if (!dx && !dy) {
+    return;
+  }
+
+  Graphic_TranslateAllSprite(dx, dy);
+}
+
+void 
+Graphic_InitCamera()
+{
+  _camera.x = 0;
+  _camera.y = 0;
+  _camera.bounds.x = 0;
+  _camera.bounds.y = 0;
+  _camera.bounds.w = 0;
+  _camera.bounds.h = 0;
+  _camera.zoom = 1.0;
+  _camera.bounds.dirty = false;
+}
+
+double
+Graphic_GetCameraZoom()
+{
+  return _camera.zoom;
 }

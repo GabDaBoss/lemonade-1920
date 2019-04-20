@@ -49,11 +49,7 @@ static Customer _customers[MAX_CUSTOMERS];
 
 static double _cameraDx;
 static double _cameraDy;
-static struct {
-  int x, y, w, h, dx, dy;
-} _map;
 
-static double _zoom;
 static int _tileWidth;
 static int _tileHeight;
 
@@ -62,13 +58,13 @@ static int _dt = 0;
 static void
 _calculateTileWidth()
 {
-   _tileWidth = DEFAULT_TILE_WIDTH * _zoom;
+   _tileWidth = DEFAULT_TILE_WIDTH;
 }
 
 static void 
 _calculateTileHeight()
 {
-  _tileHeight = DEFAULT_TILE_HEIGHT * _zoom;
+  _tileHeight = DEFAULT_TILE_HEIGHT;
 }
 
 static void 
@@ -97,31 +93,12 @@ _handleCamera() {
       _cameraDy++;
     }
 
-    if (dx > 0 && _map.x >= 0) {
-      dx = 0;
-    }
-
-    if (dx < 0 && _map.x <= w - _map.w) {
-      dx = 0;
-    }
-
-    if (dy > 0 && _map.y >= 0) {
-      dy = 0;
-    }
-
-    if (dy < 0 && _map.y <= h - _map.h) {
-      dy = 0;
-    }
-
     if (!dx && !dy) {
       return;
     }
 
-    _map.x += dx * _zoom;
-    _map.y += dy * _zoom;
-    _map.dx = _map.x + (double) (MAP_HEIGHT - 1) / 2 * (_tileWidth + _zoom * 2);
-    _map.dy = _map.y;
-    Graphic_TranslateAllSprite(dx * _zoom, dy * _zoom);
+    printf("dx: %d, dy: %d\n", dx, dy);
+    Graphic_MoveCamera(dx, dy);
   }
 }
 
@@ -249,10 +226,10 @@ static SDL_Rect
 _getTileSpriteDest(SDL_Rect src, int x, int y)
 {
   SDL_Rect dest;
-  dest.x = x * (_tileWidth / 2 + _zoom) - y * (_tileWidth / 2 + _zoom) + _map.dx;
-  dest.y = x * (_tileHeight / 2) + y * (_tileHeight / 2) + _map.dy;
-  dest.w = src.w * _zoom;
-  dest.h = src.h * _zoom;
+  dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
+  dest.y = x * (_tileHeight / 2) + y * (_tileHeight / 2);
+  dest.w = src.w;
+  dest.h = src.h;
   return dest;
 }
 
@@ -260,17 +237,18 @@ static SDL_Rect
 _getObjectSpriteDest(SDL_Rect src, int x, int y)
 {
   SDL_Rect dest;
-  dest.x = x * (_tileWidth / 2 + _zoom) - y * (_tileWidth / 2 + _zoom) + _map.dx;
-  dest.y = x * _tileHeight / 2 + y * _tileHeight / 2 + _map.dy
-    - (src.h - DEFAULT_TILE_HEIGHT) * _zoom;
-  dest.w = src.w * _zoom;
-  dest.h = src.h * _zoom;
+  dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
+  dest.y = x * _tileHeight / 2 + y * _tileHeight / 2
+    - (src.h - DEFAULT_TILE_HEIGHT);
+  dest.w = src.w;
+  dest.h = src.h;
   return dest;
 }
 
 static void 
 _moveCharacters(int x, int y, int newY)
 {
+  return;
   _objectTiles[y][x] = GameTile_Empty;
 
   SDL_Rect src = _getSrcForTile(_objectTiles[newY][x]);
@@ -297,22 +275,23 @@ _resizeSprites()
 {
   _calculateTileWidth();
   _calculateTileHeight();
-  Graphic_ZoomSprites(_zoom);
+  // Graphic_ZoomSprites(_zoom);
 }
 
 static void 
 _update(void)
 {
-  if (input_is_quit_pressed()) {
+  double zoom = Graphic_GetCameraZoom();
+  if (Input_IsQuitPressed()) {
     Graphic_Clear();
     MainMenu_Enter();
-  } else if (input_is_key_released(SDLK_EQUALS) && _zoom < 5) {
+  } else if (Input_IsKeyReleased(SDLK_EQUALS) && zoom < 5) {
     printf("+\n");
-    _zoom = 2;
+    Graphic_ZoomSprites((zoom + 1.0) / zoom);
     _resizeSprites();
-  } else if (input_is_key_released(SDLK_MINUS) && _zoom > 1) {
+  } else if (Input_IsKeyReleased(SDLK_MINUS) && zoom > 1) {
     printf("-\n");
-    _zoom = 0.5;
+    Graphic_ZoomSprites((zoom - 1.0) / zoom);
     _resizeSprites();
   }
 
@@ -380,7 +359,6 @@ Game_Enter(void)
 {
   Scene_SetUpdateTo(_update);
 
-  _zoom = 3;
   _calculateTileWidth();
   _calculateTileHeight();
 
@@ -388,13 +366,6 @@ Game_Enter(void)
 
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
-
-  _map.w = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * (_tileWidth + _zoom * 2);
-  _map.h = (double) (MAP_WIDTH + MAP_HEIGHT) / 2 * _tileHeight;
-  _map.x = (double) (w - _map.w) / 2;
-  _map.y = (double) (h - _map.h) / 2;
-  _map.dx = _map.x + (double) (MAP_HEIGHT - 1) / 2 * (_tileWidth + _zoom * 2);
-  _map.dy = _map.y;
 
   for (int y = 0; y < MAP_HEIGHT; y++) 
   {

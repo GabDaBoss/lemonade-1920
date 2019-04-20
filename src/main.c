@@ -15,6 +15,7 @@ main()
     return(EXIT_FAILURE);
   };
   
+  Graphic_InitCamera();
   MainMenu_Enter();
   Scene_GameLoop();
 

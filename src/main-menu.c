@@ -247,7 +247,7 @@ static void startGame()
 static void 
 update() 
 {
-  if (input_is_quit_pressed()) {
+  if (Input_IsQuitPressed()) {
     Scene_Quit();
   }
 
@@ -255,23 +255,23 @@ update()
     SDL_Rect okButtonRect, backButtonRect;
     Graphic_QuerySpriteDest(levelSelector.okButton, &okButtonRect);
     Graphic_QuerySpriteDest(levelSelector.backButton, &backButtonRect);
-    if (input_is_key_released(SDLK_ESCAPE)) {
+    if (Input_IsKeyReleased(SDLK_ESCAPE)) {
       closeLevelSelector();
-    } else if (input_isZoneClicked(okButtonRect, LeftMouseButton) ||
-               input_is_key_released(SDLK_RETURN)) {
+    } else if (Input_IsZoneClicked(okButtonRect, LeftMouseButton) ||
+               Input_IsKeyReleased(SDLK_RETURN)) {
       closeLevelSelector();
       startGame();
       return;
-    } else if (input_isZoneClicked(backButtonRect, LeftMouseButton)) {
+    } else if (Input_IsZoneClicked(backButtonRect, LeftMouseButton)) {
       closeLevelSelector();
     }
 
-    if (input_isMouseOverZone(okButtonRect)) {
+    if (Input_IsMouseOverZone(okButtonRect)) {
       if (levelSelector.hoveredButton.id != levelSelector.okButton) {
         levelSelector.hoveredButton.id = levelSelector.okButton;
         setBorderAroundHoveredButton();
       }
-    } else if (input_isMouseOverZone(backButtonRect)) {
+    } else if (Input_IsMouseOverZone(backButtonRect)) {
       if (levelSelector.hoveredButton.id != levelSelector.backButton) {
         levelSelector.hoveredButton.id = levelSelector.backButton;
         setBorderAroundHoveredButton();
@@ -290,39 +290,39 @@ update()
     Graphic_QuerySpriteDest(loadButton, &loadButtonRect);
     Graphic_QuerySpriteDest(quitButton, &quitButtonRect);
 
-    if (input_is_key_released(SDLK_RETURN) || 
-        input_is_key_released(SDLK_RETURN2)) {
+    if (Input_IsKeyReleased(SDLK_RETURN) || 
+        Input_IsKeyReleased(SDLK_RETURN2)) {
       switch((int) selectedButton) 
       {
         case 0: openLevelSelector(); break;
         case 1: break;
         case 2: Scene_Quit(); break;
       }
-    } else if (input_isZoneClicked(newButtonRect, LeftMouseButton)) {
+    } else if (Input_IsZoneClicked(newButtonRect, LeftMouseButton)) {
       openLevelSelector();
-    } else if (input_isZoneClicked(loadButtonRect, LeftMouseButton)) {
+    } else if (Input_IsZoneClicked(loadButtonRect, LeftMouseButton)) {
       // Load
-    } else if (input_isZoneClicked(quitButtonRect, LeftMouseButton)) {
+    } else if (Input_IsZoneClicked(quitButtonRect, LeftMouseButton)) {
       Scene_Quit();
       return;
     } else {
       int prev = selectedButton;
-      if (input_is_key_pressed(SDLK_DOWN)) {
+      if (Input_IsKeyPressed(SDLK_DOWN)) {
         prev = selectedButton;
         selectedButton += SELECTION_SPEED;
         if (selectedButton >= 3) {
           selectedButton = 0;
         }
-      } else if (input_is_key_pressed(SDLK_UP)) {
+      } else if (Input_IsKeyPressed(SDLK_UP)) {
         selectedButton -= SELECTION_SPEED;
         if (selectedButton < 0) {
           selectedButton = 2.99;
         }
-      } else if (input_isMouseOverZone(newButtonRect)) {
+      } else if (Input_IsMouseOverZone(newButtonRect)) {
         selectedButton = 0;
-      } else if (input_isMouseOverZone(loadButtonRect)) {
+      } else if (Input_IsMouseOverZone(loadButtonRect)) {
         selectedButton = 1;
-      } else if (input_isMouseOverZone(quitButtonRect)) {
+      } else if (Input_IsMouseOverZone(quitButtonRect)) {
         selectedButton = 2;
       } 
       if (selectedButton != prev) {

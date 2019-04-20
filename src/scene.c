@@ -25,7 +25,7 @@ Scene_GameLoop()
 
     int runs = 0;
     while (updateLag >= MS_PER_UPDATE && runs < 5) {
-      input_poll_inputs();
+      Input_PollInputs();
       update();
 
       runs++;
