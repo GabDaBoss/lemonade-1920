@@ -26,6 +26,11 @@ void Graphic_QueryWindowSize(int* w, int* h);
 void Graphic_Clear();
 void Graphic_TranslateAllSprite(int dx, int dy);
 void Graphic_TranslateSprite(Id id, int x, int y);
+void Graphic_TranslateSpriteFloat(
+  Id id, 
+  double x, 
+  double y
+);
 void Graphic_QueryPosition(Id id, int* x, int* y);
 void Graphic_DeleteSprite(Id id);
 void Graphic_DeleteSpriteAndAttachedTexture(Id id);

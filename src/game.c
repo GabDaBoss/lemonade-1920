@@ -1,3 +1,4 @@
+#include <math.h>
 #include "game.h"
 #include "scene.h"
 #include "input.h"
@@ -30,7 +31,7 @@ typedef enum {
 } GameTiles;
 
 #define MAP_WIDTH 100
-#define MAP_HEIGHT 100
+#define MAP_HEIGHT 200
 #define DEFAULT_TILE_WIDTH 14
 #define DEFAULT_TILE_HEIGHT 8
 #define MAX_CUSTOMERS 10
@@ -42,10 +43,12 @@ static Id _tilesObjectSpriteId[MAP_HEIGHT][MAP_WIDTH];
 
 typedef struct {
   Id sprite;
-  int x, y;
+  double x, y, dx, dy;
+  GameTiles tile;
 } Customer;
 
 static Customer _customers[MAX_CUSTOMERS];
+static int _activeCustomers;
 
 static double _cameraDx;
 static double _cameraDy;
@@ -54,6 +57,7 @@ static int _tileWidth;
 static int _tileHeight;
 
 static int _dt = 0;
+static bool _pause = false;
 
 static void
 _calculateTileWidth()
@@ -97,7 +101,6 @@ _handleCamera() {
       return;
     }
 
-    printf("dx: %d, dy: %d\n", dx, dy);
     Graphic_MoveCamera(dx, dy);
   }
 }
@@ -274,6 +277,42 @@ _moveCharacters(int x, int y, int newY)
   _tilesObjectSpriteId[y][x] = VOID_ID;
 }
 
+static void
+_moveCustomers()
+{
+  for (int i = 0; i < _activeCustomers; i++) {
+    double x = _customers[i].x + _customers[i].dx;
+    double y = _customers[i].y + _customers[i].dy;
+
+    if (x >= MAP_WIDTH) {
+      x = -1;
+    }
+
+    if (y >= MAP_HEIGHT) {
+      y = -1;
+    }
+
+    double dx = x - _customers[i].x;
+    double dy = y - _customers[i].y;
+
+    _customers[i].x = x;
+    _customers[i].y = y;
+
+    if (y > 0 && x > 0 && y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1) {
+      Graphic_SetSpriteToBeAfterAnother(
+        _customers[i].sprite, 
+        _tilesSpriteId[(int) (y + (dy > 0 ? 1 : dy < 0 ? -1: 0))][(int) (x + dx)]
+      );
+    }
+
+    Graphic_TranslateSpriteFloat(
+      _customers[i].sprite, 
+      -dy * DEFAULT_TILE_HEIGHT,
+      dy * DEFAULT_TILE_HEIGHT / 2
+    );
+  }
+}
+
 
 static void
 _resizeSprites()
@@ -291,22 +330,24 @@ _update(void)
     Graphic_Clear();
     MainMenu_Enter();
   } else if (Input_IsKeyReleased(SDLK_EQUALS) && zoom < 5) {
-    printf("+\n");
     Graphic_ZoomSprites((zoom + 1.0) / zoom);
     _resizeSprites();
   } else if (Input_IsKeyReleased(SDLK_MINUS) && zoom > 1) {
-    printf("-\n");
     Graphic_ZoomSprites((zoom - 1.0) / zoom);
     _resizeSprites();
+  } else if (Input_IsKeyReleased(SDLK_SPACE)) {
+    _pause = !_pause;
   }
 
+  /*
   if (_dt == 10) {
     for (int y = MAP_HEIGHT; y--;) {
       int nextY = (y + 1) % MAP_HEIGHT;
       if (_objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
-        _objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
+         _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
+         // _objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
       } else if (_objectTiles[y][46] == GameTile_WalkingCharacterDown2) {
-        _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
+        // _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
       } else {
         continue;
       }
@@ -327,6 +368,10 @@ _update(void)
     _dt -= 10;
   }
   _dt++;
+  */
+  if (!_pause) {
+    _moveCustomers();
+  }
   _handleCamera();
 }
 
@@ -357,6 +402,30 @@ _createSpriteForTileObject(int x, int y)
       src, 
       dest
   );
+}
+
+static void
+_createCustomerSprites()
+{
+  for (int i = 0; i < _activeCustomers; i++) {
+    SDL_Rect src, dest;
+    src = _getSrcForTile(_customers[i].tile);
+    dest = _getObjectSpriteDest(src, _customers[i].x, _customers[i].y);
+
+    /*
+    dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
+    dest.y = x * _tileHeight / 2 + y * _tileHeight / 2
+      - (src.h - DEFAULT_TILE_HEIGHT);
+    dest.w = src.w;
+    dest.h = src.h;
+    */
+
+    _customers[i].sprite = Graphic_CreateTilesetSprite(
+      spriteSheetId, 
+      src, 
+      dest
+    );
+  }
 }
 
 void 
@@ -402,8 +471,9 @@ Game_Enter(void)
   _objectTiles[39][45] = GameTile_StandCenter;
   _objectTiles[38][45] = GameTile_StandRight;
 
-  _objectTiles[0][46] = GameTile_WalkingCharacterDown1;
-  _objectTiles[99][47] = GameTile_WalkingCharacterUp1;
+  // _objectTiles[0][46] = GameTile_WalkingCharacterDown1;
+  // _objectTiles[99][47] = GameTile_WalkingCharacterUp1;
+
 
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
@@ -413,5 +483,14 @@ Game_Enter(void)
       _createSpriteForTileObject(x, y);
     }
   }
+
+  _activeCustomers = 1;
+  _customers[0].x = 46;
+  _customers[0].y = -1;
+  _customers[0].dy = 0.10;
+  _customers[0].dx = 0;
+  _customers[0].tile = GameTile_WalkingCharacterDown1;
+  _createCustomerSprites();
+  _pause = false;
 }
 

@@ -10,6 +10,10 @@ typedef struct {
     SDL_Rect dest;
 } Sprite;
 
+typedef struct {
+  double x, y, w, h;
+} RectF;
+
 static SDL_Window* _window;
 static SDL_Renderer* _renderer;
 static TTF_Font* _font;
@@ -21,6 +25,7 @@ static struct {
 
 static struct {
   Sprite sprite[MAX_SPRITES];
+  RectF rectF[MAX_SPRITES];
   unsigned int totalActive;
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
 } _sprites;
@@ -73,8 +78,6 @@ _updateCameraBoundBottom(int y, int h)
 static SDL_Rect 
 _applyCameraToDest(SDL_Rect dest)
 {
-  // dest.x -= _camera.bounds.x / _camera.zoom;
-  // dest.y -= _camera.bounds.y / _camera.zoom;
   dest.x -= _camera.x;
   dest.y -= _camera.y;
   dest.x *= _camera.zoom;
@@ -85,6 +88,26 @@ _applyCameraToDest(SDL_Rect dest)
   return dest;
 }
 
+static void
+_swap(Index it, Id id, Index with)
+{
+    _sprites.sprite[it] = _sprites.sprite[with];
+    _sprites.rectF[it] = _sprites.rectF[with];
+    _sprites.indexes[_sprites.ids[with]] = it;
+    _sprites.ids[with] = id;
+}
+
+static RectF
+_convertRectToRectF(SDL_Rect rect)
+{
+  RectF rectF;
+  rectF.x = rect.x;
+  rectF.y = rect.y;
+  rectF.w = rect.w;
+  rectF.h = rect.h;
+  return rectF;
+}
+
 static Id 
 _createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest) 
 {
@@ -93,12 +116,11 @@ _createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
   GET_NEXT_ID(_sprites, id, index, MAX_SPRITES);
 
   if (_sprites.totalActive < index) {
-    _sprites.sprite[index] = _sprites.sprite[_sprites.totalActive];
-    _sprites.indexes[_sprites.ids[_sprites.totalActive]] = index;
-    _sprites.ids[_sprites.totalActive] = id;
+    _swap(index, id, _sprites.totalActive);
   }
 
   _sprites.sprite[_sprites.totalActive].src = src;
+  _sprites.rectF[_sprites.totalActive] = _convertRectToRectF(dest);
   _sprites.sprite[_sprites.totalActive].dest = _applyCameraToDest(dest);
   _sprites.sprite[_sprites.totalActive].texture = texture;
   _sprites.totalActive++;
@@ -278,6 +300,8 @@ Graphic_SetSpriteSize(Id id, int w, int h)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
 
+  _sprites.rectF[index].w = w;
+  _sprites.rectF[index].h = h;
   _sprites.sprite[index].dest.w = w * _camera.zoom;
   _sprites.sprite[index].dest.h = h * _camera.zoom;
   _camera.bounds.dirty = true;
@@ -289,6 +313,8 @@ Graphic_TranslateSprite(Id id, int x, int y)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
 
+  _sprites.rectF[index].x = (int) _sprites.rectF[index].x + x;
+  _sprites.rectF[index].y = (int) _sprites.rectF[index].y + y;
   _sprites.sprite[index].dest.x += x * _camera.zoom;
   _sprites.sprite[index].dest.y += y * _camera.zoom;
   _camera.bounds.dirty = true;
@@ -311,6 +337,7 @@ Graphic_DeleteSprite(Id id)
       _sprites.indexes[_sprites.ids[last]] = index;
     }
     _sprites.sprite[index] = _sprites.sprite[last];
+    _sprites.rectF[index] = _sprites.rectF[last];
     index = last;
     id = _sprites.ids[last];
   } 
@@ -322,6 +349,7 @@ Graphic_DeleteSprite(Id id)
     _sprites.indexes[_sprites.ids[last]] = index;
   }
   _sprites.sprite[index] = _sprites.sprite[last];
+  _sprites.rectF[index] = _sprites.rectF[last];
   _camera.bounds.dirty = true;
 }
 
@@ -373,6 +401,8 @@ void Graphic_SetPosition(Id id, int x, int y)
   GET_INDEX_FROM_ID(_sprites, id, index);
   _sprites.sprite[index].dest.x = (x - _camera.x) * _camera.zoom;
   _sprites.sprite[index].dest.y = (y - _camera.y) * _camera.zoom;
+  _sprites.rectF[index].x = x;
+  _sprites.rectF[index].y = y;
   _camera.bounds.dirty = true;
 }
 
@@ -427,11 +457,10 @@ Graphic_CreateTextCentered(
   src.y = 0;
   src.w = w;
   src.h = h;
-  dest.x = (zone.x + zone.w / 2 - w / 2 - _camera.x) * _camera.zoom;
-  dest.y = (zone.y + zone.h / 2 - h / 2 - _camera.y) * _camera.zoom;
-  dest.w = w * _camera.zoom;
-  dest.h = h * _camera.zoom;
-  _camera.bounds.dirty = true;
+  dest.x = zone.x + zone.w / 2 - w / 2;
+  dest.y = zone.y + zone.h / 2 - h / 2;
+  dest.w = w;
+  dest.h = h;
   return Graphic_CreateTilesetSprite(texture, src, dest);
 }
 
@@ -465,6 +494,8 @@ Graphic_SetText(
     (unsigned int*) &src.h
   );
   _sprites.sprite[index].src = src;
+  _sprites.rectF[index].x = x;
+  _sprites.rectF[index].y = y;
   _sprites.sprite[index].dest.x = (x - _camera.x) * _camera.zoom;
   _sprites.sprite[index].dest.y = (y - _camera.x) * _camera.zoom;
   _sprites.sprite[index].dest.w = src.w * _camera.zoom;
@@ -500,6 +531,7 @@ Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest)
 {
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
+  _sprites.rectF[index] = _convertRectToRectF(dest);
   _sprites.sprite[index].src = src;
   _sprites.sprite[index].dest = _applyCameraToDest(dest);
   _camera.bounds.dirty = true;
@@ -525,6 +557,8 @@ Graphic_CenterSpriteOnScreen(Id id)
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2;
   dest->y = h / 2 - dest->h / 2;
+  _sprites.rectF[index].x = dest->x;
+  _sprites.rectF[index].y = dest->y;
   _camera.bounds.dirty = true;
 }
 
@@ -539,6 +573,7 @@ Graphic_CenterSpriteOnScreenWidth(Id id)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2;
+  _sprites.rectF[index].x = dest->x;
   _camera.bounds.dirty = true;
 }
 
@@ -553,6 +588,7 @@ Graphic_CenterSpriteOnScreenHeight(Id id)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->y = h / 2 - dest->h / 2;
+  _sprites.rectF[index].y = dest->y;
   _camera.bounds.dirty = true;
 }
 
@@ -568,6 +604,8 @@ Graphic_CenterSpriteOnScreenWithOffset(Id id, int x, int y)
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2 + x;
   dest->y = h / 2 - dest->h / 2 + y;
+  _sprites.rectF[index].x = dest->x;
+  _sprites.rectF[index].y = dest->y;
   _camera.bounds.dirty = true;
 }
 
@@ -582,6 +620,7 @@ Graphic_CenterSpriteOnScreenWidthWithOffset(Id id, int x)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->x = w / 2 - dest->w / 2 + x;
+  _sprites.rectF[index].x = dest->x;
   _camera.bounds.dirty = true;
 }
 
@@ -596,6 +635,7 @@ Graphic_CenterSpriteOnScreenHeightWithOffset(Id id, int y)
 
   SDL_Rect* dest = &_sprites.sprite[index].dest;
   dest->y = h / 2 - dest->h / 2 + y;
+  _sprites.rectF[index].y = dest->y;
   _camera.bounds.dirty = true;
 }
 
@@ -634,6 +674,7 @@ Graphic_ResizeSpriteToScreen(Id id)
   }
   _sprites.sprite[index].dest.y = 0;
   _sprites.sprite[index].dest.h = windowHeight;
+  _sprites.rectF[index] = _convertRectToRectF(_sprites.sprite[index].dest);
   _camera.bounds.dirty = true;
 }
 
@@ -693,8 +734,11 @@ Graphic_SetSpriteToInactive(Id id)
     _sprites.indexes[id] = last;
   }
   Sprite tmp = _sprites.sprite[last];
+  RectF tRectF = _sprites.rectF[last];
   _sprites.sprite[last] = _sprites.sprite[index];
+  _sprites.rectF[last] = _sprites.rectF[index];
   _sprites.sprite[index] = tmp;
+  _sprites.rectF[index] = tRectF;
   _camera.bounds.dirty = true;
 }
 
@@ -715,8 +759,11 @@ Graphic_SetSpriteToActive(Id id)
     _sprites.indexes[id] = last;
   }
   Sprite tmp = _sprites.sprite[last];
+  RectF tRectF = _sprites.rectF[last];
   _sprites.sprite[last] = _sprites.sprite[index];
+  _sprites.rectF[last] = _sprites.rectF[index];
   _sprites.sprite[index] = tmp;
+  _sprites.rectF[index] = tRectF;
   _camera.bounds.dirty = true;
 }
 
@@ -727,6 +774,7 @@ Graphic_SetSpriteDest(Id id, SDL_Rect dest)
   GET_INDEX_FROM_ID(_sprites, id, index);
 
   _sprites.sprite[index].dest = _applyCameraToDest(dest);
+  _sprites.rectF[index] = _convertRectToRectF(dest);
   _camera.bounds.dirty = true;
 }
 
@@ -743,14 +791,21 @@ Graphic_CenterSpriteInRect(Id id, SDL_Rect rect)
     &w, 
     &h
   );
+
+  RectF rectF;
+  rectF.x = rect.x + rect.w / 2 - w / 2;
+  rectF.y = rect.y + rect.h / 2 - h / 2;
+  rectF.w = w;
+  rectF.h = h;
   SDL_Rect dest;
 
-  dest.x = (rect.x + rect.w / 2 - w / 2 - _camera.x) * _camera.zoom;
-  dest.y = (rect.y + rect.h / 2 - h / 2 - _camera.y) * _camera.zoom;
-  dest.w = w * _camera.zoom;
-  dest.h = h * _camera.zoom;
+  dest.x = (rectF.x - _camera.x) * _camera.zoom;
+  dest.y = (rectF.y - _camera.y) * _camera.zoom;
+  dest.w = rectF.w * _camera.zoom;
+  dest.h = rectF.h * _camera.zoom;
 
   _sprites.sprite[index].dest = dest;
+  _sprites.rectF[index] = rectF;
   _camera.bounds.dirty = true;
 }
 
@@ -768,6 +823,8 @@ Graphic_CenterSpriteInRectButKeepRatio(Id id, SDL_Rect rect)
     &h
   );
   SDL_Rect dest;
+
+  _sprites.rectF[index] = _convertRectToRectF(rect);
 
   dest.x = (rect.x - _camera.x) * _camera.zoom;
   dest.y = (rect.y - _camera.y) * _camera.zoom;
@@ -809,6 +866,10 @@ Graphic_CreateInactiveSprite(Id textureId)
   _sprites.sprite[index].dest.y = 0;
   _sprites.sprite[index].dest.w = 0;
   _sprites.sprite[index].dest.h = 0;
+  _sprites.rectF[index].x = 0;
+  _sprites.rectF[index].y = 0;
+  _sprites.rectF[index].w = 0;
+  _sprites.rectF[index].h = 0;
 
   return id;
 }
@@ -834,7 +895,9 @@ Graphic_DeleteTexture(Id id)
     {
       _sprites.totalActive--;
       _sprites.sprite[i] = _sprites.sprite[_sprites.totalActive];
+      _sprites.rectF[i] = _sprites.rectF[_sprites.totalActive];
       _sprites.sprite[_sprites.totalActive] = _sprites.sprite[spriteLast];
+      _sprites.rectF[_sprites.totalActive] = _sprites.rectF[spriteLast];
     } 
     else 
     { 
@@ -843,6 +906,7 @@ Graphic_DeleteTexture(Id id)
         _sprites.totalActive--;
       }
       _sprites.sprite[i] = _sprites.sprite[spriteLast];
+      _sprites.rectF[i] = _sprites.rectF[spriteLast];
     }
     i--;
     _camera.bounds.dirty = true;
@@ -857,6 +921,8 @@ Graphic_TranslateAllSprite(int dx, int dy)
   for (Index i = 0; i < _sprites.totalActive; i++) {
     _sprites.sprite[i].dest.x += dx * _camera.zoom;
     _sprites.sprite[i].dest.y += dy * _camera.zoom;
+    // _sprites.rectF[i].x += dx;
+    // _sprites.rectF[i].y += dy;
   }
 }
 
@@ -868,6 +934,7 @@ Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
   GET_INDEX_FROM_ID(_sprites, other, otherIdx);
 
   Sprite sprite = _sprites.sprite[idx];
+  RectF rectF = _sprites.rectF[idx];
   if (idx == otherIdx) {
     return;
   }
@@ -875,21 +942,25 @@ Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
   if (idx < otherIdx) {
     for (Index i = idx; i < otherIdx; i++) {
       _sprites.sprite[i] = _sprites.sprite[i + 1];
+      _sprites.rectF[i] = _sprites.rectF[i + 1];
       _sprites.ids[i] = _sprites.ids[i + 1];
       _sprites.indexes[_sprites.ids[i]] = i;
     }
 
     _sprites.sprite[otherIdx] = sprite;
+    _sprites.rectF[otherIdx] = rectF;
     _sprites.ids[otherIdx] = id;
     _sprites.indexes[id] = otherIdx;
   } else {
     for (Index i = idx; i > otherIdx + 1; i--) {
       _sprites.sprite[i] = _sprites.sprite[i - 1];
+      _sprites.rectF[i] = _sprites.rectF[i - 1];
       _sprites.ids[i] = _sprites.ids[i - 1];
       _sprites.indexes[_sprites.ids[i]] = i;
     }
 
     _sprites.sprite[otherIdx + 1] = sprite;
+    _sprites.rectF[otherIdx + 1] = rectF;
     _sprites.ids[otherIdx + 1] = id;
     _sprites.indexes[id] = otherIdx + 1;
   }
@@ -898,7 +969,6 @@ Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
 void 
 Graphic_ZoomSprites(double zoom)
 {
-  printf("zoom: %f\n", zoom);
   _camera.zoom *= zoom;
   for (Index i = 0; i < _sprites.total; i++) {
     _sprites.sprite[i].dest.x *= zoom;
@@ -936,11 +1006,6 @@ Graphic_MoveCamera(int dx, int dy)
   Graphic_QueryWindowSize(&w, &h);
   w /= _camera.zoom;
   h /= _camera.zoom;
-  printf("x: %d, y: %d, w: %d, h: %d\n", 
-      _camera.bounds.x, 
-      _camera.bounds.y,
-      _camera.bounds.w,
-      _camera.bounds.h);
 
   if ((_camera.bounds.x >= 0 && dx > 0) ||
       (_camera.bounds.x + _camera.bounds.w <= w && dx < 0)) {
@@ -978,4 +1043,22 @@ double
 Graphic_GetCameraZoom()
 {
   return _camera.zoom;
+}
+
+void 
+Graphic_TranslateSpriteFloat(
+  Id id, 
+  double x, 
+  double y)
+{
+  Index idx;
+  GET_INDEX_FROM_ID(_sprites, id, idx);
+  _sprites.rectF[idx].x += x;
+  _sprites.rectF[idx].y += y;
+  _sprites.sprite[idx].dest.x = _sprites.rectF[idx].x;
+  _sprites.sprite[idx].dest.y = _sprites.rectF[idx].y;
+  _sprites.sprite[idx].dest.x -= _camera.x;
+  _sprites.sprite[idx].dest.y -= _camera.y;
+  _sprites.sprite[idx].dest.x *= _camera.zoom;
+  _sprites.sprite[idx].dest.y *= _camera.zoom;
 }
