@@ -73,8 +73,8 @@ _updateCameraBoundBottom(int y, int h)
 static SDL_Rect 
 _applyCameraToDest(SDL_Rect dest)
 {
-  dest.x -= _camera.x;
-  dest.y -= _camera.y;
+  // dest.x -= _camera.bounds.x / _camera.zoom;
+  // dest.y -= _camera.bounds.y / _camera.zoom;
   dest.x *= _camera.zoom;
   dest.y *= _camera.zoom;
   dest.w *= _camera.zoom;
