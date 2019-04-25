@@ -75,6 +75,31 @@ _updateCameraBoundBottom(int y, int h)
   }
 }
 
+static void
+_updateCameraBounds()
+{
+  if (_camera.bounds.dirty) {
+    _camera.bounds.x = 0;
+    _camera.bounds.y = 0;
+    _camera.bounds.w = 0;
+    _camera.bounds.h = 0;
+    _camera.bounds.dirty = false;
+
+    for (Index i = 0; i < _sprites.totalActive; i++) {
+      _updateCameraBoundLeft(_sprites.sprite[i].dest.x / _camera.zoom);
+      _updateCameraBoundRight(
+        _sprites.sprite[i].dest.x / _camera.zoom,
+        _sprites.sprite[i].dest.w / _camera.zoom
+      );
+      _updateCameraBoundTop(_sprites.sprite[i].dest.y / _camera.zoom);
+      _updateCameraBoundBottom(
+        _sprites.sprite[i].dest.y / _camera.zoom, 
+        _sprites.sprite[i].dest.h / _camera.zoom
+      );
+    }
+  }
+}
+
 static SDL_Rect 
 _applyCameraToDest(SDL_Rect dest)
 {
@@ -392,7 +417,7 @@ void Graphic_QueryPosition(Id id, int * x, int* y)
   Index index;
   GET_INDEX_FROM_ID(_sprites, id, index);
   (*x) = _sprites.sprite[index].dest.x / _camera.zoom + _camera.x;
-  (*y) = _sprites.sprite[index].dest.y / _camera.zoom + _camera.x;
+  (*y) = _sprites.sprite[index].dest.y / _camera.zoom + _camera.y;
 }
 
 void Graphic_SetPosition(Id id, int x, int y)
@@ -970,9 +995,34 @@ void
 Graphic_ZoomSprites(double zoom)
 {
   _camera.zoom *= zoom;
+  //_camera.x *= zoom;
+  //_camera.y *= zoom;
+  int w, h;
+  Graphic_QueryWindowSize(&w, &h);
+  int dx = w / 2 * (zoom - 1.0);
+  int dy = h / 2 * (zoom - 1.0);
+  if (dx % 2 == -1) {
+    dx--;
+  }
+  if (dx % 2 == 1) {
+    dx++;
+  }
+
+  if (dy % 2 == -1) {
+    dy--;
+  }
+
+  if (dy % 2 == 1) {
+    dy++;
+  }
   for (Index i = 0; i < _sprites.total; i++) {
     _sprites.sprite[i].dest.x *= zoom;
+    _sprites.sprite[i].dest.x -= dx;
+    // _sprites.sprite[i].dest.x -= w / 2 * (zoom - 1) + _camera.x;
     _sprites.sprite[i].dest.y *= zoom;
+    _sprites.sprite[i].dest.y -= dy;
+    // _sprites.sprite[i].dest.y -= h / 2 * (zoom - 1) + _camera.y;
+
     _sprites.sprite[i].dest.w *= zoom;
     _sprites.sprite[i].dest.h *= zoom;
   }
@@ -981,26 +1031,7 @@ Graphic_ZoomSprites(double zoom)
 void 
 Graphic_MoveCamera(int dx, int dy)
 {
-  if (_camera.bounds.dirty) {
-    _camera.bounds.x = 0;
-    _camera.bounds.y = 0;
-    _camera.bounds.w = 0;
-    _camera.bounds.h = 0;
-    _camera.bounds.dirty = false;
-
-    for (Index i = 0; i < _sprites.totalActive; i++) {
-      _updateCameraBoundLeft(_sprites.sprite[i].dest.x / _camera.zoom);
-      _updateCameraBoundRight(
-        _sprites.sprite[i].dest.x / _camera.zoom,
-        _sprites.sprite[i].dest.w / _camera.zoom
-      );
-      _updateCameraBoundTop(_sprites.sprite[i].dest.y / _camera.zoom);
-      _updateCameraBoundBottom(
-        _sprites.sprite[i].dest.y / _camera.zoom, 
-        _sprites.sprite[i].dest.h / _camera.zoom
-      );
-    }
-  }
+  _updateCameraBounds();
   
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
@@ -1053,12 +1084,33 @@ Graphic_TranslateSpriteFloat(
 {
   Index idx;
   GET_INDEX_FROM_ID(_sprites, id, idx);
+
+  int w, h;
+  Graphic_QueryWindowSize(&w, &h);
   _sprites.rectF[idx].x += x;
   _sprites.rectF[idx].y += y;
-  _sprites.sprite[idx].dest.x = _sprites.rectF[idx].x;
-  _sprites.sprite[idx].dest.y = _sprites.rectF[idx].y;
-  _sprites.sprite[idx].dest.x -= _camera.x;
-  _sprites.sprite[idx].dest.y -= _camera.y;
-  _sprites.sprite[idx].dest.x *= _camera.zoom;
-  _sprites.sprite[idx].dest.y *= _camera.zoom;
+  _sprites.sprite[idx].dest.x = 
+    (_sprites.rectF[idx].x - _camera.x) * _camera.zoom - 
+    w / 2 * (_camera.zoom - 1);
+  _sprites.sprite[idx].dest.y = 
+    (_sprites.rectF[idx].y - _camera.y) * _camera.zoom -
+    h / 2 * (_camera.zoom - 1);
+}
+
+void 
+Graphic_CenterCamera()
+{
+  _updateCameraBounds();
+
+  int w, h;
+  Graphic_QueryWindowSize(&w, &h);
+  w /= _camera.zoom;
+  h /= _camera.zoom;
+
+  int dx = 0, dy = 0;
+  dx = _camera.x + (_camera.bounds.w - w) / 2;
+  dy = _camera.y - (_camera.bounds.h - h) / 2;
+  _camera.x -= dx;
+  _camera.y -= dy;
+  Graphic_TranslateAllSprite(dx, dy);
 }

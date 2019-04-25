@@ -47,6 +47,7 @@ void Graphic_ResizeSpriteToScreen(Id id);
 void Graphic_ZoomSprites(double zoom);
 void Graphic_MoveCamera(int dx, int dy);
 void Graphic_InitCamera();
+void Graphic_CenterCamera();
 
 void Graphic_SetSpriteToBeAfterAnother(Id id, Id other);
 void Graphic_SetSpriteSrcAndDest(Id id, SDL_Rect src, SDL_Rect dest);

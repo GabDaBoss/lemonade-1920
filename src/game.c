@@ -31,7 +31,7 @@ typedef enum {
 } GameTiles;
 
 #define MAP_WIDTH 100
-#define MAP_HEIGHT 200
+#define MAP_HEIGHT 100
 #define DEFAULT_TILE_WIDTH 14
 #define DEFAULT_TILE_HEIGHT 8
 #define MAX_CUSTOMERS 10
@@ -248,35 +248,6 @@ _getObjectSpriteDest(SDL_Rect src, int x, int y)
   return dest;
 }
 
-static void 
-_moveCharacters(int x, int y, int newY)
-{
-  _objectTiles[y][x] = GameTile_Empty;
-
-  SDL_Rect src = _getSrcForTile(_objectTiles[newY][x]);
-  SDL_Rect dest = _getObjectSpriteDest(src, x, newY);
-  /*
-  SDL_Rect dest;
-  Graphic_QuerySpriteDest(_tilesSpriteId[newY][x], &dest);
-  dest.y -= src.h - DEFAULT_TILE_HEIGHT;
-  dest.h = src.h;
-  */
-
-  Graphic_SetSpriteSrcAndDest(
-      _tilesObjectSpriteId[y][x], 
-      src,
-      dest
-  );
-
-  Graphic_SetSpriteToBeAfterAnother(
-      _tilesObjectSpriteId[y][x], 
-      _tilesSpriteId[newY][x]
-  );
-
-  _tilesObjectSpriteId[newY][x] = _tilesObjectSpriteId[y][x];
-  _tilesObjectSpriteId[y][x] = VOID_ID;
-}
-
 static void
 _moveCustomers()
 {
@@ -305,21 +276,15 @@ _moveCustomers()
       );
     }
 
+    printf("dx: %f, dy: %f\n",
+      -dy * DEFAULT_TILE_HEIGHT,
+      dy * DEFAULT_TILE_HEIGHT / 2);
     Graphic_TranslateSpriteFloat(
       _customers[i].sprite, 
       -dy * DEFAULT_TILE_HEIGHT,
       dy * DEFAULT_TILE_HEIGHT / 2
     );
   }
-}
-
-
-static void
-_resizeSprites()
-{
-  _calculateTileWidth();
-  _calculateTileHeight();
-  // Graphic_ZoomSprites(_zoom);
 }
 
 static void 
@@ -331,44 +296,12 @@ _update(void)
     MainMenu_Enter();
   } else if (Input_IsKeyReleased(SDLK_EQUALS) && zoom < 5) {
     Graphic_ZoomSprites((zoom + 1.0) / zoom);
-    _resizeSprites();
   } else if (Input_IsKeyReleased(SDLK_MINUS) && zoom > 1) {
     Graphic_ZoomSprites((zoom - 1.0) / zoom);
-    _resizeSprites();
   } else if (Input_IsKeyReleased(SDLK_SPACE)) {
     _pause = !_pause;
   }
 
-  /*
-  if (_dt == 10) {
-    for (int y = MAP_HEIGHT; y--;) {
-      int nextY = (y + 1) % MAP_HEIGHT;
-      if (_objectTiles[y][46] == GameTile_WalkingCharacterDown1) {
-         _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
-         // _objectTiles[nextY][46] = GameTile_WalkingCharacterDown2;
-      } else if (_objectTiles[y][46] == GameTile_WalkingCharacterDown2) {
-        // _objectTiles[nextY][46] = GameTile_WalkingCharacterDown1;
-      } else {
-        continue;
-      }
-      _moveCharacters(46, y, nextY);
-    }
-
-    for (int y = 0; y < MAP_HEIGHT; y++) {
-      int nextY = y - 1 >= 0 ? y - 1 : MAP_HEIGHT - 1;
-      if (_objectTiles[y][47] == GameTile_WalkingCharacterUp1) {
-        _objectTiles[nextY][47] = GameTile_WalkingCharacterUp2;
-      } else if (_objectTiles[y][47] == GameTile_WalkingCharacterUp2) {
-        _objectTiles[nextY][47] = GameTile_WalkingCharacterUp1;
-      } else {
-        continue;
-      }
-      _moveCharacters(47, y, nextY);
-    }
-    _dt -= 10;
-  }
-  _dt++;
-  */
   if (!_pause) {
     _moveCustomers();
   }
@@ -411,14 +344,6 @@ _createCustomerSprites()
     SDL_Rect src, dest;
     src = _getSrcForTile(_customers[i].tile);
     dest = _getObjectSpriteDest(src, _customers[i].x, _customers[i].y);
-
-    /*
-    dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
-    dest.y = x * _tileHeight / 2 + y * _tileHeight / 2
-      - (src.h - DEFAULT_TILE_HEIGHT);
-    dest.w = src.w;
-    dest.h = src.h;
-    */
 
     _customers[i].sprite = Graphic_CreateTilesetSprite(
       spriteSheetId, 
@@ -471,9 +396,6 @@ Game_Enter(void)
   _objectTiles[39][45] = GameTile_StandCenter;
   _objectTiles[38][45] = GameTile_StandRight;
 
-  // _objectTiles[0][46] = GameTile_WalkingCharacterDown1;
-  // _objectTiles[99][47] = GameTile_WalkingCharacterUp1;
-
 
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
@@ -487,10 +409,11 @@ Game_Enter(void)
   _activeCustomers = 1;
   _customers[0].x = 46;
   _customers[0].y = -1;
-  _customers[0].dy = 0.10;
+  _customers[0].dy = 0.05;
   _customers[0].dx = 0;
   _customers[0].tile = GameTile_WalkingCharacterDown1;
   _createCustomerSprites();
   _pause = false;
+  //Graphic_CenterCamera();
 }
 
