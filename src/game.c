@@ -30,8 +30,8 @@ typedef enum {
   GameTile_WalkingCharacterLeft2,
 } GameTiles;
 
-#define MAP_WIDTH 100
-#define MAP_HEIGHT 100
+#define MAP_WIDTH 200
+#define MAP_HEIGHT 200
 #define DEFAULT_TILE_WIDTH 14
 #define DEFAULT_TILE_HEIGHT 8
 #define MAX_CUSTOMERS 10
@@ -106,7 +106,7 @@ _handleCamera() {
 }
 
 static SDL_Rect
-_getSrcForTile(GameTiles tile)
+_getTileSrc(GameTiles tile)
 {
   SDL_Rect src;
   switch (tile) {
@@ -226,7 +226,7 @@ _getSrcForTile(GameTiles tile)
 }
 
 static SDL_Rect 
-_getTileSpriteDest(SDL_Rect src, int x, int y)
+_getTileDest(SDL_Rect src, int x, int y)
 {
   SDL_Rect dest;
   dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
@@ -269,16 +269,15 @@ _moveCustomers()
     _customers[i].x = x;
     _customers[i].y = y;
 
+    /*
     if (y > 0 && x > 0 && y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1) {
       Graphic_SetSpriteToBeAfterAnother(
         _customers[i].sprite, 
         _tilesSpriteId[(int) (y + (dy > 0 ? 1 : dy < 0 ? -1: 0))][(int) (x + dx)]
       );
     }
+    */
 
-    printf("dx: %f, dy: %f\n",
-      -dy * DEFAULT_TILE_HEIGHT,
-      dy * DEFAULT_TILE_HEIGHT / 2);
     Graphic_TranslateSpriteFloat(
       _customers[i].sprite, 
       -dy * DEFAULT_TILE_HEIGHT,
@@ -311,8 +310,8 @@ _update(void)
 static void
 _createSpriteForTile(int x, int y)
 {
-  SDL_Rect src = _getSrcForTile(_groundTiles[y][x]);
-  SDL_Rect dest = _getTileSpriteDest(src, x, y);
+  SDL_Rect src = _getTileSrc(_groundTiles[y][x]);
+  SDL_Rect dest = _getTileDest(src, x, y);
   
   _tilesSpriteId[y][x] = Graphic_CreateTilesetSprite(
       spriteSheetId, 
@@ -327,7 +326,7 @@ _createSpriteForTileObject(int x, int y)
   if (_objectTiles[y][x] == GameTile_Empty) {
     return;
   }
-  SDL_Rect src = _getSrcForTile(_objectTiles[y][x]);
+  SDL_Rect src = _getTileSrc(_objectTiles[y][x]);
   SDL_Rect dest = _getObjectSpriteDest(src, x, y);
 
   _tilesObjectSpriteId[y][x] = Graphic_CreateTilesetSprite(
@@ -342,7 +341,7 @@ _createCustomerSprites()
 {
   for (int i = 0; i < _activeCustomers; i++) {
     SDL_Rect src, dest;
-    src = _getSrcForTile(_customers[i].tile);
+    src = _getTileSrc(_customers[i].tile);
     dest = _getObjectSpriteDest(src, _customers[i].x, _customers[i].y);
 
     _customers[i].sprite = Graphic_CreateTilesetSprite(
@@ -351,6 +350,44 @@ _createCustomerSprites()
       dest
     );
   }
+}
+
+static void
+_createMapSprite()
+{
+  Sprite mapSprites[MAP_HEIGHT][MAP_WIDTH] = {0};
+  for (int y = 0; y < MAP_HEIGHT; y++) 
+  {
+    for (int x = 0; x < MAP_WIDTH; x++)
+    {
+      mapSprites[y][x].src = _getTileSrc(GameTile_Grass);
+      mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
+      mapSprites[y][x].textureId = spriteSheetId;
+    }
+  }
+
+  for (int y = 0; y < MAP_HEIGHT; y++)
+  {
+    for (int x = 48; x < 56; x++)
+    {
+      mapSprites[y][x].src = _getTileSrc(GameTile_Road);
+      mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
+    }
+  }
+
+  for (int y = 0; y < MAP_HEIGHT; y++)
+  {
+    mapSprites[y][46].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][46].dest = _getTileDest(mapSprites[y][46].src, 46, y);
+    mapSprites[y][47].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][47].dest = _getTileDest(mapSprites[y][47].src, 47, y);
+    mapSprites[y][56].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][56].dest = _getTileDest(mapSprites[y][56].src, 56, y);
+    mapSprites[y][57].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][57].dest = _getTileDest(mapSprites[y][57].src, 57, y);
+  }
+
+  Graphic_CreateSpriteFromSprites((Sprite*) mapSprites, (Sprite*) mapSprites[MAP_WIDTH]);
 }
 
 void 
@@ -371,25 +408,8 @@ Game_Enter(void)
   {
     for (int x = 0; x < MAP_WIDTH; x++)
     {
-      _groundTiles[y][x] = GameTile_Grass;
       _objectTiles[y][x] = GameTile_Empty;
     }
-  }
-
-  for (int y = 0; y < MAP_HEIGHT; y++)
-  {
-    for (int x = 48; x < 56; x++)
-    {
-      _groundTiles[y][x] = GameTile_Road;
-    }
-  }
-
-  for (int y = 0; y < MAP_HEIGHT; y++)
-  {
-    _groundTiles[y][46] = GameTile_SideWalk;
-    _groundTiles[y][47] = GameTile_SideWalk;
-    _groundTiles[y][56] = GameTile_SideWalk;
-    _groundTiles[y][57] = GameTile_SideWalk;
   }
 
   _objectTiles[40][45] = GameTile_StandLeft;
@@ -397,11 +417,12 @@ Game_Enter(void)
   _objectTiles[38][45] = GameTile_StandRight;
 
 
+  _createMapSprite();
   for (int y = 0; y < MAP_HEIGHT; y++)
   {
     for (int x = 0; x < MAP_WIDTH; x++)
     {
-      _createSpriteForTile(x, y);
+      //_createSpriteForTile(x, y);
       _createSpriteForTileObject(x, y);
     }
   }

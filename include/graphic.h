@@ -17,6 +17,11 @@ typedef enum TextureIds {
     TotalTextureIds
 } TextureIds;
 
+typedef struct {
+  SDL_Rect src, dest;
+  Id textureId;
+} Sprite;
+
 bool Graphic_Init(const char * const title, int w, int h, int font_size);
 
 void Graphic_Quit();
@@ -70,6 +75,7 @@ Id Graphic_CreateSolidTexture(Uint32 color);
 Id Graphic_CreateTextTexture(const char * const text, SDL_Color color);
 Id Graphic_CreateInactiveSprite(Id textureId);
 Id Graphic_CreateInactiveText(char * const text, SDL_Color color);
+Id Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end);
 
 double Graphic_GetCameraZoom();
 

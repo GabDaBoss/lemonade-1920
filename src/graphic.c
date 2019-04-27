@@ -8,7 +8,7 @@ typedef struct {
     SDL_Texture* texture;
     SDL_Rect src;
     SDL_Rect dest;
-} Sprite;
+} _Sprite;
 
 typedef struct {
   double x, y, w, h;
@@ -24,7 +24,7 @@ static struct {
 } _textures;
 
 static struct {
-  Sprite sprite[MAX_SPRITES];
+  _Sprite sprite[MAX_SPRITES];
   RectF rectF[MAX_SPRITES];
   unsigned int totalActive;
   SET_STRUCT_FOR_DOD(Id, MAX_SPRITES);
@@ -258,7 +258,6 @@ Graphic_Render()
       &_sprites.sprite[i].dest
     );
   }
-
   SDL_RenderPresent(_renderer);
 }
 
@@ -758,7 +757,7 @@ Graphic_SetSpriteToInactive(Id id)
     _sprites.ids[last] = id;
     _sprites.indexes[id] = last;
   }
-  Sprite tmp = _sprites.sprite[last];
+  _Sprite tmp = _sprites.sprite[last];
   RectF tRectF = _sprites.rectF[last];
   _sprites.sprite[last] = _sprites.sprite[index];
   _sprites.rectF[last] = _sprites.rectF[index];
@@ -783,7 +782,7 @@ Graphic_SetSpriteToActive(Id id)
     _sprites.ids[last] = id;
     _sprites.indexes[id] = last;
   }
-  Sprite tmp = _sprites.sprite[last];
+  _Sprite tmp = _sprites.sprite[last];
   RectF tRectF = _sprites.rectF[last];
   _sprites.sprite[last] = _sprites.sprite[index];
   _sprites.rectF[last] = _sprites.rectF[index];
@@ -958,7 +957,7 @@ Graphic_SetSpriteToBeAfterAnother(Id id, Id other)
   GET_INDEX_FROM_ID(_sprites, id, idx);
   GET_INDEX_FROM_ID(_sprites, other, otherIdx);
 
-  Sprite sprite = _sprites.sprite[idx];
+  _Sprite sprite = _sprites.sprite[idx];
   RectF rectF = _sprites.rectF[idx];
   if (idx == otherIdx) {
     return;
@@ -995,8 +994,10 @@ void
 Graphic_ZoomSprites(double zoom)
 {
   _camera.zoom *= zoom;
-  //_camera.x *= zoom;
-  //_camera.y *= zoom;
+  _camera.bounds.x *= zoom;
+  _camera.bounds.y *= zoom;
+  _camera.bounds.w *= zoom;
+  _camera.bounds.h *= zoom;
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
   int dx = w / 2 * (zoom - 1.0);
@@ -1018,10 +1019,8 @@ Graphic_ZoomSprites(double zoom)
   for (Index i = 0; i < _sprites.total; i++) {
     _sprites.sprite[i].dest.x *= zoom;
     _sprites.sprite[i].dest.x -= dx;
-    // _sprites.sprite[i].dest.x -= w / 2 * (zoom - 1) + _camera.x;
     _sprites.sprite[i].dest.y *= zoom;
     _sprites.sprite[i].dest.y -= dy;
-    // _sprites.sprite[i].dest.y -= h / 2 * (zoom - 1) + _camera.y;
 
     _sprites.sprite[i].dest.w *= zoom;
     _sprites.sprite[i].dest.h *= zoom;
@@ -1113,4 +1112,69 @@ Graphic_CenterCamera()
   _camera.x -= dx;
   _camera.y -= dy;
   Graphic_TranslateAllSprite(dx, dy);
+}
+
+Id 
+Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end)
+{
+  if (start == NULL) {
+    return VOID_ID;
+  }
+
+  int left = start->dest.x; 
+  int top = start->dest.y;
+  int right = left + start->dest.w;
+  int bottom = top + start->dest.h;
+  for (Sprite* curr = start + 1; curr < end; curr++) {
+    if (curr->dest.x < left) {
+      left = curr->dest.x;
+    }
+
+    if (curr->dest.x + curr->dest.w > right) {
+      right = curr->dest.x + curr->dest.w;
+    }
+
+    if (curr->dest.y < top) {
+      top = curr->dest.y;
+    }
+
+    if (curr->dest.y + curr->dest.h > bottom) {
+      bottom = curr->dest.y + curr->dest.h;
+    }
+  }
+
+  SDL_Texture* texture = SDL_CreateTexture(
+    _renderer, 
+    SDL_GetWindowPixelFormat(_window), 
+    SDL_TEXTUREACCESS_TARGET,
+    right - left, 
+    bottom - top
+  );
+
+  SDL_Texture* t = SDL_GetRenderTarget(_renderer);
+  SDL_SetRenderTarget(_renderer, texture);
+  SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, 0x00);
+  SDL_RenderClear(_renderer);
+  for (Sprite* curr = start; curr < end; curr++) {
+    Index textureIdx;
+    GET_INDEX_FROM_ID(_textures, curr->textureId, textureIdx);
+    curr->dest.x -= left;
+    curr->dest.y -= top;
+    SDL_RenderCopy(_renderer, _textures.textures[textureIdx], &curr->src, &curr->dest);
+  }
+  SDL_RenderPresent(_renderer);
+  SDL_SetRenderTarget(_renderer, t);
+
+  SDL_Rect dest, src;
+  dest.x = left;
+  dest.y = top;
+  src.x = 0;
+  src.y = 0;
+  src.w = dest.w = right - left;
+  src.h = dest.h = bottom - top;
+
+  printf("src.x: %d, src.y: %d, src.w: %d, src.h: %d, dest.x: %d, dest.y: %d, dest.w: %d, dest.h: %d\n", 
+      src.x, src.y, src.w, src.h, dest.x, dest.y, dest.w, dest.h
+  );
+  return _createTilesetSprite(texture, src, dest);
 }
