@@ -33,7 +33,7 @@ Scene_GameLoop()
     }
 
     Graphic_Render();
-    printf("elapsed: %d\n", SDL_GetTicks() - current);
+    //printf("elapsed: %d\n", SDL_GetTicks() - current);
     SDL_Delay(1);
   }
 }

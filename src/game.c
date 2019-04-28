@@ -30,8 +30,8 @@ typedef enum {
   GameTile_WalkingCharacterLeft2,
 } GameTiles;
 
-#define MAP_WIDTH 200
-#define MAP_HEIGHT 200
+#define MAP_WIDTH 100
+#define MAP_HEIGHT 100
 #define DEFAULT_TILE_WIDTH 14
 #define DEFAULT_TILE_HEIGHT 8
 #define MAX_CUSTOMERS 10
@@ -412,9 +412,9 @@ Game_Enter(void)
     }
   }
 
-  _objectTiles[40][45] = GameTile_StandLeft;
-  _objectTiles[39][45] = GameTile_StandCenter;
-  _objectTiles[38][45] = GameTile_StandRight;
+  _objectTiles[46][45] = GameTile_StandLeft;
+  _objectTiles[45][45] = GameTile_StandCenter;
+  _objectTiles[44][45] = GameTile_StandRight;
 
 
   _createMapSprite();
@@ -435,6 +435,6 @@ Game_Enter(void)
   _customers[0].tile = GameTile_WalkingCharacterDown1;
   _createCustomerSprites();
   _pause = false;
-  //Graphic_CenterCamera();
+  Graphic_CenterCamera();
 }
 

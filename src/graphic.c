@@ -1000,28 +1000,15 @@ Graphic_ZoomSprites(double zoom)
   _camera.bounds.h *= zoom;
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
-  int dx = w / 2 * (zoom - 1.0);
-  int dy = h / 2 * (zoom - 1.0);
-  if (dx % 2 == -1) {
-    dx--;
-  }
-  if (dx % 2 == 1) {
-    dx++;
-  }
 
-  if (dy % 2 == -1) {
-    dy--;
-  }
-
-  if (dy % 2 == 1) {
-    dy++;
-  }
   for (Index i = 0; i < _sprites.total; i++) {
-    _sprites.sprite[i].dest.x *= zoom;
-    _sprites.sprite[i].dest.x -= dx;
-    _sprites.sprite[i].dest.y *= zoom;
-    _sprites.sprite[i].dest.y -= dy;
-
+    _sprites.sprite[i].dest.x = 
+      (_sprites.rectF[i].x - _camera.x) * _camera.zoom - 
+      w / 2 * (_camera.zoom - 1);
+    _sprites.sprite[i].dest.y = 
+      (_sprites.rectF[i].y - _camera.y) * _camera.zoom -
+      h / 2 * (_camera.zoom - 1);
+    
     _sprites.sprite[i].dest.w *= zoom;
     _sprites.sprite[i].dest.h *= zoom;
   }
@@ -1103,12 +1090,10 @@ Graphic_CenterCamera()
 
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
-  w /= _camera.zoom;
-  h /= _camera.zoom;
 
   int dx = 0, dy = 0;
-  dx = _camera.x + (_camera.bounds.w - w) / 2;
-  dy = _camera.y - (_camera.bounds.h - h) / 2;
+  dx = _camera.x + w / 2 - _camera.bounds.x - _camera.bounds.w / 2;
+  dy = _camera.y + h / 2 - _camera.bounds.y - _camera.bounds.h / 2;
   _camera.x -= dx;
   _camera.y -= dy;
   Graphic_TranslateAllSprite(dx, dy);
