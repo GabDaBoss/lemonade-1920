@@ -249,6 +249,23 @@ _getObjectSpriteDest(SDL_Rect src, int x, int y)
 }
 
 static void
+_animateCustomers()
+{
+  for (int i = 0; i < _activeCustomers; i++) {
+    switch (_customers[i].tile) {
+      case GameTile_WalkingCharacterDown1: 
+        _customers[i].tile = GameTile_WalkingCharacterDown2;
+        break;
+      case GameTile_WalkingCharacterDown2: 
+        _customers[i].tile = GameTile_WalkingCharacterDown1;
+        break;
+    }
+    SDL_Rect src = _getTileSrc(_customers[i].tile);
+    Graphic_SetSpriteSrcRect(_customers[i].sprite, src);
+  }
+}
+
+static void
 _moveCustomers()
 {
   for (int i = 0; i < _activeCustomers; i++) {
@@ -303,6 +320,12 @@ _update(void)
 
   if (!_pause) {
     _moveCustomers();
+    if (_dt == 15) {
+      _dt -= 15;
+      _animateCustomers();
+    } else {
+      _dt++;
+    }
   }
   _handleCamera();
 }
@@ -436,5 +459,6 @@ Game_Enter(void)
   _createCustomerSprites();
   _pause = false;
   Graphic_CenterCamera();
+  _dt = 0;
 }
 
