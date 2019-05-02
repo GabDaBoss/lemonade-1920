@@ -13,27 +13,25 @@ typedef enum {
   GameTile_Grass,
   GameTile_SideWalk,
   GameTile_Road,
-  GameTile_StandLeft,
-  GameTile_StandCenter,
-  GameTile_StandRight,
-  GameTile_StandingCharacterDown,
-  GameTile_StandingCharacterRight,
-  GameTile_StandingCharacterUp,
-  GameTile_StandingCharacterLeft,
-  GameTile_WalkingCharacterDown1,
-  GameTile_WalkingCharacterRight1,
-  GameTile_WalkingCharacterUp1,
-  GameTile_WalkingCharacterLeft1,
-  GameTile_WalkingCharacterDown2,
-  GameTile_WalkingCharacterRight2,
-  GameTile_WalkingCharacterUp2,
-  GameTile_WalkingCharacterLeft2,
+  GameTile_Stand,
+  GameTile_StandingCharacterSouth,
+  GameTile_StandingCharacterEast,
+  GameTile_StandingCharacterNorth,
+  GameTile_StandingCharacterWest,
+  GameTile_WalkingCharacterSouth1,
+  GameTile_WalkingCharacterEast1,
+  GameTile_WalkingCharacterNorth1,
+  GameTile_WalkingCharacterWest1,
+  GameTile_WalkingCharacterSouth2,
+  GameTile_WalkingCharacterEast2,
+  GameTile_WalkingCharacterNorth2,
+  GameTile_WalkingCharacterWest2,
 } GameTiles;
 
 #define MAP_WIDTH 100
 #define MAP_HEIGHT 100
-#define DEFAULT_TILE_WIDTH 14
-#define DEFAULT_TILE_HEIGHT 8
+#define DEFAULT_TILE_WIDTH 32
+#define DEFAULT_TILE_HEIGHT 16
 #define MAX_CUSTOMERS 10
 
 static GameTiles _groundTiles[MAP_HEIGHT][MAP_WIDTH];
@@ -115,111 +113,99 @@ _getTileSrc(GameTiles tile)
       break;
     case GameTile_Grass:
       src.x = 0;
-      src.y = 0;
-      src.w = 14;
-      src.h = 8;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
       break;
     case GameTile_SideWalk:
-      src.x = 14;
-      src.y = 0;
-      src.w = 14;
-      src.h = 8;
+      src.x = 32;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
       break;
     case GameTile_Road:
-      src.x = 28;
+      src.x = 64;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
+      break;
+    case GameTile_Stand:
+      src.x = 0;
+      src.y = 208;
+      src.w = 32;
+      src.h = 64;
+      break;
+    case GameTile_StandingCharacterSouth:
+      src.x = 0;
+      src.y = 144;
+      src.w = 32;
+      src.h = 48;
+      break;
+    case GameTile_StandingCharacterEast:
+      src.x = 0;
+      src.y = 96;
+      src.w = 32;
+      src.h = 48;
+      break;
+    case GameTile_StandingCharacterNorth:
+      src.x = 0;
+      src.y = 48;
+      src.w = 32;
+      src.h = 48;
+      break;
+    case GameTile_StandingCharacterWest:
+      src.x = 0;
       src.y = 0;
-      src.w = 14;
-      src.h = 8;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandLeft:
-      src.x = 0;
-      src.y = 8;
-      src.w = 14;
-      src.h = 47;
+    case GameTile_WalkingCharacterSouth1:
+      src.x = 32;
+      src.y = 144;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandCenter:
-      src.x = 14;
-      src.y = 8;
-      src.w = 14;
-      src.h = 47;
+    case GameTile_WalkingCharacterEast1:
+      src.x = 32;
+      src.y = 96;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandRight:
-      src.x = 28;
-      src.y = 8;
-      src.w = 14;
-      src.h = 47;
+    case GameTile_WalkingCharacterNorth1:
+      src.x = 32;
+      src.y = 48;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandingCharacterDown:
-      src.x = 0;
-      src.y = 55;
-      src.w = 14;
-      src.h = 40;
+    case GameTile_WalkingCharacterWest1:
+      src.x = 32;
+      src.y = 0;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandingCharacterRight:
-      src.x = 14;
-      src.y = 55;
-      src.w = 14;
-      src.h = 40;
+    case GameTile_WalkingCharacterSouth2:
+      src.x = 64;
+      src.y = 144;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandingCharacterUp:
-      src.x = 28;
-      src.y = 55;
-      src.w = 14;
-      src.h = 40;
+    case GameTile_WalkingCharacterEast2:
+      src.x = 64;
+      src.y = 96;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_StandingCharacterLeft:
-      src.x = 42;
-      src.y = 55;
-      src.w = 14;
-      src.h = 40;
+    case GameTile_WalkingCharacterNorth2:
+      src.x = 64;
+      src.y = 48;
+      src.w = 32;
+      src.h = 48;
       break;
-    case GameTile_WalkingCharacterDown1:
-      src.x = 0;
-      src.y = 95;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterRight1:
-      src.x = 14;
-      src.y = 95;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterUp1:
-      src.x = 28;
-      src.y = 95;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterLeft1:
-      src.x = 42;
-      src.y = 95;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterDown2:
-      src.x = 0;
-      src.y = 135;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterRight2:
-      src.x = 14;
-      src.y = 135;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterUp2:
-      src.x = 28; 
-      src.y = 135;
-      src.w = 14;
-      src.h = 40;
-      break;
-    case GameTile_WalkingCharacterLeft2:
-      src.x = 42;
-      src.y = 135;
-      src.w = 14;
-      src.h = 40;
+    case GameTile_WalkingCharacterWest2:
+      src.x = 64;
+      src.y = 0;
+      src.w = 32;
+      src.h = 48;
       break;
   }
   return src;
@@ -229,7 +215,7 @@ static SDL_Rect
 _getTileDest(SDL_Rect src, int x, int y)
 {
   SDL_Rect dest;
-  dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
+  dest.x = x * (_tileWidth / 2) - y * (_tileWidth / 2);
   dest.y = x * (_tileHeight / 2) + y * (_tileHeight / 2);
   dest.w = src.w;
   dest.h = src.h;
@@ -240,7 +226,7 @@ static SDL_Rect
 _getObjectSpriteDest(SDL_Rect src, int x, int y)
 {
   SDL_Rect dest;
-  dest.x = x * (_tileWidth / 2 + 1) - y * (_tileWidth / 2 + 1);
+  dest.x = x * (_tileWidth / 2) - y * (_tileWidth / 2);
   dest.y = x * _tileHeight / 2 + y * _tileHeight / 2
     - (src.h - DEFAULT_TILE_HEIGHT);
   dest.w = src.w;
@@ -253,11 +239,11 @@ _animateCustomers()
 {
   for (int i = 0; i < _activeCustomers; i++) {
     switch (_customers[i].tile) {
-      case GameTile_WalkingCharacterDown1: 
-        _customers[i].tile = GameTile_WalkingCharacterDown2;
+      case GameTile_WalkingCharacterSouth1: 
+        _customers[i].tile = GameTile_WalkingCharacterSouth2;
         break;
-      case GameTile_WalkingCharacterDown2: 
-        _customers[i].tile = GameTile_WalkingCharacterDown1;
+      case GameTile_WalkingCharacterSouth2: 
+        _customers[i].tile = GameTile_WalkingCharacterSouth1;
         break;
     }
     SDL_Rect src = _getTileSrc(_customers[i].tile);
@@ -422,7 +408,7 @@ Game_Enter(void)
   _calculateTileWidth();
   _calculateTileHeight();
 
-  spriteSheetId = Graphic_LoadTexture("sprite-sheet.bmp");
+  spriteSheetId = Graphic_LoadTexture("sprite-sheet2.bmp");
 
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
@@ -435,9 +421,7 @@ Game_Enter(void)
     }
   }
 
-  _objectTiles[46][45] = GameTile_StandLeft;
-  _objectTiles[45][45] = GameTile_StandCenter;
-  _objectTiles[44][45] = GameTile_StandRight;
+  _objectTiles[45][45] = GameTile_Stand;
 
 
   _createMapSprite();
@@ -455,7 +439,7 @@ Game_Enter(void)
   _customers[0].y = -1;
   _customers[0].dy = 0.05;
   _customers[0].dx = 0;
-  _customers[0].tile = GameTile_WalkingCharacterDown1;
+  _customers[0].tile = GameTile_WalkingCharacterSouth1;
   _createCustomerSprites();
   _pause = false;
   Graphic_CenterCamera();
