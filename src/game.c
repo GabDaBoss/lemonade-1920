@@ -296,6 +296,18 @@ _animateCustomers()
       case GameTile_WalkingCharacterNorth2: 
         _customers[i].tile = GameTile_WalkingCharacterNorth1;
         break;
+      case GameTile_WalkingCharacterEast1: 
+        _customers[i].tile = GameTile_WalkingCharacterEast2;
+        break;
+      case GameTile_WalkingCharacterEast2: 
+        _customers[i].tile = GameTile_WalkingCharacterEast1;
+        break;
+      case GameTile_WalkingCharacterWest1: 
+        _customers[i].tile = GameTile_WalkingCharacterWest2;
+        break;
+      case GameTile_WalkingCharacterWest2: 
+        _customers[i].tile = GameTile_WalkingCharacterWest1;
+        break;
     }
     SDL_Rect src = _getTileSrc(_customers[i].tile);
     Graphic_SetSpriteSrcRect(_customers[i].sprite, src);
