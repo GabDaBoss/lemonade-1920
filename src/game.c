@@ -36,7 +36,7 @@ typedef enum {
 #define MAP_HEIGHT 100
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 16
-#define MAX_CUSTOMERS 10
+#define MAX_CUSTOMERS 20
 #define NORTH_TO_SOUTH_WEST_SIDE_LANE 46
 #define SOUTH_TO_NORTH_WEST_SIDE_LANE 47
 #define NORTH_TO_SOUTH_EAST_SIDE_LANE 56
@@ -303,6 +303,15 @@ _animateCustomers()
 }
 
 static void
+_animateCustomer(int i, GameTiles frame1, GameTiles frame2)
+{
+  if (_customers[i].tile != frame1 && _customers[i].tile != frame2)
+  {
+    _customers[i].tile = frame1;
+  }
+}
+
+static void
 _moveCustomers()
 {
   for (int i = 0; i < _activeCustomers; i++) {
@@ -312,29 +321,165 @@ _moveCustomers()
       case NorthToSouthOnWestSide:
       case NorthToSouthOnEastSide:
         break;
+      case EastOnSouthSideToNorthOnWestSide:
       case EastOnNorthSideToNorthOnWestSide:
         if ((_customers[i].x) <= SOUTH_TO_NORTH_WEST_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterNorth1, 
+            GameTile_WalkingCharacterNorth2
+          );
           _customers[i].dy = -0.05;
           _customers[i].dx = 0;
         } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
+          );
           _customers[i].dy = 0;
           _customers[i].dx = -0.05;
         }
-      case EastOnNorthSideToNorthOnEastSide:
-      case EastOnSouthSideToNorthOnWestSide:
+        break;
       case EastOnSouthSideToNorthOnEastSide:
-      case EastOnSouthSideToSouthOnWestSide:
-      case EastOnSouthSideToSouthOnEastSide:
+      case EastOnNorthSideToNorthOnEastSide:
+        if ((_customers[i].x) <= SOUTH_TO_NORTH_EAST_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterNorth1, 
+            GameTile_WalkingCharacterNorth2
+          );
+          _customers[i].dy = -0.05;
+          _customers[i].dx = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
+          );
+          _customers[i].dy = 0;
+          _customers[i].dx = -0.05;
+        }
+        break;
       case EastOnNorthSideToSouthOnWestSide:
+      case EastOnSouthSideToSouthOnWestSide:
+        if ((_customers[i].x) <= NORTH_TO_SOUTH_WEST_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterSouth1, 
+            GameTile_WalkingCharacterSouth2
+          );
+          _customers[i].dy = 0.05;
+          _customers[i].dx = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
+          );
+          _customers[i].dy = 0;
+          _customers[i].dx = -0.05;
+        }
+        break;
+      case EastOnSouthSideToSouthOnEastSide:
       case EastOnNorthSideToSouthOnEastSide:
-      case SouthOnWestSideToEastOnSouthSide:
-      case SouthOnWestSideToEastOnNorthSide:
+        if (_customers[i].x <= NORTH_TO_SOUTH_EAST_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterSouth1, 
+            GameTile_WalkingCharacterSouth2
+          );
+          _customers[i].dy = 0.05;
+          _customers[i].dx = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
+          );
+          _customers[i].dy = 0;
+          _customers[i].dx = -0.05;
+        }
+        break;
       case SouthOnEastSideToEastOnSouthSide:
+      case SouthOnWestSideToEastOnSouthSide:
+        if ((_customers[i].y) >= WEST_TO_EAST_SOUTH_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
+          );
+          _customers[i].dx = 0.05;
+          _customers[i].dy = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterNorth1, 
+            GameTile_WalkingCharacterNorth2
+          );
+          _customers[i].dx = 0;
+          _customers[i].dy = -0.05;
+        }
+        break;
+      case SouthOnWestSideToEastOnNorthSide:
       case SouthOnEastSideToEastOnNorthSide:
+        if ((_customers[i].y) >= WEST_TO_EAST_NORTH_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
+          );
+          _customers[i].dx = 0.05;
+          _customers[i].dy = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterNorth1, 
+            GameTile_WalkingCharacterNorth2
+          );
+          _customers[i].dx = 0;
+          _customers[i].dy = -0.05;
+        }
+        break;
       case NorthOnWestSideToEastOnSouthSide:
-      case NorthOnWestSideToEastOnNorthSide:
       case NorthOnEastSideToEastOnSouthSide:
+        if ((_customers[i].y) >= WEST_TO_EAST_SOUTH_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
+          );
+          _customers[i].dx = 0.05;
+          _customers[i].dy = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterSouth1, 
+            GameTile_WalkingCharacterSouth2
+          );
+          _customers[i].dx = 0;
+          _customers[i].dy = 0.05;
+        }
+        break;
+      case NorthOnWestSideToEastOnNorthSide:
       case NorthOnEastSideToEastOnNorthSide:
+        if ((_customers[i].y) >= WEST_TO_EAST_NORTH_SIDE_LANE) {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
+          );
+          _customers[i].dx = 0.05;
+          _customers[i].dy = 0;
+        } else {
+          _animateCustomer(
+            i, 
+            GameTile_WalkingCharacterSouth1, 
+            GameTile_WalkingCharacterSouth2
+          );
+          _customers[i].dx = 0;
+          _customers[i].dy = 0.05;
+        }
         break;
     }
     double x = _customers[i].x + _customers[i].dx;
@@ -684,6 +829,22 @@ Game_Enter(void)
   _createCustomer(NorthToSouthOnEastSide, _activeCustomers++);
   _createCustomer(SouthToNorthOnEastSide, _activeCustomers++);
   _createCustomer(EastOnNorthSideToNorthOnWestSide, _activeCustomers++);
+  _createCustomer(EastOnNorthSideToSouthOnWestSide, _activeCustomers++);
+  _createCustomer(EastOnNorthSideToNorthOnEastSide, _activeCustomers++);
+  _createCustomer(EastOnNorthSideToSouthOnEastSide, _activeCustomers++);
+  _createCustomer(EastOnSouthSideToNorthOnWestSide, _activeCustomers++);
+  _createCustomer(EastOnSouthSideToSouthOnWestSide, _activeCustomers++);
+  _createCustomer(EastOnSouthSideToNorthOnEastSide, _activeCustomers++);
+  _createCustomer(EastOnSouthSideToSouthOnEastSide, _activeCustomers++);
+  _createCustomer(SouthOnEastSideToEastOnNorthSide, _activeCustomers++);
+  _createCustomer(SouthOnEastSideToEastOnSouthSide, _activeCustomers++);
+  _createCustomer(SouthOnWestSideToEastOnNorthSide, _activeCustomers++);
+  _createCustomer(SouthOnWestSideToEastOnSouthSide, _activeCustomers++);
+  _createCustomer(NorthOnEastSideToEastOnNorthSide, _activeCustomers++);
+  _createCustomer(NorthOnEastSideToEastOnSouthSide, _activeCustomers++);
+  _createCustomer(NorthOnWestSideToEastOnNorthSide, _activeCustomers++);
+  _createCustomer(NorthOnWestSideToEastOnSouthSide, _activeCustomers++);
+  printf("%d\n", _activeCustomers);
   _createCustomerSprites();
   _pause = false;
   Graphic_CenterCamera();
