@@ -12,6 +12,10 @@ typedef enum {
   GameTile_Empty,
   GameTile_Grass,
   GameTile_SideWalk,
+  GameTile_CrosswalkNorthSouth1,
+  GameTile_CrosswalkNorthSouth2,
+  GameTile_CrosswalkEastWest1,
+  GameTile_CrosswalkEastWest2,
   GameTile_Road,
   GameTile_Stand,
   GameTile_StandingCharacterSouth,
@@ -119,6 +123,30 @@ _getTileSrc(GameTiles tile)
       break;
     case GameTile_SideWalk:
       src.x = 32;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
+      break;
+    case GameTile_CrosswalkNorthSouth1:
+      src.x = 96;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
+      break;
+    case GameTile_CrosswalkNorthSouth2:
+      src.x = 128;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
+      break;
+    case GameTile_CrosswalkEastWest1:
+      src.x = 160;
+      src.y = 192;
+      src.w = 32;
+      src.h = 16;
+      break;
+    case GameTile_CrosswalkEastWest2:
+      src.x = 192;
       src.y = 192;
       src.w = 32;
       src.h = 16;
@@ -245,6 +273,12 @@ _animateCustomers()
       case GameTile_WalkingCharacterSouth2: 
         _customers[i].tile = GameTile_WalkingCharacterSouth1;
         break;
+      case GameTile_WalkingCharacterNorth1: 
+        _customers[i].tile = GameTile_WalkingCharacterNorth2;
+        break;
+      case GameTile_WalkingCharacterNorth2: 
+        _customers[i].tile = GameTile_WalkingCharacterNorth1;
+        break;
     }
     SDL_Rect src = _getTileSrc(_customers[i].tile);
     Graphic_SetSpriteSrcRect(_customers[i].sprite, src);
@@ -370,7 +404,6 @@ _createMapSprite()
     for (int x = 0; x < MAP_WIDTH; x++)
     {
       mapSprites[y][x].src = _getTileSrc(GameTile_Grass);
-      mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
       mapSprites[y][x].textureId = spriteSheetId;
     }
   }
@@ -380,23 +413,48 @@ _createMapSprite()
     for (int x = 48; x < 56; x++)
     {
       mapSprites[y][x].src = _getTileSrc(GameTile_Road);
+    }
+  }
+
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    mapSprites[y][46].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][47].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][56].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[y][57].src = _getTileSrc(GameTile_SideWalk);
+  }
+
+  for (int y = 32; y < 40; y++) {
+    mapSprites[y][56].src = _getTileSrc(GameTile_CrosswalkNorthSouth1);
+    mapSprites[y][57].src = _getTileSrc(GameTile_CrosswalkNorthSouth2);
+  }
+
+  for (int x = 48; x < 56; x++)
+  {
+    mapSprites[30][x].src = _getTileSrc(GameTile_CrosswalkEastWest2);
+    mapSprites[31][x].src = _getTileSrc(GameTile_CrosswalkEastWest1);
+    mapSprites[40][x].src = _getTileSrc(GameTile_CrosswalkEastWest2);
+    mapSprites[41][x].src = _getTileSrc(GameTile_CrosswalkEastWest1);
+  }
+
+  for (int x = 58; x < MAP_WIDTH; x++) {
+    for (int y = 32; y < 40; y++) {
+      mapSprites[y][x].src = _getTileSrc(GameTile_Road);
+    }
+    mapSprites[30][x].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[31][x].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[40][x].src = _getTileSrc(GameTile_SideWalk);
+    mapSprites[41][x].src = _getTileSrc(GameTile_SideWalk);
+  }
+
+  for (int x = 0; x < MAP_WIDTH; x++) {
+    for (int y = 0; y < MAP_HEIGHT; y++) {
       mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
     }
   }
 
-  for (int y = 0; y < MAP_HEIGHT; y++)
-  {
-    mapSprites[y][46].src = _getTileSrc(GameTile_SideWalk);
-    mapSprites[y][46].dest = _getTileDest(mapSprites[y][46].src, 46, y);
-    mapSprites[y][47].src = _getTileSrc(GameTile_SideWalk);
-    mapSprites[y][47].dest = _getTileDest(mapSprites[y][47].src, 47, y);
-    mapSprites[y][56].src = _getTileSrc(GameTile_SideWalk);
-    mapSprites[y][56].dest = _getTileDest(mapSprites[y][56].src, 56, y);
-    mapSprites[y][57].src = _getTileSrc(GameTile_SideWalk);
-    mapSprites[y][57].dest = _getTileDest(mapSprites[y][57].src, 57, y);
-  }
-
-  Graphic_CreateSpriteFromSprites((Sprite*) mapSprites, (Sprite*) mapSprites[MAP_WIDTH]);
+  Graphic_CreateSpriteFromSprites(
+      (Sprite*) mapSprites, 
+      (Sprite*) mapSprites[MAP_WIDTH]);
 }
 
 void 
