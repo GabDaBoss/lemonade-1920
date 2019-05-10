@@ -32,6 +32,7 @@ typedef enum {
   GameTile_WalkingCharacterWest2,
   GameTile_StopSignFacingEast,
   GameTile_StopSignFacingSouth,
+  GameTile_Bush,
 } GameTiles;
 
 #define MAP_WIDTH 100
@@ -304,6 +305,11 @@ _getTileSrc(GameTiles tile)
       src.w = TILE_WIDTH;
       src.h = 4 * TILE_HEIGHT;
       break;
+    case GameTile_Bush:
+      src.x = 0;
+      src.y = 17 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
   }
   return src;
 }
@@ -945,6 +951,14 @@ Game_Enter(void)
       GameTile_StopSignFacingSouth, 
       SOUTH_TO_NORTH_EAST_SIDE_LANE + 1,
       WEST_TO_EAST_SOUTH_SIDE_LANE + 1,
+      0,
+      0,
+      _activeGameObjects++
+  );
+  _createGameObject(
+      GameTile_Bush,
+      SOUTH_TO_NORTH_EAST_SIDE_LANE + 1,
+      EAST_TO_WEST_NORTH_SIDE_LANE - 2,
       0,
       0,
       _activeGameObjects++
