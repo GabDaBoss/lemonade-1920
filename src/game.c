@@ -558,7 +558,7 @@ _moveGameObjects()
         break;
       case SouthOnEastSideToEastOnSouthSide:
       case SouthOnWestSideToEastOnSouthSide:
-        if ((_gameObjects[i].y) >= WEST_TO_EAST_SOUTH_SIDE_LANE) {
+        if ((_gameObjects[i].y) <= WEST_TO_EAST_SOUTH_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterEast1, 
@@ -578,7 +578,7 @@ _moveGameObjects()
         break;
       case SouthOnWestSideToEastOnNorthSide:
       case SouthOnEastSideToEastOnNorthSide:
-        if ((_gameObjects[i].y) >= WEST_TO_EAST_NORTH_SIDE_LANE) {
+        if ((_gameObjects[i].y) <= WEST_TO_EAST_NORTH_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterEast1, 
