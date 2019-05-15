@@ -33,6 +33,18 @@ typedef enum {
   GameTile_StopSignFacingEast,
   GameTile_StopSignFacingSouth,
   GameTile_Bush,
+  GameTile_LeftHouseCorner,
+  GameTile_HouseDoor,
+  GameTile_Wall,
+  GameTile_RightHouseCorner,
+  GameTile_HouseRightWallFirstSection,
+  GameTile_HouseRightWallCenterSection,
+  GameTile_HouseRightWallThirdSection,
+  GameTile_HouseRightWallLastSection,
+  GameTile_HouseRoof,
+  GameTile_HouseLeftRoof,
+  GameTile_HouseTopRoof,
+  GameTile_HouseTopLeftRoof
 } GameTiles;
 
 #define MAP_WIDTH 100
@@ -79,7 +91,7 @@ typedef enum {
 
 typedef struct {
   Id sprite;
-  double x, y, dx, dy;
+  double x, y, z, dx, dy, dz;
   GameTiles tile;
   Path path;
 } GameObject;
@@ -310,6 +322,79 @@ _getTileSrc(GameTiles tile)
       src.y = 17 * TILE_HEIGHT;
       src.w = TILE_WIDTH;
       src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_LeftHouseCorner:
+      src.x = 5 * TILE_WIDTH;
+      src.y = 27 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 7 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseDoor:
+      src.x = 6 * TILE_WIDTH;
+      src.y = 27 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 7 * TILE_HEIGHT;
+      break;
+    case GameTile_Wall:
+      src.x = 7 * TILE_WIDTH;
+      src.y = 27 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 7 * TILE_HEIGHT;
+      break;
+    case GameTile_RightHouseCorner:
+      src.x = 8 * TILE_WIDTH;
+      src.y = 27 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 7 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseRightWallFirstSection:
+      src.x = 4 * TILE_WIDTH;
+      src.y = 26 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 8 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseRightWallCenterSection:
+      src.x = 3 * TILE_WIDTH;
+      src.y = 25 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 9 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseRightWallThirdSection:
+      src.x = 2 * TILE_WIDTH;
+      src.y = 27 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 7 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseRightWallLastSection:
+      src.x = 1 * TILE_WIDTH;
+      src.y = 28 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 6 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseRoof:
+      src.x = 0 * TILE_WIDTH;
+      src.y = 28 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 3 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseLeftRoof:
+      src.x = 0 * TILE_WIDTH;
+      src.y = 31 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 3 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseTopRoof:
+      src.x = 0 * TILE_WIDTH;
+      src.y = 24 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_HouseTopLeftRoof:
+      src.x = 0 * TILE_WIDTH;
+      src.y = 26 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
   }
   return src;
 }
@@ -326,12 +411,12 @@ _getTileDest(SDL_Rect src, int x, int y)
 }
 
 static SDL_Rect
-_getObjectSpriteDest(SDL_Rect src, int x, int y)
+_getObjectSpriteDest(SDL_Rect src, int x, int y, int z)
 {
   SDL_Rect dest;
   dest.x = x * (TILE_WIDTH / 2) - y * (TILE_WIDTH / 2);
   dest.y = x * TILE_HEIGHT / 2 + y * TILE_HEIGHT / 2
-    - (src.h - TILE_HEIGHT);
+    - (src.h - TILE_HEIGHT) - z;
   dest.w = src.w;
   dest.h = src.h;
   return dest;
@@ -698,7 +783,7 @@ _createSpriteForTileObject(int x, int y)
     return;
   }
   SDL_Rect src = _getTileSrc(_objectTiles[y][x]);
-  SDL_Rect dest = _getObjectSpriteDest(src, x, y);
+  SDL_Rect dest = _getObjectSpriteDest(src, x, y, 0);
 
   _tilesObjectSpriteId[y][x] = Graphic_CreateTilesetSprite(
       _spriteSheetId, 
@@ -712,17 +797,21 @@ _createGameObject(
     GameTiles tile, 
     double x, 
     double y, 
+    double z,
     double dx, 
     double dy, 
+    double dz,
     int i)
 {
   SDL_Rect src = _getTileSrc(tile);
-  SDL_Rect dest = _getObjectSpriteDest(src, x, y);
+  SDL_Rect dest = _getObjectSpriteDest(src, x, y, z);
   _gameObjects[i].tile = tile;
   _gameObjects[i].x = x;
   _gameObjects[i].y = y;
+  _gameObjects[i].z = z;
   _gameObjects[i].dx = dx;
   _gameObjects[i].dy = dy;
+  _gameObjects[i].dz = dz;
   _gameObjects[i].sprite = Graphic_CreateTilesetSprite(
       _spriteSheetId, 
       src, 
@@ -813,7 +902,7 @@ _createCustomerSprites()
   for (int i = 0; i < _activeGameObjects; i++) {
     SDL_Rect src, dest;
     src = _getTileSrc(_gameObjects[i].tile);
-    dest = _getObjectSpriteDest(src, _gameObjects[i].x, _gameObjects[i].y);
+    dest = _getObjectSpriteDest(src, _gameObjects[i].x, _gameObjects[i].y, _gameObjects[i].z);
 
     _gameObjects[i].sprite = Graphic_CreateTilesetSprite(
       _spriteSheetId, 
@@ -885,6 +974,37 @@ _createMapSprite()
       (Sprite*) mapSprites[MAP_WIDTH]);
 }
 
+static void
+_createHouse(int x, int y)
+{
+  _createGameObject(GameTile_LeftHouseCorner, x, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Wall, x + 1, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseDoor, x + 2, y, 0, 0, 0, 0,  _activeGameObjects++);
+  _createGameObject(GameTile_Wall, x + 3, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Wall, x + 4, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Wall, x + 5, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Wall, x + 6, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_RightHouseCorner, x + 7, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRightWallFirstSection, x + 7, y - 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRightWallCenterSection, x + 7, y - 2, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRightWallThirdSection, x + 7, y - 3, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRightWallLastSection, x + 7, y - 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 6, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 5, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 4, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 3, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 2, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopRoof, x + 1, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseTopLeftRoof, x, y - 2, 7 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseLeftRoof, x, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 6, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 5, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 4, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 3, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 2, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_HouseRoof, x + 1, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+}
+
 void 
 Game_Enter(void)
 {
@@ -945,12 +1065,16 @@ Game_Enter(void)
       EAST_TO_WEST_NORTH_SIDE_LANE - 1,
       0,
       0,
+      0,
+      0,
       _activeGameObjects++
   );
   _createGameObject(
       GameTile_StopSignFacingSouth, 
       SOUTH_TO_NORTH_EAST_SIDE_LANE + 1,
       WEST_TO_EAST_SOUTH_SIDE_LANE + 1,
+      0,
+      0,
       0,
       0,
       _activeGameObjects++
@@ -961,7 +1085,14 @@ Game_Enter(void)
       EAST_TO_WEST_NORTH_SIDE_LANE - 2,
       0,
       0,
+      0,
+      0,
       _activeGameObjects++
+  );
+
+  _createHouse(
+      SOUTH_TO_NORTH_EAST_SIDE_LANE + 4,
+      EAST_TO_WEST_NORTH_SIDE_LANE - 6
   );
   _pause = false;
   Graphic_CenterCamera();
