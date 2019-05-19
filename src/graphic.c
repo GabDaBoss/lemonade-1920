@@ -60,7 +60,7 @@ _updateCameraBoundRight(int x, int w)
 static void
 _updateCameraBoundTop(int y)
 {
-  if (y < _camera.bounds.x) {
+  if (y < _camera.bounds.y) {
     _camera.bounds.h += _camera.bounds.y - y;
     _camera.bounds.y = y;
   } 
@@ -79,22 +79,24 @@ static void
 _updateCameraBounds()
 {
   if (_camera.bounds.dirty) {
-    _camera.bounds.x = 0;
-    _camera.bounds.y = 0;
-    _camera.bounds.w = 0;
-    _camera.bounds.h = 0;
+    _camera.bounds.x = INT_MAX;
+    _camera.bounds.y = INT_MAX;
+    _camera.bounds.w = INT_MAX;
+    _camera.bounds.h = INT_MAX;
     _camera.bounds.dirty = false;
 
     for (Index i = 0; i < _sprites.totalActive; i++) {
-      _updateCameraBoundLeft(_sprites.sprite[i].dest.x / _camera.zoom);
+      // printf("x: %d, w: %d\n", _sprites.sprite[i].dest.x, _sprites.sprite[i].dest.w);
+      _updateCameraBoundLeft(_sprites.sprite[i].dest.x);
       _updateCameraBoundRight(
-        _sprites.sprite[i].dest.x / _camera.zoom,
-        _sprites.sprite[i].dest.w / _camera.zoom
+        _sprites.sprite[i].dest.x,
+        _sprites.sprite[i].dest.w
       );
-      _updateCameraBoundTop(_sprites.sprite[i].dest.y / _camera.zoom);
+      printf("y: %d, h: %d\n", _sprites.sprite[i].dest.y, _sprites.sprite[i].dest.h);
+      _updateCameraBoundTop(_sprites.sprite[i].dest.y);
       _updateCameraBoundBottom(
-        _sprites.sprite[i].dest.y / _camera.zoom, 
-        _sprites.sprite[i].dest.h / _camera.zoom
+        _sprites.sprite[i].dest.y, 
+        _sprites.sprite[i].dest.h      
       );
     }
   }
@@ -156,7 +158,7 @@ _createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
 static SDL_Texture*
 _createTextTexture(
   const char * const text, 
-  SDL_Color color, 
+  SDL_Color color,
   unsigned int *w, 
   unsigned int *h)
 {
@@ -940,13 +942,11 @@ Graphic_DeleteTexture(Id id)
 void
 Graphic_TranslateAllSprite(int dx, int dy)
 {
-  _camera.bounds.x += dx;
-  _camera.bounds.y += dy;
+  _camera.bounds.x += dx * _camera.zoom;
+  _camera.bounds.y += dy * _camera.zoom;
   for (Index i = 0; i < _sprites.totalActive; i++) {
     _sprites.sprite[i].dest.x += dx * _camera.zoom;
     _sprites.sprite[i].dest.y += dy * _camera.zoom;
-    // _sprites.rectF[i].x += dx;
-    // _sprites.rectF[i].y += dy;
   }
 }
 
@@ -994,10 +994,11 @@ void
 Graphic_ZoomSprites(double zoom)
 {
   _camera.zoom *= zoom;
-  _camera.bounds.x *= zoom;
-  _camera.bounds.y *= zoom;
-  _camera.bounds.w *= zoom;
-  _camera.bounds.h *= zoom;
+  //_camera.bounds.x *= zoom;
+  //_camera.bounds.y *= zoom;
+  //_camera.bounds.w *= zoom;
+  //_camera.bounds.h *= zoom;
+  _camera.bounds.dirty = true;
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
 
@@ -1012,6 +1013,7 @@ Graphic_ZoomSprites(double zoom)
     _sprites.sprite[i].dest.w *= zoom;
     _sprites.sprite[i].dest.h *= zoom;
   }
+  //_updateCameraBounds();
 }
 
 void 
@@ -1021,14 +1023,17 @@ Graphic_MoveCamera(int dx, int dy)
   
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
-  w /= _camera.zoom;
-  h /= _camera.zoom;
+  // w /= _camera.zoom;
+  // h /= _camera.zoom;
 
+  //printf("bx: %d, bw: %d, w: %d\n", _camera.bounds.x, _camera.bounds.w, w);
   if ((_camera.bounds.x >= 0 && dx > 0) ||
       (_camera.bounds.x + _camera.bounds.w <= w && dx < 0)) {
     dx = 0;
   }
 
+  printf("x: %d, y: %d\n", _camera.x, _camera.y);
+  printf("by: %d, bh: %d, h: %d\n", _camera.bounds.y, _camera.bounds.h, h);
   if ((_camera.bounds.y >= 0 && dy > 0) ||
       (_camera.bounds.y + _camera.bounds.h <= h && dy < 0)) {
     dy = 0;
@@ -1158,8 +1163,10 @@ Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end)
   src.w = dest.w = right - left;
   src.h = dest.h = bottom - top;
 
+  /*
   printf("src.x: %d, src.y: %d, src.w: %d, src.h: %d, dest.x: %d, dest.y: %d, dest.w: %d, dest.h: %d\n", 
       src.x, src.y, src.w, src.h, dest.x, dest.y, dest.w, dest.h
   );
+  */
   return _createTilesetSprite(texture, src, dest);
 }
