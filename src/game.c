@@ -67,6 +67,7 @@ static Id _tilesSpriteId[MAP_HEIGHT][MAP_WIDTH];
 static Id _tilesObjectSpriteId[MAP_HEIGHT][MAP_WIDTH];
 
 typedef enum {
+  NoPath,
   SouthToNorthOnWestSide,
   NorthToSouthOnWestSide,
   SouthToNorthOnEastSide,
@@ -742,6 +743,7 @@ _update(void)
   if (Input_IsQuitPressed()) {
     Graphic_Clear();
     MainMenu_Enter();
+    return;
   } else if (Input_IsKeyReleased(SDLK_EQUALS) && zoom < 5) {
     Graphic_ZoomSprites((zoom + 1.0) / zoom);
   } else if (Input_IsKeyReleased(SDLK_MINUS) && zoom > 1) {
@@ -817,6 +819,7 @@ _createGameObject(
       src, 
       dest
   );
+  _gameObjects[i].path = NoPath;
 }
 
 static void
@@ -825,6 +828,8 @@ _createCustomer(Path path, int i)
   _gameObjects[i].path = path;
   _gameObjects[i].dy = 0;
   _gameObjects[i].dx = 0;
+  _gameObjects[i].z = 0;
+  _gameObjects[i].dz = 0;
   switch(path) {
     case SouthToNorthOnWestSide:
     case SouthOnWestSideToEastOnSouthSide:
@@ -1008,6 +1013,9 @@ _createHouse(int x, int y)
 void 
 Game_Enter(void)
 {
+  _cameraDx = 0;
+  _cameraDy = 0;
+  _activeGameObjects = 0;
   Scene_SetUpdateTo(_update);
   Graphic_InitCamera();
 
@@ -1037,7 +1045,6 @@ Game_Enter(void)
     }
   }
 
-  _activeGameObjects = 0;
   _createCustomer(NorthToSouthOnWestSide, _activeGameObjects++);
   _createCustomer(SouthToNorthOnWestSide, _activeGameObjects++);
   _createCustomer(NorthToSouthOnEastSide, _activeGameObjects++);
@@ -1094,7 +1101,8 @@ Game_Enter(void)
       SOUTH_TO_NORTH_EAST_SIDE_LANE + 4,
       EAST_TO_WEST_NORTH_SIDE_LANE - 6
   );
-  _pause = false;
+//  _pause = false;
+  _pause = true;
   Graphic_CenterCamera();
   _dt = 0;
 }
