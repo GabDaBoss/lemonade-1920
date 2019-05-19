@@ -47,19 +47,21 @@ typedef enum {
   GameTile_HouseTopLeftRoof
 } GameTiles;
 
-#define MAP_WIDTH 100
-#define MAP_HEIGHT 100
+#define MAP_WIDTH 50
+#define MAP_HEIGHT 50
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 16
 #define MAX_GAME_OBJECTS 100
-#define NORTH_TO_SOUTH_WEST_SIDE_LANE 46
-#define SOUTH_TO_NORTH_WEST_SIDE_LANE 47
-#define NORTH_TO_SOUTH_EAST_SIDE_LANE 56
-#define SOUTH_TO_NORTH_EAST_SIDE_LANE 57
-#define EAST_TO_WEST_NORTH_SIDE_LANE 30
-#define WEST_TO_EAST_NORTH_SIDE_LANE 31
-#define EAST_TO_WEST_SOUTH_SIDE_LANE 40
-#define WEST_TO_EAST_SOUTH_SIDE_LANE 41
+#define NORTH_TO_SOUTH_WEST_SIDE_LANE 13
+#define SOUTH_TO_NORTH_WEST_SIDE_LANE 14
+#define NORTH_TO_SOUTH_EAST_SIDE_LANE 23
+#define SOUTH_TO_NORTH_EAST_SIDE_LANE 24
+#define EAST_TO_WEST_NORTH_SIDE_LANE 10
+#define WEST_TO_EAST_NORTH_SIDE_LANE 11
+#define EAST_TO_WEST_SOUTH_SIDE_LANE 20
+#define WEST_TO_EAST_SOUTH_SIDE_LANE 21
+#define STAND_X 12
+#define STAND_Y 12
 
 static GameTiles _groundTiles[MAP_HEIGHT][MAP_WIDTH];
 static GameTiles _objectTiles[MAP_HEIGHT][MAP_WIDTH];
@@ -1032,7 +1034,7 @@ Game_Enter(void)
     }
   }
 
-  _objectTiles[45][45] = GameTile_Stand;
+  _objectTiles[STAND_Y][STAND_X] = GameTile_Stand;
 
 
   _createMapSprite();
@@ -1040,7 +1042,6 @@ Game_Enter(void)
   {
     for (int x = 0; x < MAP_WIDTH; x++)
     {
-      //_createSpriteForTile(x, y);
       _createSpriteForTileObject(x, y);
     }
   }
@@ -1101,8 +1102,7 @@ Game_Enter(void)
       SOUTH_TO_NORTH_EAST_SIDE_LANE + 4,
       EAST_TO_WEST_NORTH_SIDE_LANE - 6
   );
-//  _pause = false;
-  _pause = true;
+  _pause = false;
   Graphic_CenterCamera();
   _dt = 0;
 }
