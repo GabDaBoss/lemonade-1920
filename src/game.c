@@ -32,6 +32,8 @@ typedef enum {
   GameTile_WalkingCharacterWest2,
   GameTile_StopSignFacingEast,
   GameTile_StopSignFacingSouth,
+  GameTile_StopSignFacingWest,
+  GameTile_StopSignFacingNorth,
   GameTile_Bush,
   GameTile_LeftHouseCorner,
   GameTile_HouseDoor,
@@ -44,7 +46,9 @@ typedef enum {
   GameTile_HouseRoof,
   GameTile_HouseLeftRoof,
   GameTile_HouseTopRoof,
-  GameTile_HouseTopLeftRoof
+  GameTile_HouseTopLeftRoof,
+  GameTile_FrontPorchStair,
+  GameTile_NorthToSouthEntryWalkway
 } GameTiles;
 
 #define MAP_WIDTH 50
@@ -52,16 +56,16 @@ typedef enum {
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 16
 #define MAX_GAME_OBJECTS 100
-#define NORTH_TO_SOUTH_WEST_SIDE_LANE 13
-#define SOUTH_TO_NORTH_WEST_SIDE_LANE 14
-#define NORTH_TO_SOUTH_EAST_SIDE_LANE 23
-#define SOUTH_TO_NORTH_EAST_SIDE_LANE 24
+#define NORTH_TO_SOUTH_WEST_SIDE_LANE 26
+#define SOUTH_TO_NORTH_WEST_SIDE_LANE 27
+#define NORTH_TO_SOUTH_EAST_SIDE_LANE 36
+#define SOUTH_TO_NORTH_EAST_SIDE_LANE 37
 #define EAST_TO_WEST_NORTH_SIDE_LANE 10
 #define WEST_TO_EAST_NORTH_SIDE_LANE 11
 #define EAST_TO_WEST_SOUTH_SIDE_LANE 20
 #define WEST_TO_EAST_SOUTH_SIDE_LANE 21
-#define STAND_X 12
-#define STAND_Y 12
+#define STAND_X 25
+#define STAND_Y 25
 
 static GameTiles _groundTiles[MAP_HEIGHT][MAP_WIDTH];
 static GameTiles _objectTiles[MAP_HEIGHT][MAP_WIDTH];
@@ -74,22 +78,22 @@ typedef enum {
   NorthToSouthOnWestSide,
   SouthToNorthOnEastSide,
   NorthToSouthOnEastSide,
-  SouthOnWestSideToEastOnSouthSide,
-  EastOnSouthSideToSouthOnWestSide,
-  SouthOnEastSideToEastOnSouthSide,
-  EastOnSouthSideToSouthOnEastSide,
-  NorthOnWestSideToEastOnSouthSide,
-  EastOnSouthSideToNorthOnWestSide,
-  NorthOnEastSideToEastOnSouthSide,
-  EastOnSouthSideToNorthOnEastSide,
-  SouthOnWestSideToEastOnNorthSide,
-  EastOnNorthSideToSouthOnWestSide,
-  SouthOnEastSideToEastOnNorthSide,
-  EastOnNorthSideToSouthOnEastSide,
-  NorthOnWestSideToEastOnNorthSide,
-  EastOnNorthSideToNorthOnWestSide,
-  NorthOnEastSideToEastOnNorthSide,
-  EastOnNorthSideToNorthOnEastSide,
+  SouthOnWestSideToWestOnSouthSide,
+  WestOnSouthSideToSouthOnWestSide,
+  SouthOnEastSideToWestOnSouthSide,
+  WestOnSouthSideToSouthOnEastSide,
+  NorthOnWestSideToWestOnSouthSide,
+  WestOnSouthSideToNorthOnWestSide,
+  NorthOnEastSideToWestOnSouthSide,
+  WestOnSouthSideToNorthOnEastSide,
+  SouthOnWestSideToWestOnNorthSide,
+  WestOnNorthSideToSouthOnWestSide,
+  SouthOnEastSideToWestOnNorthSide,
+  WestOnNorthSideToSouthOnEastSide,
+  NorthOnWestSideToWestOnNorthSide,
+  WestOnNorthSideToNorthOnWestSide,
+  NorthOnEastSideToWestOnNorthSide,
+  WestOnNorthSideToNorthOnEastSide,
 } Path;
 
 typedef struct {
@@ -147,12 +151,12 @@ _reorderGameObjects()
 }
 
 static void 
-_handleCamera() {
+_handleCamera() 
+{
   int x, y, w, h;
   Input_QueryMousePosition(&x, &y);
   Graphic_QueryWindowSize(&w, &h);
-  if (x < w * .20 || x > w * .80 || y < h * .20 || y > h * .80) 
-  {
+  if (x < w * .20 || x > w * .80 || y < h * .20 || y > h * .80) {
     _cameraDx += (double) (x - w / 2) / (w / 2);
     _cameraDy += (double) (y - h / 2) / (h / 2);
     int dx = 0, dy = 0;
@@ -226,6 +230,12 @@ _getTileSrc(GameTiles tile)
       break;
     case GameTile_CrosswalkEastWest2:
       src.x = 6 * TILE_WIDTH;
+      src.y = 12 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = TILE_HEIGHT;
+      break;
+    case GameTile_NorthToSouthEntryWalkway:
+      src.x = 7 * TILE_WIDTH;
       src.y = 12 * TILE_HEIGHT;
       src.w = TILE_WIDTH;
       src.h = TILE_HEIGHT;
@@ -320,6 +330,18 @@ _getTileSrc(GameTiles tile)
       src.w = TILE_WIDTH;
       src.h = 4 * TILE_HEIGHT;
       break;
+    case GameTile_StopSignFacingWest:
+      src.x = 3 * TILE_WIDTH;
+      src.y = 13 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 4 * TILE_HEIGHT;
+      break;
+    case GameTile_StopSignFacingNorth:
+      src.x = 4 * TILE_WIDTH;
+      src.y = 13 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 4 * TILE_HEIGHT;
+      break;
     case GameTile_Bush:
       src.x = 0;
       src.y = 17 * TILE_HEIGHT;
@@ -398,6 +420,12 @@ _getTileSrc(GameTiles tile)
       src.w = TILE_WIDTH;
       src.h = 2 * TILE_HEIGHT;
       break;
+    case GameTile_FrontPorchStair:
+      src.x = 1 * TILE_WIDTH;
+      src.y = 26 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
   }
   return src;
 }
@@ -463,8 +491,7 @@ _animateGameObjects()
 static void
 _animateGameObject(int i, GameTiles frame1, GameTiles frame2)
 {
-  if (_gameObjects[i].tile != frame1 && _gameObjects[i].tile != frame2)
-  {
+  if (_gameObjects[i].tile != frame1 && _gameObjects[i].tile != frame2) {
     _gameObjects[i].tile = frame1;
   }
 }
@@ -479,9 +506,9 @@ _moveGameObjects()
       case NorthToSouthOnWestSide:
       case NorthToSouthOnEastSide:
         break;
-      case EastOnSouthSideToNorthOnWestSide:
-      case EastOnNorthSideToNorthOnWestSide:
-        if ((_gameObjects[i].x) <= SOUTH_TO_NORTH_WEST_SIDE_LANE) {
+      case WestOnSouthSideToNorthOnWestSide:
+      case WestOnNorthSideToNorthOnWestSide:
+        if (_gameObjects[i].x >= SOUTH_TO_NORTH_WEST_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterNorth1, 
@@ -492,16 +519,16 @@ _moveGameObjects()
         } else {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterWest1, 
-            GameTile_WalkingCharacterWest2
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
           );
           _gameObjects[i].dy = 0;
-          _gameObjects[i].dx = -0.05;
+          _gameObjects[i].dx = 0.05;
         }
         break;
-      case EastOnSouthSideToNorthOnEastSide:
-      case EastOnNorthSideToNorthOnEastSide:
-        if ((_gameObjects[i].x) <= SOUTH_TO_NORTH_EAST_SIDE_LANE) {
+      case WestOnSouthSideToNorthOnEastSide:
+      case WestOnNorthSideToNorthOnEastSide:
+        if (_gameObjects[i].x >= SOUTH_TO_NORTH_EAST_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterNorth1, 
@@ -512,16 +539,16 @@ _moveGameObjects()
         } else {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterWest1, 
-            GameTile_WalkingCharacterWest2
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
           );
           _gameObjects[i].dy = 0;
-          _gameObjects[i].dx = -0.05;
+          _gameObjects[i].dx = 0.05;
         }
         break;
-      case EastOnNorthSideToSouthOnWestSide:
-      case EastOnSouthSideToSouthOnWestSide:
-        if ((_gameObjects[i].x) <= NORTH_TO_SOUTH_WEST_SIDE_LANE) {
+      case WestOnNorthSideToSouthOnWestSide:
+      case WestOnSouthSideToSouthOnWestSide:
+        if (_gameObjects[i].x >= NORTH_TO_SOUTH_WEST_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterSouth1, 
@@ -532,16 +559,16 @@ _moveGameObjects()
         } else {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterWest1, 
-            GameTile_WalkingCharacterWest2
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
           );
           _gameObjects[i].dy = 0;
-          _gameObjects[i].dx = -0.05;
+          _gameObjects[i].dx = 0.05;
         }
         break;
-      case EastOnSouthSideToSouthOnEastSide:
-      case EastOnNorthSideToSouthOnEastSide:
-        if (_gameObjects[i].x <= NORTH_TO_SOUTH_EAST_SIDE_LANE) {
+      case WestOnSouthSideToSouthOnEastSide:
+      case WestOnNorthSideToSouthOnEastSide:
+        if (_gameObjects[i].x >= NORTH_TO_SOUTH_EAST_SIDE_LANE) {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterSouth1, 
@@ -552,91 +579,91 @@ _moveGameObjects()
         } else {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterWest1, 
-            GameTile_WalkingCharacterWest2
+            GameTile_WalkingCharacterEast1, 
+            GameTile_WalkingCharacterEast2
           );
           _gameObjects[i].dy = 0;
-          _gameObjects[i].dx = -0.05;
+          _gameObjects[i].dx = 0.05;
         }
         break;
-      case SouthOnEastSideToEastOnSouthSide:
-      case SouthOnWestSideToEastOnSouthSide:
+      case SouthOnEastSideToWestOnSouthSide:
+      case SouthOnWestSideToWestOnSouthSide:
         if ((_gameObjects[i].y) <= WEST_TO_EAST_SOUTH_SIDE_LANE) {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterEast1, 
-            GameTile_WalkingCharacterEast2
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
           );
-          _gameObjects[i].dx = 0.05;
           _gameObjects[i].dy = 0;
+          _gameObjects[i].dx = -0.05;
         } else {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterNorth1, 
             GameTile_WalkingCharacterNorth2
           );
-          _gameObjects[i].dx = 0;
           _gameObjects[i].dy = -0.05;
+          _gameObjects[i].dx = 0;
         }
         break;
-      case SouthOnWestSideToEastOnNorthSide:
-      case SouthOnEastSideToEastOnNorthSide:
+      case SouthOnWestSideToWestOnNorthSide:
+      case SouthOnEastSideToWestOnNorthSide:
         if ((_gameObjects[i].y) <= WEST_TO_EAST_NORTH_SIDE_LANE) {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterEast1, 
-            GameTile_WalkingCharacterEast2
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
           );
-          _gameObjects[i].dx = 0.05;
           _gameObjects[i].dy = 0;
+          _gameObjects[i].dx = -0.05;
         } else {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterNorth1, 
             GameTile_WalkingCharacterNorth2
           );
-          _gameObjects[i].dx = 0;
           _gameObjects[i].dy = -0.05;
+          _gameObjects[i].dx = 0;
         }
         break;
-      case NorthOnWestSideToEastOnSouthSide:
-      case NorthOnEastSideToEastOnSouthSide:
+      case NorthOnWestSideToWestOnSouthSide:
+      case NorthOnEastSideToWestOnSouthSide:
         if ((_gameObjects[i].y) >= WEST_TO_EAST_SOUTH_SIDE_LANE) {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterEast1, 
-            GameTile_WalkingCharacterEast2
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
           );
-          _gameObjects[i].dx = 0.05;
           _gameObjects[i].dy = 0;
+          _gameObjects[i].dx = -0.05;
         } else {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterSouth1, 
             GameTile_WalkingCharacterSouth2
           );
-          _gameObjects[i].dx = 0;
           _gameObjects[i].dy = 0.05;
+          _gameObjects[i].dx = 0;
         }
         break;
-      case NorthOnWestSideToEastOnNorthSide:
-      case NorthOnEastSideToEastOnNorthSide:
+      case NorthOnWestSideToWestOnNorthSide:
+      case NorthOnEastSideToWestOnNorthSide:
         if ((_gameObjects[i].y) >= WEST_TO_EAST_NORTH_SIDE_LANE) {
           _animateGameObject(
             i, 
-            GameTile_WalkingCharacterEast1, 
-            GameTile_WalkingCharacterEast2
+            GameTile_WalkingCharacterWest1, 
+            GameTile_WalkingCharacterWest2
           );
-          _gameObjects[i].dx = 0.05;
           _gameObjects[i].dy = 0;
+          _gameObjects[i].dx = -0.05;
         } else {
           _animateGameObject(
             i, 
             GameTile_WalkingCharacterSouth1, 
             GameTile_WalkingCharacterSouth2
           );
-          _gameObjects[i].dx = 0;
           _gameObjects[i].dy = 0.05;
+          _gameObjects[i].dx = 0;
         }
         break;
     }
@@ -650,17 +677,17 @@ _moveGameObjects()
           y = MAP_HEIGHT;
         }
         break;
-      case EastOnNorthSideToNorthOnWestSide:
-      case EastOnNorthSideToNorthOnEastSide:
+      case WestOnNorthSideToNorthOnWestSide:
+      case WestOnNorthSideToNorthOnEastSide:
         if (y < 0) {
-          x = MAP_WIDTH;
+          x = 0;
           y = EAST_TO_WEST_NORTH_SIDE_LANE;
         }
         break;
-      case EastOnSouthSideToNorthOnWestSide:
-      case EastOnSouthSideToNorthOnEastSide:
+      case WestOnSouthSideToNorthOnWestSide:
+      case WestOnSouthSideToNorthOnEastSide:
         if (y < 0) {
-          x = MAP_WIDTH;
+          x = 0;
           y = EAST_TO_WEST_SOUTH_SIDE_LANE;
         }
         break;
@@ -670,44 +697,44 @@ _moveGameObjects()
           y = 0;
         }
         break;
-      case EastOnSouthSideToSouthOnWestSide:
-      case EastOnSouthSideToSouthOnEastSide:
+      case WestOnSouthSideToSouthOnWestSide:
+      case WestOnSouthSideToSouthOnEastSide:
         if (y >= MAP_HEIGHT) {
-          x = MAP_WIDTH;
+          x = 0;
           y = EAST_TO_WEST_SOUTH_SIDE_LANE;
         }
         break;
-      case EastOnNorthSideToSouthOnWestSide:
-      case EastOnNorthSideToSouthOnEastSide:
+      case WestOnNorthSideToSouthOnWestSide:
+      case WestOnNorthSideToSouthOnEastSide:
         if (y >= MAP_HEIGHT) {
-          x = MAP_WIDTH;
+          x = 0;
           y = EAST_TO_WEST_NORTH_SIDE_LANE;
         }
         break;
-      case SouthOnWestSideToEastOnSouthSide:
-      case SouthOnWestSideToEastOnNorthSide:
-        if (x >= MAP_WIDTH) {
+      case SouthOnWestSideToWestOnSouthSide:
+      case SouthOnWestSideToWestOnNorthSide:
+        if (x < 0) {
           x = SOUTH_TO_NORTH_WEST_SIDE_LANE;
           y = MAP_HEIGHT;
         }
         break;
-      case SouthOnEastSideToEastOnSouthSide:
-      case SouthOnEastSideToEastOnNorthSide:
-        if (x >= MAP_WIDTH) {
+      case SouthOnEastSideToWestOnSouthSide:
+      case SouthOnEastSideToWestOnNorthSide:
+        if (x < 0) {
           x = SOUTH_TO_NORTH_EAST_SIDE_LANE;
           y = MAP_HEIGHT;
         }
         break;
-      case NorthOnWestSideToEastOnSouthSide:
-      case NorthOnWestSideToEastOnNorthSide:
-        if (x >= MAP_WIDTH) {
+      case NorthOnWestSideToWestOnSouthSide:
+      case NorthOnWestSideToWestOnNorthSide:
+        if (x < 0) {
           x = NORTH_TO_SOUTH_WEST_SIDE_LANE;
           y = 0;
         }
         break;
-      case NorthOnEastSideToEastOnSouthSide:
-      case NorthOnEastSideToEastOnNorthSide:
-        if (x >= MAP_WIDTH) {
+      case NorthOnEastSideToWestOnSouthSide:
+      case NorthOnEastSideToWestOnNorthSide:
+        if (x < 0) {
           x = NORTH_TO_SOUTH_EAST_SIDE_LANE;
           y = 0;
         }
@@ -720,15 +747,6 @@ _moveGameObjects()
 
     _gameObjects[i].x = x;
     _gameObjects[i].y = y;
-
-    /*
-    if (y > 0 && x > 0 && y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1) {
-      Graphic_SetSpriteToBeAfterAnother(
-        _gameObjects[i].sprite, 
-        _tilesSpriteId[(int) (y + (dy > 0 ? 1 : dy < 0 ? -1: 0))][(int) (x + dx)]
-      );
-    }
-    */
 
     Graphic_TranslateSpriteFloat(
       _gameObjects[i].sprite, 
@@ -834,70 +852,70 @@ _createCustomer(Path path, int i)
   _gameObjects[i].dz = 0;
   switch(path) {
     case SouthToNorthOnWestSide:
-    case SouthOnWestSideToEastOnSouthSide:
-    case SouthOnWestSideToEastOnNorthSide:
+    case SouthOnWestSideToWestOnSouthSide:
+    case SouthOnWestSideToWestOnNorthSide:
     case SouthToNorthOnEastSide:
-    case SouthOnEastSideToEastOnSouthSide:
-    case SouthOnEastSideToEastOnNorthSide:
+    case SouthOnEastSideToWestOnSouthSide:
+    case SouthOnEastSideToWestOnNorthSide:
       _gameObjects[i].tile = GameTile_WalkingCharacterNorth1;
       _gameObjects[i].dy = -0.05;
       _gameObjects[i].y = MAP_HEIGHT;
       break;
     case NorthToSouthOnWestSide:
     case NorthToSouthOnEastSide:
-    case NorthOnWestSideToEastOnSouthSide:
-    case NorthOnEastSideToEastOnSouthSide:
-    case NorthOnWestSideToEastOnNorthSide:
-    case NorthOnEastSideToEastOnNorthSide:
+    case NorthOnWestSideToWestOnSouthSide:
+    case NorthOnEastSideToWestOnSouthSide:
+    case NorthOnWestSideToWestOnNorthSide:
+    case NorthOnEastSideToWestOnNorthSide:
       _gameObjects[i].tile = GameTile_WalkingCharacterSouth1;
       _gameObjects[i].dy = 0.05;
       _gameObjects[i].y = 0;
       break;
-    case EastOnSouthSideToSouthOnWestSide:
-    case EastOnSouthSideToSouthOnEastSide:
-    case EastOnSouthSideToNorthOnWestSide:
-    case EastOnSouthSideToNorthOnEastSide:
-    case EastOnNorthSideToSouthOnWestSide:
-    case EastOnNorthSideToSouthOnEastSide:
-    case EastOnNorthSideToNorthOnWestSide:
-    case EastOnNorthSideToNorthOnEastSide:
-      _gameObjects[i].tile = GameTile_WalkingCharacterWest1;
-      _gameObjects[i].dx = -0.05;
-      _gameObjects[i].x = MAP_WIDTH;
+    case WestOnSouthSideToSouthOnWestSide:
+    case WestOnSouthSideToSouthOnEastSide:
+    case WestOnSouthSideToNorthOnWestSide:
+    case WestOnSouthSideToNorthOnEastSide:
+    case WestOnNorthSideToSouthOnWestSide:
+    case WestOnNorthSideToSouthOnEastSide:
+    case WestOnNorthSideToNorthOnWestSide:
+    case WestOnNorthSideToNorthOnEastSide:
+      _gameObjects[i].tile = GameTile_WalkingCharacterEast1;
+      _gameObjects[i].dx = 0.05;
+      _gameObjects[i].x = 0;
       break;
   }
 
   switch(path) {
     case SouthToNorthOnWestSide:
-    case SouthOnWestSideToEastOnSouthSide:
-    case SouthOnWestSideToEastOnNorthSide:
+    case SouthOnWestSideToWestOnSouthSide:
+    case SouthOnWestSideToWestOnNorthSide:
       _gameObjects[i].x = SOUTH_TO_NORTH_WEST_SIDE_LANE;
       break;
     case SouthToNorthOnEastSide:
-    case SouthOnEastSideToEastOnSouthSide:
-    case SouthOnEastSideToEastOnNorthSide:
+    case SouthOnEastSideToWestOnSouthSide:
+    case SouthOnEastSideToWestOnNorthSide:
       _gameObjects[i].x = SOUTH_TO_NORTH_EAST_SIDE_LANE;
       break;
     case NorthToSouthOnWestSide:
-    case NorthOnWestSideToEastOnSouthSide:
-    case NorthOnWestSideToEastOnNorthSide:
+    case NorthOnWestSideToWestOnSouthSide:
+    case NorthOnWestSideToWestOnNorthSide:
       _gameObjects[i].x = NORTH_TO_SOUTH_WEST_SIDE_LANE;
       break;
-    case NorthOnEastSideToEastOnSouthSide:
+    case NorthOnEastSideToWestOnSouthSide:
     case NorthToSouthOnEastSide:
-    case NorthOnEastSideToEastOnNorthSide:
+    case NorthOnEastSideToWestOnNorthSide:
       _gameObjects[i].x = NORTH_TO_SOUTH_EAST_SIDE_LANE;
       break;
-    case EastOnSouthSideToSouthOnWestSide:
-    case EastOnSouthSideToSouthOnEastSide:
-    case EastOnSouthSideToNorthOnWestSide:
-    case EastOnSouthSideToNorthOnEastSide:
+    case WestOnSouthSideToSouthOnWestSide:
+    case WestOnSouthSideToSouthOnEastSide:
+    case WestOnSouthSideToNorthOnWestSide:
+    case WestOnSouthSideToNorthOnEastSide:
       _gameObjects[i].y = EAST_TO_WEST_SOUTH_SIDE_LANE;
       break;
-    case EastOnNorthSideToSouthOnWestSide:
-    case EastOnNorthSideToSouthOnEastSide:
-    case EastOnNorthSideToNorthOnWestSide:
-    case EastOnNorthSideToNorthOnEastSide:
+    case WestOnNorthSideToSouthOnWestSide:
+    case WestOnNorthSideToSouthOnEastSide:
+    case WestOnNorthSideToNorthOnWestSide:
+    case WestOnNorthSideToNorthOnEastSide:
       _gameObjects[i].y = EAST_TO_WEST_NORTH_SIDE_LANE;
       break;
   }
@@ -923,19 +941,15 @@ static void
 _createMapSprite()
 {
   Sprite mapSprites[MAP_HEIGHT][MAP_WIDTH] = {0};
-  for (int y = 0; y < MAP_HEIGHT; y++) 
-  {
-    for (int x = 0; x < MAP_WIDTH; x++)
-    {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       mapSprites[y][x].src = _getTileSrc(GameTile_Grass);
       mapSprites[y][x].textureId = _spriteSheetId;
     }
   }
 
-  for (int y = 0; y < MAP_HEIGHT; y++)
-  {
-    for (int x = SOUTH_TO_NORTH_WEST_SIDE_LANE + 1; x < NORTH_TO_SOUTH_EAST_SIDE_LANE; x++)
-    {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = SOUTH_TO_NORTH_WEST_SIDE_LANE + 1; x < NORTH_TO_SOUTH_EAST_SIDE_LANE; x++) {
       mapSprites[y][x].src = _getTileSrc(GameTile_Road);
     }
   }
@@ -948,19 +962,18 @@ _createMapSprite()
   }
 
   for (int y = WEST_TO_EAST_NORTH_SIDE_LANE + 1; y < EAST_TO_WEST_SOUTH_SIDE_LANE; y++) {
-    mapSprites[y][NORTH_TO_SOUTH_EAST_SIDE_LANE].src = _getTileSrc(GameTile_CrosswalkNorthSouth1);
-    mapSprites[y][SOUTH_TO_NORTH_EAST_SIDE_LANE].src = _getTileSrc(GameTile_CrosswalkNorthSouth2);
+    mapSprites[y][NORTH_TO_SOUTH_WEST_SIDE_LANE].src = _getTileSrc(GameTile_CrosswalkNorthSouth1);
+    mapSprites[y][SOUTH_TO_NORTH_WEST_SIDE_LANE].src = _getTileSrc(GameTile_CrosswalkNorthSouth2);
   }
 
-  for (int x = SOUTH_TO_NORTH_WEST_SIDE_LANE + 1; x < NORTH_TO_SOUTH_EAST_SIDE_LANE; x++)
-  {
+  for (int x = SOUTH_TO_NORTH_WEST_SIDE_LANE + 1; x < NORTH_TO_SOUTH_EAST_SIDE_LANE; x++) {
     mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE][x].src = _getTileSrc(GameTile_CrosswalkEastWest2);
     mapSprites[WEST_TO_EAST_NORTH_SIDE_LANE][x].src = _getTileSrc(GameTile_CrosswalkEastWest1);
     mapSprites[EAST_TO_WEST_SOUTH_SIDE_LANE][x].src = _getTileSrc(GameTile_CrosswalkEastWest2);
     mapSprites[WEST_TO_EAST_SOUTH_SIDE_LANE][x].src = _getTileSrc(GameTile_CrosswalkEastWest1);
   }
 
-  for (int x = SOUTH_TO_NORTH_EAST_SIDE_LANE + 1; x < MAP_WIDTH; x++) {
+  for (int x = 0; x < NORTH_TO_SOUTH_WEST_SIDE_LANE;  x++) {
     for (int y = WEST_TO_EAST_NORTH_SIDE_LANE + 1; y < EAST_TO_WEST_SOUTH_SIDE_LANE; y++) {
       mapSprites[y][x].src = _getTileSrc(GameTile_Road);
     }
@@ -970,15 +983,23 @@ _createMapSprite()
     mapSprites[WEST_TO_EAST_SOUTH_SIDE_LANE][x].src = _getTileSrc(GameTile_SideWalk);
   }
 
+  mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE - 1][NORTH_TO_SOUTH_WEST_SIDE_LANE - 8].src = _getTileSrc(GameTile_NorthToSouthEntryWalkway);
+  mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE - 2][NORTH_TO_SOUTH_WEST_SIDE_LANE - 8].src = _getTileSrc(GameTile_NorthToSouthEntryWalkway);
+  mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE - 3][NORTH_TO_SOUTH_WEST_SIDE_LANE - 8].src = _getTileSrc(GameTile_NorthToSouthEntryWalkway);
+  mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE - 4][NORTH_TO_SOUTH_WEST_SIDE_LANE - 8].src = _getTileSrc(GameTile_NorthToSouthEntryWalkway);
+  mapSprites[EAST_TO_WEST_NORTH_SIDE_LANE - 5][NORTH_TO_SOUTH_WEST_SIDE_LANE - 8].src = _getTileSrc(GameTile_NorthToSouthEntryWalkway);
+
   for (int x = 0; x < MAP_WIDTH; x++) {
     for (int y = 0; y < MAP_HEIGHT; y++) {
       mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
     }
   }
 
+
   Graphic_CreateSpriteFromSprites(
       (Sprite*) mapSprites, 
-      (Sprite*) mapSprites[MAP_WIDTH]);
+      (Sprite*) mapSprites[MAP_WIDTH]
+  );
 }
 
 static void
@@ -1010,6 +1031,14 @@ _createHouse(int x, int y)
   _createGameObject(GameTile_HouseRoof, x + 3, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
   _createGameObject(GameTile_HouseRoof, x + 2, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
   _createGameObject(GameTile_HouseRoof, x + 1, y - 1, 5.5 * TILE_HEIGHT, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 1, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_FrontPorchStair, x + 2, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 3, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 4, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 5, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 6, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_Bush, x + 7, y + 1, 0, 0, 0, 0, _activeGameObjects++);
 }
 
 void 
@@ -1026,10 +1055,8 @@ Game_Enter(void)
   int w, h;
   Graphic_QueryWindowSize(&w, &h);
 
-  for (int y = 0; y < MAP_HEIGHT; y++) 
-  {
-    for (int x = 0; x < MAP_WIDTH; x++)
-    {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       _objectTiles[y][x] = GameTile_Empty;
     }
   }
@@ -1038,10 +1065,8 @@ Game_Enter(void)
 
 
   _createMapSprite();
-  for (int y = 0; y < MAP_HEIGHT; y++)
-  {
-    for (int x = 0; x < MAP_WIDTH; x++)
-    {
+  for (int y = 0; y < MAP_HEIGHT; y++) {
+    for (int x = 0; x < MAP_WIDTH; x++) {
       _createSpriteForTileObject(x, y);
     }
   }
@@ -1050,27 +1075,27 @@ Game_Enter(void)
   _createCustomer(SouthToNorthOnWestSide, _activeGameObjects++);
   _createCustomer(NorthToSouthOnEastSide, _activeGameObjects++);
   _createCustomer(SouthToNorthOnEastSide, _activeGameObjects++);
-  _createCustomer(EastOnNorthSideToNorthOnWestSide, _activeGameObjects++);
-  _createCustomer(EastOnNorthSideToSouthOnWestSide, _activeGameObjects++);
-  _createCustomer(EastOnNorthSideToNorthOnEastSide, _activeGameObjects++);
-  _createCustomer(EastOnNorthSideToSouthOnEastSide, _activeGameObjects++);
-  _createCustomer(EastOnSouthSideToNorthOnWestSide, _activeGameObjects++);
-  _createCustomer(EastOnSouthSideToSouthOnWestSide, _activeGameObjects++);
-  _createCustomer(EastOnSouthSideToNorthOnEastSide, _activeGameObjects++);
-  _createCustomer(EastOnSouthSideToSouthOnEastSide, _activeGameObjects++);
-  _createCustomer(SouthOnEastSideToEastOnNorthSide, _activeGameObjects++);
-  _createCustomer(SouthOnEastSideToEastOnSouthSide, _activeGameObjects++);
-  _createCustomer(SouthOnWestSideToEastOnNorthSide, _activeGameObjects++);
-  _createCustomer(SouthOnWestSideToEastOnSouthSide, _activeGameObjects++);
-  _createCustomer(NorthOnEastSideToEastOnNorthSide, _activeGameObjects++);
-  _createCustomer(NorthOnEastSideToEastOnSouthSide, _activeGameObjects++);
-  _createCustomer(NorthOnWestSideToEastOnNorthSide, _activeGameObjects++);
-  _createCustomer(NorthOnWestSideToEastOnSouthSide, _activeGameObjects++);
+  _createCustomer(WestOnNorthSideToNorthOnWestSide, _activeGameObjects++);
+  _createCustomer(WestOnNorthSideToSouthOnWestSide, _activeGameObjects++);
+  _createCustomer(WestOnNorthSideToNorthOnEastSide, _activeGameObjects++);
+  _createCustomer(WestOnNorthSideToSouthOnEastSide, _activeGameObjects++);
+  _createCustomer(WestOnSouthSideToNorthOnWestSide, _activeGameObjects++);
+  _createCustomer(WestOnSouthSideToSouthOnWestSide, _activeGameObjects++);
+  _createCustomer(WestOnSouthSideToNorthOnEastSide, _activeGameObjects++);
+  _createCustomer(WestOnSouthSideToSouthOnEastSide, _activeGameObjects++);
+  _createCustomer(SouthOnEastSideToWestOnNorthSide, _activeGameObjects++);
+  _createCustomer(SouthOnEastSideToWestOnSouthSide, _activeGameObjects++);
+  _createCustomer(SouthOnWestSideToWestOnNorthSide, _activeGameObjects++);
+  _createCustomer(SouthOnWestSideToWestOnSouthSide, _activeGameObjects++);
+  _createCustomer(NorthOnEastSideToWestOnNorthSide, _activeGameObjects++);
+  _createCustomer(NorthOnEastSideToWestOnSouthSide, _activeGameObjects++);
+  _createCustomer(NorthOnWestSideToWestOnNorthSide, _activeGameObjects++);
+  _createCustomer(NorthOnWestSideToWestOnSouthSide, _activeGameObjects++);
   _createCustomerSprites();
   _createGameObject(
-      GameTile_StopSignFacingEast, 
-      SOUTH_TO_NORTH_EAST_SIDE_LANE + 1,
-      EAST_TO_WEST_NORTH_SIDE_LANE - 1,
+      GameTile_StopSignFacingWest, 
+      NORTH_TO_SOUTH_WEST_SIDE_LANE - 1,
+      WEST_TO_EAST_SOUTH_SIDE_LANE + 1,
       0,
       0,
       0,
@@ -1081,6 +1106,16 @@ Game_Enter(void)
       GameTile_StopSignFacingSouth, 
       SOUTH_TO_NORTH_EAST_SIDE_LANE + 1,
       WEST_TO_EAST_SOUTH_SIDE_LANE + 1,
+      0,
+      0,
+      0,
+      0,
+      _activeGameObjects++
+  );
+  _createGameObject(
+      GameTile_StopSignFacingNorth,
+      NORTH_TO_SOUTH_WEST_SIDE_LANE - 1,
+      EAST_TO_WEST_NORTH_SIDE_LANE - 1,
       0,
       0,
       0,
@@ -1099,7 +1134,7 @@ Game_Enter(void)
   );
 
   _createHouse(
-      SOUTH_TO_NORTH_EAST_SIDE_LANE + 4,
+      NORTH_TO_SOUTH_WEST_SIDE_LANE - 10,
       EAST_TO_WEST_NORTH_SIDE_LANE - 6
   );
   _pause = false;
