@@ -48,7 +48,13 @@ typedef enum {
   GameTile_HouseTopRoof,
   GameTile_HouseTopLeftRoof,
   GameTile_FrontPorchStair,
-  GameTile_NorthToSouthEntryWalkway
+  GameTile_NorthToSouthEntryWalkway,
+  GameTile_EastToWestFence,
+  GameTile_SouthToNorthFence,
+  GameTile_EastToWestFenceEntrance,
+  GameTile_WestToNorthFenceCorner,
+  GameTile_NorthToSouthFence,
+  GameTile_EastToNorthFenceCorner,
 } GameTiles;
 
 #define MAP_WIDTH 50
@@ -423,6 +429,42 @@ _getTileSrc(GameTiles tile)
     case GameTile_FrontPorchStair:
       src.x = 1 * TILE_WIDTH;
       src.y = 26 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_EastToWestFence:
+      src.x = 1 * TILE_WIDTH;
+      src.y = 22 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_SouthToNorthFence:
+      src.x = 1 * TILE_WIDTH;
+      src.y = 24 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_EastToWestFenceEntrance:
+      src.x = 2 * TILE_WIDTH;
+      src.y = 22 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_WestToNorthFenceCorner:
+      src.x = 2 * TILE_WIDTH;
+      src.y = 24 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_NorthToSouthFence:
+      src.x = 0 * TILE_WIDTH;
+      src.y = 22 * TILE_HEIGHT;
+      src.w = TILE_WIDTH;
+      src.h = 2 * TILE_HEIGHT;
+      break;
+    case GameTile_EastToNorthFenceCorner:
+      src.x = 3 * TILE_WIDTH;
+      src.y = 23 * TILE_HEIGHT;
       src.w = TILE_WIDTH;
       src.h = 2 * TILE_HEIGHT;
       break;
@@ -1039,6 +1081,36 @@ _createHouse(int x, int y)
   _createGameObject(GameTile_Bush, x + 5, y + 1, 0, 0, 0, 0, _activeGameObjects++);
   _createGameObject(GameTile_Bush, x + 6, y + 1, 0, 0, 0, 0, _activeGameObjects++);
   _createGameObject(GameTile_Bush, x + 7, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y + 3, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y + 2, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y - 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y - 2, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y - 3, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_NorthToSouthFence, x - 4, y - 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToNorthFenceCorner, x - 4, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x - 3, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x - 2, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x - 1, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 1, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFenceEntrance, x + 2, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 3, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 4, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 5, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 6, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_EastToWestFence, x + 7, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_WestToNorthFenceCorner, x + 8, y + 4, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y + 3, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y + 2, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y + 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y - 1, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y - 2, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y - 3, 0, 0, 0, 0, _activeGameObjects++);
+  _createGameObject(GameTile_SouthToNorthFence, x + 8, y - 4, 0, 0, 0, 0, _activeGameObjects++);
 }
 
 void 
