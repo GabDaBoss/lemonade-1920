@@ -815,14 +815,7 @@ _update(void)
   }
 
   if (!_pause) {
-    _moveGameObjects();
-    if (_dt == 15) {
-      _dt -= 15;
-      _animateGameObjects();
-    } else {
-      _dt++;
-    }
-    _reorderGameObjects();
+    Game_UpdateSimulation();
   }
   _handleCamera();
 }
@@ -1113,15 +1106,9 @@ _createHouse(int x, int y)
   _createGameObject(GameTile_SouthToNorthFence, x + 8, y - 4, 0, 0, 0, 0, _activeGameObjects++);
 }
 
-void 
-Game_Enter(void)
+static void
+_createFirstLevel()
 {
-  _cameraDx = 0;
-  _cameraDy = 0;
-  _activeGameObjects = 0;
-  Scene_SetUpdateTo(_update);
-  Graphic_InitCamera();
-
   _spriteSheetId = Graphic_LoadTexture("sprite-sheet2.bmp");
 
   int w, h;
@@ -1212,5 +1199,35 @@ Game_Enter(void)
   _pause = false;
   Graphic_CenterCamera();
   _dt = 0;
+}
+
+void 
+Game_Enter(void)
+{
+  _cameraDx = 0;
+  _cameraDy = 0;
+  _activeGameObjects = 0;
+  Scene_SetUpdateTo(_update);
+  Graphic_InitCamera();
+  _createFirstLevel();
+}
+
+void
+Game_StartSimulation()
+{
+  _createFirstLevel();
+}
+
+void
+Game_UpdateSimulation()
+{
+  _moveGameObjects();
+  if (_dt == 15) {
+    _dt -= 15;
+    _animateGameObjects();
+  } else {
+    _dt++;
+  }
+  _reorderGameObjects();
 }
 

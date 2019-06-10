@@ -119,6 +119,8 @@ _swap(Index it, Id id, Index with)
     _sprites.sprite[it] = _sprites.sprite[with];
     _sprites.rectF[it] = _sprites.rectF[with];
     _sprites.indexes[_sprites.ids[with]] = it;
+    _sprites.indexes[_sprites.ids[it]] = with;
+    _sprites.ids[it] = _sprites.ids[with];
     _sprites.ids[with] = id;
 }
 
@@ -542,6 +544,16 @@ Graphic_DeleteText(Id id)
 void
 Graphic_Clear()
 {
+  for (Index i = 0; i < _textures.total; i++) {
+    SDL_DestroyTexture(_textures.textures[i]);
+  }
+
+  /*
+  for (Index i = 0; i < _sprites.total; i++) {
+    SDL_DestroyTexture(_sprites.sprite[i].texture);
+  }
+  */
+
   INIT_STRUCT_FOR_DOD_FREE_LIST(_sprites, MAX_SPRITES);
   INIT_STRUCT_FOR_DOD_FREE_LIST(_textures, MAX_TEXTURES);
   _sprites.totalActive = 0;
@@ -713,8 +725,13 @@ Graphic_CreateSolidTexture(Uint32 color)
     SDL_PIXELFORMAT_RGB888
   );
 
+  assert(surface != NULL);
+  assert(_renderer != NULL);
+
   SDL_Rect rect = {0, 0, 1, 1}; 
   SDL_FillRect(surface, &rect, color);
+  SDL_Texture* t = SDL_GetRenderTarget(_renderer);
+  assert(t == NULL);
                     
   SDL_Texture* texture = SDL_CreateTextureFromSurface(_renderer, surface);
   SDL_FreeSurface(surface);

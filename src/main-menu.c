@@ -57,7 +57,7 @@ centerMainMenu()
   Graphic_CenterSpriteOnScreenWithOffset(newButton, 0, -20);
   Graphic_CenterSpriteOnScreenWithOffset(loadButton, 0, 0);
   Graphic_CenterSpriteOnScreenWithOffset(quitButton, 0, 20);
-  Graphic_ResizeSpriteToScreen(background);
+  // Graphic_ResizeSpriteToScreen(background);
 }
 
 void
@@ -66,7 +66,10 @@ openLevelSelector()
   levelSelector.opened = true;
 
   SDL_Rect backgroundDest;
-  Graphic_QuerySpriteDest(background, &backgroundDest);
+  backgroundDest.x = 0;
+  backgroundDest.y = 0;
+  Graphic_QueryWindowSize(&backgroundDest.w, &backgroundDest.h);
+  // Graphic_QuerySpriteDest(background, &backgroundDest);
 
   backgroundDest.x += backgroundDest.w * 0.1;
   backgroundDest.y += backgroundDest.h * 0.1;
@@ -347,6 +350,7 @@ update()
     }
   }
   centerMainMenu();
+  Game_UpdateSimulation();
 }
 
 void 
@@ -356,17 +360,18 @@ MainMenu_Enter()
   levelSelector.opened = false; 
   selectedButton = 0;
 
-  lightScreenSolidTextureId = Graphic_CreateSolidTexture(0xEEFFAA);
-  greenSolidTextureId = Graphic_CreateSolidTexture(0x225500);
+
   backgroundTextureId = Graphic_LoadTexture("background.png");
   okButtonTextureId = Graphic_LoadTexture("ok.png");
   backButtonTextureId = Graphic_LoadTexture("back.png");
+  lightScreenSolidTextureId = Graphic_CreateSolidTexture(0xEEFFAA);
+  greenSolidTextureId = Graphic_CreateSolidTexture(0x225500);
 
   SDL_Rect backgroundDest = {0};
-  background = Graphic_CreateFullTextureSprite(backgroundTextureId, backgroundDest);
-  Graphic_ResizeSpriteToScreen(background);
+  // background = Graphic_CreateFullTextureSprite(backgroundTextureId, backgroundDest);
+  // Graphic_ResizeSpriteToScreen(background);
 
-  Graphic_CenterSpriteOnScreen(background);
+  // Graphic_CenterSpriteOnScreen(background);
   mainMenuTitle = Graphic_CreateText("Lemonade 5000", 0, 40, textColor);
   newButton = Graphic_CreateText(">New", 0, 0, textColor);
   loadButton = Graphic_CreateText("Load", 0, 0, textColor);
@@ -422,6 +427,8 @@ MainMenu_Enter()
   levelSelector.hoveredButton.topBorder = Graphic_CreateInactiveSprite(
     greenSolidTextureId
   );
+
+  Game_StartSimulation();
 
   Scene_SetUpdateTo(update);
   centerMainMenu();
