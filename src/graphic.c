@@ -249,6 +249,7 @@ Graphic_Init(const char * const title, int w, int h, int font_size)
 void 
 Graphic_Render() 
 {
+  fprintf(stderr, "Error: %s\n", SDL_GetError());
   SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, 0xFF);
   SDL_RenderClear(_renderer);
 
@@ -410,6 +411,7 @@ Graphic_Quit()
 void 
 Graphic_QueryWindowSize(int* w, int* h)
 {
+  assert(_window != NULL);
   SDL_GetWindowSize(_window, w, h);
 }
 
@@ -725,13 +727,8 @@ Graphic_CreateSolidTexture(Uint32 color)
     SDL_PIXELFORMAT_RGB888
   );
 
-  assert(surface != NULL);
-  assert(_renderer != NULL);
-
   SDL_Rect rect = {0, 0, 1, 1}; 
   SDL_FillRect(surface, &rect, color);
-  SDL_Texture* t = SDL_GetRenderTarget(_renderer);
-  assert(t == NULL);
                     
   SDL_Texture* texture = SDL_CreateTextureFromSurface(_renderer, surface);
   SDL_FreeSurface(surface);

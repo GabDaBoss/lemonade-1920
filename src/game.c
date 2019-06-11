@@ -61,7 +61,7 @@ typedef enum {
 #define MAP_HEIGHT 50
 #define TILE_WIDTH 32
 #define TILE_HEIGHT 16
-#define MAX_GAME_OBJECTS 100
+#define MAX_GAME_OBJECTS 1000
 #define NORTH_TO_SOUTH_WEST_SIDE_LANE 26
 #define SOUTH_TO_NORTH_WEST_SIDE_LANE 27
 #define NORTH_TO_SOUTH_EAST_SIDE_LANE 36
@@ -1029,7 +1029,6 @@ _createMapSprite()
       mapSprites[y][x].dest = _getTileDest(mapSprites[y][x].src, x, y);
     }
   }
-
 
   Graphic_CreateSpriteFromSprites(
       (Sprite*) mapSprites, 
