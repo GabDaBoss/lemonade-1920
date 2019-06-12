@@ -1108,6 +1108,7 @@ _createHouse(int x, int y)
 static void
 _createFirstLevel()
 {
+  _activeGameObjects = 0;
   _spriteSheetId = Graphic_LoadTexture("sprite-sheet2.bmp");
 
   int w, h;
@@ -1205,7 +1206,6 @@ Game_Enter(void)
 {
   _cameraDx = 0;
   _cameraDy = 0;
-  _activeGameObjects = 0;
   Scene_SetUpdateTo(_update);
   Graphic_InitCamera();
   _createFirstLevel();

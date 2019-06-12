@@ -249,7 +249,6 @@ Graphic_Init(const char * const title, int w, int h, int font_size)
 void 
 Graphic_Render() 
 {
-  fprintf(stderr, "Error: %s\n", SDL_GetError());
   SDL_SetRenderDrawColor(_renderer, 0x00, 0x00, 0x00, 0xFF);
   SDL_RenderClear(_renderer);
 
