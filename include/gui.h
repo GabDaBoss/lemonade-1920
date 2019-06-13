@@ -20,7 +20,7 @@ typedef enum {
 
 typedef void (*GUI_OnHandlerFunc)(Id el, GUI_Events e);
 
-void GUI_AddElement(Id parent);
+Id GUI_AddElement(Id parent);
 void GUI_AddEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler);
 void GUI_RemoveEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler);
  
