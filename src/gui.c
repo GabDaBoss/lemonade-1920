@@ -4,20 +4,12 @@
 #define MAX_GUI_ELEMENTS 1000
 
 typedef struct {
-  double value;
-  GUI_Unit unit;
-} Size;
-
-typedef struct {
-  Size left, right, top, bottom;
-} Square;
+  double width, height, x, y;
+} Position;
 
 static struct {
-  Square margins[MAX_GUI_ELEMENTS], 
-         paddings[MAX_GUI_ELEMENTS], 
-         borders[MAX_GUI_ELEMENTS];
   Index  parents[MAX_GUI_ELEMENTS];
-  Size widths[MAX_GUI_ELEMENTS], heights[MAX_GUI_ELEMENTS];
+  Position positions[MAX_GUI_ELEMENTS];
   Uint32 backgroundColors[MAX_GUI_ELEMENTS];
   Uint32 bordersColors[MAX_GUI_ELEMENTS];
   SET_STRUCT_FOR_DOD(Id, MAX_GUI_ELEMENTS);
@@ -35,18 +27,6 @@ GUI_AddElement(Id parent)
   return id;
 }
 
-static double 
-_toPixels(Size size, double outerSizeInPixels)
-{
-  if (size.unit == GUI_Pixel) {
-    return size.value;
-  } else if (size.unit == GUI_Percent) {
-    return outerSizeInPixels * size.unit / 100;
-  }
-
-  return 0;
-}
-
 void 
 GUI_AddEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)
 {
@@ -62,31 +42,18 @@ GUI_RemoveEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)
 void 
 GUI_Render()
 {
-//  Square margin = _elements.margins[GUI_ROOT];
-//
-//  if (_elements.widths[GUI_ROOT].unit == GUI_Auto) {
-//    Graphic_QueryWindowSize(&dest.w, NULL);
-//    dest.w -=  _toPixels(margin.left, dest.w) + _toPixels(margin.right, dest.w);
-//  } else {
-//    dest.w = _elements.widths[GUI_ROOT].value;
-//  }
-//  if (_elements.widths[GUI_ROOT].unit == GUI_Auto || 
-//      _elements.widths[GUI_ROOT].unit == GUI_Percent) {
-//    Graphic_QueryWindowSize(NULL, &dest.h);
-//    dest.h -=  _toPixels(margin.top, dest.h) + _toPixels(margin.right, dest.h);
-//  }
-
-
   for (Index i = 0; i < _elements.total; i++) {
     printf("render gui: %d\n", i);
-    SDL_Rect dest = {0}, parentDest = {0};
+    SDL_Rect dest = {0};
 
-    if (_elements.parents[i] == VOID_INDEX) {
-      Graphic_QueryWindowSize(&parentDest.w, &parentDest.h);
+    for (Index j = i; j != VOID_INDEX; j = _elements.parents[j]){
+      dest.x += _elements.positions[j].x;
+      dest.y += _elements.positions[j].y;
     }
 
-    dest.w = _elements.widths[i].value;
-    dest.h = _elements.heights[i].value;
+
+    dest.w = _elements.positions[i].width;
+    dest.h = _elements.positions[i].height;
 
     Graphic_FillRect(dest, _elements.backgroundColors[i]);
   }
@@ -97,9 +64,17 @@ GUI_Init()
   INIT_STRUCT_FOR_DOD_FREE_LIST(_elements, MAX_GUI_ELEMENTS);
   _elements.total = 1;
   _elements.backgroundColors[GUI_ROOT] = 0xFF00FFFF;
-  _elements.widths[GUI_ROOT].unit = GUI_Pixel;
-  _elements.widths[GUI_ROOT].value = 20;
-  _elements.heights[GUI_ROOT].unit = GUI_Pixel;
-  _elements.heights[GUI_ROOT].value = 20;
+  _elements.positions[GUI_ROOT].x = 20;
+  _elements.positions[GUI_ROOT].y = 20;
+  _elements.positions[GUI_ROOT].width = 20;
+  _elements.positions[GUI_ROOT].height = 20;
   _elements.parents[GUI_ROOT] = VOID_INDEX;
+
+  
+  _elements.backgroundColors[_elements.total] = 0x00FFFFFF;
+  _elements.positions[_elements.total].x = 20;
+  _elements.positions[_elements.total].y = 20;
+  _elements.positions[_elements.total].width = 20;
+  _elements.positions[_elements.total].height = 20;
+  _elements.parents[_elements.total++] = GUI_ROOT;
 }
