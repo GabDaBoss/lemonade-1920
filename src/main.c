@@ -7,6 +7,7 @@
 #include "graphic.h"
 #include "scene.h"
 #include "main-menu.h"
+#include "gui.h"
 
 int
 main() 
@@ -16,6 +17,8 @@ main()
   };
   
   Graphic_InitCamera();
+  GUI_Init();
+
   MainMenu_Enter();
   Scene_GameLoop();
 

@@ -4,6 +4,7 @@
 #include "scene.h"
 #include "graphic.h"
 #include "input.h"
+#include "gui.h"
 
 static UpdateFunc update;
 static bool running = true;
@@ -33,7 +34,6 @@ Scene_GameLoop()
     }
 
     Graphic_Render();
-    //printf("elapsed: %d\n", SDL_GetTicks() - current);
     SDL_Delay(1);
   }
 }

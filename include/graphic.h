@@ -78,6 +78,7 @@ Id Graphic_CreateInactiveText(char * const text, SDL_Color color);
 Id Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end);
 
 double Graphic_GetCameraZoom();
+void Graphic_FillRect(SDL_Rect dest, Uint32 color);
 
 #endif /* RENDERER_H */
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "graphic.h"
+#include "gui.h"
 
 #define MAX_TEXTURES 1024
 
@@ -260,6 +261,8 @@ Graphic_Render()
       &_sprites.sprite[i].dest
     );
   }
+
+  GUI_Render();
   SDL_RenderPresent(_renderer);
 }
 
@@ -1171,3 +1174,27 @@ Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end)
 
   return _createTilesetSprite(texture, src, dest);
 }
+
+void 
+Graphic_FillRect(SDL_Rect dest, Uint32 color)
+{
+  Uint8 prevR, prevG, prevB, prevA;
+  SDL_GetRenderDrawColor(_renderer, &prevR, &prevG, &prevB, &prevA);
+  SDL_SetRenderDrawColor(
+    _renderer, 
+    color >> 24 & 0xFF, 
+    color >> 16 & 0xFF, 
+    color >> 8 & 0xFF, 
+    color & 0xFF
+  );
+  printf("x: %d, y: %d, w: %d, h: %d\n", dest.x, dest.y, dest.w, dest.h);
+  SDL_RenderFillRect(_renderer, &dest);
+  SDL_SetRenderDrawColor(
+    _renderer, 
+    prevR,
+    prevG,
+    prevB,
+    prevA
+  );
+}
+

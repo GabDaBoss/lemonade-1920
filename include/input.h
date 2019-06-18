@@ -1,5 +1,5 @@
-#ifndef GUI_H
-#define GUI_H
+#ifndef INPUT_H
+#define INPUT_H
 
 #include <stdbool.h>
 #include <SDL2/SDL.h>
