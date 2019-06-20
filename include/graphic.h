@@ -77,6 +77,13 @@ Id Graphic_CreateInactiveSprite(Id textureId);
 Id Graphic_CreateInactiveText(char * const text, SDL_Color color);
 Id Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end);
 
+SDL_Texture* Graphic_CreateTextSDLTexture(
+  const char * const text, 
+  SDL_Color color,
+  unsigned int *w, 
+  unsigned int *h
+);
+
 double Graphic_GetCameraZoom();
 void Graphic_FillRect(SDL_Rect dest, Uint32 color);
 

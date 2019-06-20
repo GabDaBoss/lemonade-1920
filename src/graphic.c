@@ -156,8 +156,8 @@ _createTilesetSprite(SDL_Texture* texture, SDL_Rect src, SDL_Rect dest)
   return id;
 }
 
-static SDL_Texture*
-_createTextTexture(
+SDL_Texture*
+Graphic_CreateTextSDLTexture(
   const char * const text, 
   SDL_Color color,
   unsigned int *w, 
@@ -444,7 +444,7 @@ Graphic_CreateTextTexture(const char * const text, SDL_Color color)
   Id id;
   GET_NEXT_ID(_textures, id, index, MAX_TEXTURES);
 
-  _textures.textures[index] = _createTextTexture(text, color, NULL, NULL);
+  _textures.textures[index] = Graphic_CreateTextSDLTexture(text, color, NULL, NULL);
   _camera.bounds.dirty = true;
   return id;
 }
@@ -458,7 +458,7 @@ Graphic_CreateText(
 { 
   SDL_Rect src, dest;
   unsigned int w, h;
-  SDL_Texture* texture = _createTextTexture(text, color, &w, &h);
+  SDL_Texture* texture = Graphic_CreateTextSDLTexture(text, color, &w, &h);
 
   src.x = 0;
   src.y = 0;
@@ -517,7 +517,7 @@ Graphic_SetText(
   SDL_Rect src;
   src.x = 0;
   src.y = 0;
-  _sprites.sprite[index].texture = _createTextTexture(
+  _sprites.sprite[index].texture = Graphic_CreateTextSDLTexture(
     text, 
     color, 
     (unsigned int*) &src.w,
