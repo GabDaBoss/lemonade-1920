@@ -1198,3 +1198,9 @@ Graphic_FillRect(SDL_Rect dest, Uint32 color)
   );
 }
 
+void 
+Graphic_RenderCopy(SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dest)
+{
+  SDL_RenderCopy(_renderer, texture, src, dest);
+}
+

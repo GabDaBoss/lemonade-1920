@@ -102,6 +102,12 @@ GUI_Render()
     dest.h = el.height;
 
     Graphic_FillRect(dest, el.backgroundColor);
+
+    if (el.textTexture) {
+      SDL_Rect textDest = dest;
+      SDL_QueryTexture(el.textTexture, NULL, NULL, &textDest.w, &textDest.h);
+      Graphic_RenderCopy(el.textTexture, NULL, &textDest);
+    }
   }
 }
 
@@ -117,6 +123,9 @@ GUI_Init()
   _elements.elements[GUI_ROOT].unitInPercentFlags |= UnitInPercentFlags_Width;
   _elements.elements[GUI_ROOT].height = 20;
   _elements.elements[GUI_ROOT].parent = VOID_INDEX;
+  SDL_Color color = {0xFF};
+  _elements.elements[GUI_ROOT].textTexture = Graphic_CreateTextSDLTexture(
+      "Lemon2092", color, NULL, NULL);
 
   
   _elements.elements[_elements.total].backgroundColor = 0x00FFFFFF;
