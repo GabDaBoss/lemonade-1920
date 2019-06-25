@@ -6,10 +6,6 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 ARRAY_LENGTH	include/utils.h	80;"	d
 AUTO	src/gui.c	6;"	d	file:
-AlignCenter	src/gui.c	/^  AlignLeft, AlignRight, AlignCenter$/;"	e	enum:__anon9	file:
-AlignLeft	src/gui.c	/^  AlignLeft, AlignRight, AlignCenter$/;"	e	enum:__anon9	file:
-AlignRight	src/gui.c	/^  AlignLeft, AlignRight, AlignCenter$/;"	e	enum:__anon9	file:
-Alignment	src/gui.c	/^} Alignment;$/;"	t	typeref:enum:__anon9	file:
 BUILDDIR	Makefile	/^BUILDDIR := build$/;"	m
 CC	Makefile	/^CC := gcc$/;"	m
 CFLAGS	Makefile	/^CFLAGS := -std=c11 -g -Wall -Wextra$/;"	m
@@ -23,20 +19,24 @@ Element	src/gui.c	/^} Element;$/;"	t	typeref:struct:__anon10	file:
 FLAGS_NUM	src/input.c	4;"	d	file:
 FLAGS_PER_WORD	src/input.c	3;"	d	file:
 FONT	include/graphic.h	13;"	d
-FixedValueFlags	src/gui.c	/^} FixedValueFlags;$/;"	t	typeref:enum:__anon7	file:
-FixedValueFlags_Height	src/gui.c	/^  FixedValueFlags_Height = 1 << 2,$/;"	e	enum:__anon7	file:
-FixedValueFlags_Width	src/gui.c	/^  FixedValueFlags_Width = 1 << 1,$/;"	e	enum:__anon7	file:
-FixedValueFlags_X	src/gui.c	/^  FixedValueFlags_X = 1 << 3,$/;"	e	enum:__anon7	file:
-FixedValueFlags_Y	src/gui.c	/^  FixedValueFlags_Y = 1 << 4$/;"	e	enum:__anon7	file:
+FixedValueFlags	src/gui.c	/^} FixedValueFlags;$/;"	t	typeref:enum:__anon8	file:
+FixedValueFlags_Height	src/gui.c	/^  FixedValueFlags_Height = 1 << 2,$/;"	e	enum:__anon8	file:
+FixedValueFlags_Width	src/gui.c	/^  FixedValueFlags_Width = 1 << 1,$/;"	e	enum:__anon8	file:
+FixedValueFlags_X	src/gui.c	/^  FixedValueFlags_X = 1 << 3,$/;"	e	enum:__anon8	file:
+FixedValueFlags_Y	src/gui.c	/^  FixedValueFlags_Y = 1 << 4$/;"	e	enum:__anon8	file:
 FlagsForFile	.ycm_extra_conf.py	/^def FlagsForFile( filename, **kwargs ):$/;"	f
 GAME_H	include/game.h	2;"	d
 GET_INDEX_FROM_ID	include/utils.h	108;"	d
 GET_NAME	include/utils.h	61;"	d
 GET_NEXT_ID	include/utils.h	63;"	d
-GUI_AddElement	src/gui.c	/^GUI_AddElement(Id parent)$/;"	f
 GUI_AddEventListener	src/gui.c	/^GUI_AddEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)$/;"	f
+GUI_AlignCenter	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
+GUI_AlignLeft	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
+GUI_AlignRight	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
+GUI_Alignment	include/gui.h	/^} GUI_Alignment;$/;"	t	typeref:enum:__anon4
 GUI_All	include/gui.h	/^  GUI_All$/;"	e	enum:__anon2
 GUI_Auto	include/gui.h	/^  GUI_Auto,$/;"	e	enum:__anon3
+GUI_CreateWidget	src/gui.c	/^GUI_CreateWidget(Id parent)$/;"	f
 GUI_Element	include/gui.h	/^} GUI_Element;$/;"	t	typeref:struct:__anon1
 GUI_Events	include/gui.h	/^} GUI_Events;$/;"	t	typeref:enum:__anon2
 GUI_H	include/gui.h	2;"	d
@@ -46,9 +46,9 @@ GUI_OnFocus	include/gui.h	/^  GUI_OnFocus,$/;"	e	enum:__anon2
 GUI_OnHandlerFunc	include/gui.h	/^typedef void (*GUI_OnHandlerFunc)(Id el, GUI_Events e);$/;"	t
 GUI_Percent	include/gui.h	/^  GUI_Percent,$/;"	e	enum:__anon3
 GUI_Pixel	include/gui.h	/^  GUI_Pixel,$/;"	e	enum:__anon3
-GUI_ROOT	include/gui.h	7;"	d
 GUI_RemoveEventListener	src/gui.c	/^GUI_RemoveEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)$/;"	f
 GUI_Render	src/gui.c	/^GUI_Render()$/;"	f
+GUI_SetWidgetAligments	src/gui.c	/^GUI_SetWidgetAligments($/;"	f
 GUI_Unit	include/gui.h	/^} GUI_Unit;$/;"	t	typeref:enum:__anon3
 GameObject	src/game.c	/^} GameObject;$/;"	t	typeref:struct:__anon17	file:
 GameTile_Bush	src/game.c	/^  GameTile_Bush,$/;"	e	enum:__anon15	file:
@@ -170,7 +170,7 @@ Input_QueryMousePosition	src/input.c	/^void Input_QueryMousePosition(int* x, int
 Input_QueryMouseTranslation	src/input.c	/^Input_QueryMouseTranslation(int* dx, int* dy)$/;"	f
 IsHeaderFile	.ycm_extra_conf.py	/^def IsHeaderFile( filename ):$/;"	f
 LIB	Makefile	/^LIB := -lm -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf$/;"	m
-LeftMouseButton	include/input.h	/^  LeftMouseButton = 1 << 0,$/;"	e	enum:__anon5
+LeftMouseButton	include/input.h	/^  LeftMouseButton = 1 << 0,$/;"	e	enum:__anon6
 MAIN_MENU_H	include/main-menu.h	2;"	d
 MAP_HEIGHT	src/game.c	61;"	d	file:
 MAP_WIDTH	src/game.c	60;"	d	file:
@@ -183,11 +183,11 @@ MS_PER_FRAME	src/scene.c	13;"	d	file:
 MS_PER_UPDATE	src/scene.c	12;"	d	file:
 MainMenu_Enter	src/main-menu.c	/^MainMenu_Enter()$/;"	f
 MakeRelativePathsInFlagsAbsolute	.ycm_extra_conf.py	/^def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):$/;"	f
-MiddleMouseButton	include/input.h	/^  MiddleMouseButton = 1 << 2,$/;"	e	enum:__anon5
-MouseButton	include/input.h	/^} MouseButton;$/;"	t	typeref:enum:__anon5
+MiddleMouseButton	include/input.h	/^  MiddleMouseButton = 1 << 2,$/;"	e	enum:__anon6
+MouseButton	include/input.h	/^} MouseButton;$/;"	t	typeref:enum:__anon6
 NORTH_TO_SOUTH_EAST_SIDE_LANE	src/game.c	67;"	d	file:
 NORTH_TO_SOUTH_WEST_SIDE_LANE	src/game.c	65;"	d	file:
-NoMouseButton	include/input.h	/^  NoMouseButton = 0,$/;"	e	enum:__anon5
+NoMouseButton	include/input.h	/^  NoMouseButton = 0,$/;"	e	enum:__anon6
 NoPath	src/game.c	/^  NoPath,$/;"	e	enum:__anon16	file:
 NorthOnEastSideToWestOnNorthSide	src/game.c	/^  NorthOnEastSideToWestOnNorthSide,$/;"	e	enum:__anon16	file:
 NorthOnEastSideToWestOnSouthSide	src/game.c	/^  NorthOnEastSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
@@ -199,7 +199,7 @@ OBJECTS	Makefile	/^OBJECTS := $(patsubst $(SRCDIR)\/%,$(BUILDDIR)\/%,$(SOURCES:.
 Path	src/game.c	/^} Path;$/;"	t	typeref:enum:__anon16	file:
 RENDERER_H	include/graphic.h	2;"	d
 RectF	src/graphic.c	/^} RectF;$/;"	t	typeref:struct:__anon19	file:
-RightMouseButton	include/input.h	/^  RightMouseButton = 1 << 1,$/;"	e	enum:__anon5
+RightMouseButton	include/input.h	/^  RightMouseButton = 1 << 1,$/;"	e	enum:__anon6
 SCENE_H	include/scene.h	2;"	d
 SELECTION_SPEED	src/main-menu.c	/^static const double SELECTION_SPEED = 0.10;$/;"	v	file:
 SET_ID_INDEX	include/utils.h	51;"	d
@@ -225,7 +225,7 @@ SouthOnWestSideToWestOnNorthSide	src/game.c	/^  SouthOnWestSideToWestOnNorthSide
 SouthOnWestSideToWestOnSouthSide	src/game.c	/^  SouthOnWestSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
 SouthToNorthOnEastSide	src/game.c	/^  SouthToNorthOnEastSide,$/;"	e	enum:__anon16	file:
 SouthToNorthOnWestSide	src/game.c	/^  SouthToNorthOnWestSide,$/;"	e	enum:__anon16	file:
-Sprite	include/graphic.h	/^} Sprite;$/;"	t	typeref:struct:__anon4
+Sprite	include/graphic.h	/^} Sprite;$/;"	t	typeref:struct:__anon5
 TARGET	Makefile	/^TARGET := runner$/;"	m
 TARGETDIR	Makefile	/^TARGETDIR := bin$/;"	m
 TILE_HEIGHT	src/game.c	63;"	d	file:
@@ -238,11 +238,11 @@ TinyId	include/utils.h	/^    typedef unsigned char TinyId;$/;"	t
 TinyIndex	include/utils.h	/^    typedef unsigned char TinyIndex;$/;"	t
 TotalTextureIds	include/graphic.h	/^    TotalTextureIds$/;"	e	enum:TextureIds
 UTILS_H	include/utils.h	15;"	d
-UnitInPercentFlags	src/gui.c	/^} UnitInPercentFlags;$/;"	t	typeref:enum:__anon8	file:
-UnitInPercentFlags_Height	src/gui.c	/^  UnitInPercentFlags_Height = 1 << 2,$/;"	e	enum:__anon8	file:
-UnitInPercentFlags_Width	src/gui.c	/^  UnitInPercentFlags_Width = 1 << 1,$/;"	e	enum:__anon8	file:
-UnitInPercentFlags_X	src/gui.c	/^  UnitInPercentFlags_X = 1 << 3,$/;"	e	enum:__anon8	file:
-UnitInPercentFlags_Y	src/gui.c	/^  UnitInPercentFlags_Y = 1 << 4,$/;"	e	enum:__anon8	file:
+UnitInPercentFlags	src/gui.c	/^} UnitInPercentFlags;$/;"	t	typeref:enum:__anon9	file:
+UnitInPercentFlags_Height	src/gui.c	/^  UnitInPercentFlags_Height = 1 << 2,$/;"	e	enum:__anon9	file:
+UnitInPercentFlags_Width	src/gui.c	/^  UnitInPercentFlags_Width = 1 << 1,$/;"	e	enum:__anon9	file:
+UnitInPercentFlags_X	src/gui.c	/^  UnitInPercentFlags_X = 1 << 3,$/;"	e	enum:__anon9	file:
+UnitInPercentFlags_Y	src/gui.c	/^  UnitInPercentFlags_Y = 1 << 4,$/;"	e	enum:__anon9	file:
 UpdateFunc	include/scene.h	/^typedef void (*UpdateFunc)(void);$/;"	t
 VOID_ID	include/utils.h	38;"	d
 VOID_INDEX	include/utils.h	41;"	d
@@ -297,7 +297,7 @@ _reorderGameObjects	src/game.c	/^_reorderGameObjects()$/;"	f	file:
 _setElementText	src/gui.c	/^_setElementText(Element* el, const char * const text)$/;"	f	file:
 _spriteSheetId	src/game.c	/^static Id _spriteSheetId = VOID_ID;$/;"	v	file:
 _sprites	src/graphic.c	/^} _sprites;$/;"	v	typeref:struct:__anon21	file:
-_state	src/input.c	/^} _state;$/;"	v	typeref:struct:__anon6	file:
+_state	src/input.c	/^} _state;$/;"	v	typeref:struct:__anon7	file:
 _swap	src/graphic.c	/^_swap(Index it, Id id, Index with)$/;"	f	file:
 _textures	src/graphic.c	/^} _textures;$/;"	v	typeref:struct:__anon20	file:
 _tilesObjectSpriteId	src/game.c	/^static Id _tilesObjectSpriteId[MAP_HEIGHT][MAP_WIDTH];$/;"	v	file:
@@ -325,7 +325,7 @@ closeLevelSelector	src/main-menu.c	/^closeLevelSelector()$/;"	f
 compilation_database_folder	.ycm_extra_conf.py	/^compilation_database_folder = ''$/;"	v
 database	.ycm_extra_conf.py	/^  database = None$/;"	v
 database	.ycm_extra_conf.py	/^  database = ycm_core.CompilationDatabase( compilation_database_folder )$/;"	v
-dest	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon4
+dest	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon5
 dest	include/gui.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
 dest	src/graphic.c	/^    SDL_Rect dest;$/;"	m	struct:__anon18	file:
 dirty	src/graphic.c	/^    bool dirty;$/;"	m	struct:__anon22::__anon23	file:
@@ -342,13 +342,13 @@ greenTextColor	src/main-menu.c	/^static const SDL_Color greenTextColor = { 0x22,
 h	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 h	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 height	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-horizontalAlignment	src/gui.c	/^  Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
+horizontalAlignment	src/gui.c	/^  GUI_Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
 hoveredButton	src/main-menu.c	/^  } hoveredButton;$/;"	m	struct:__anon12	typeref:struct:__anon12::__anon14	file:
 id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon12::__anon13	file:
 id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon12::__anon14	file:
 initiated	src/utils.c	/^static bool initiated;$/;"	v	file:
-keyPressed	src/input.c	/^  unsigned long keyPressed[FLAGS_NUM]; $/;"	m	struct:__anon6	file:
-keyReleased	src/input.c	/^  unsigned long keyReleased[FLAGS_NUM]; $/;"	m	struct:__anon6	file:
+keyPressed	src/input.c	/^  unsigned long keyPressed[FLAGS_NUM]; $/;"	m	struct:__anon7	file:
+keyReleased	src/input.c	/^  unsigned long keyReleased[FLAGS_NUM]; $/;"	m	struct:__anon7	file:
 leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon12::__anon13	file:
 leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon12::__anon14	file:
 leftBorder	src/main-menu.c	/^  Id leftBorder;$/;"	m	struct:__anon12	file:
@@ -357,9 +357,9 @@ lightScreenSolidTextureId	src/main-menu.c	/^static Id lightScreenSolidTextureId 
 loadButton	src/main-menu.c	/^static Id loadButton;$/;"	v	file:
 main	src/main.c	/^main() $/;"	f
 mainMenuTitle	src/main-menu.c	/^static Id mainMenuTitle;$/;"	v	file:
-mouseButtonClicked	src/input.c	/^  MouseButton mouseButtonClicked;$/;"	m	struct:__anon6	file:
-mouseButtonPressed	src/input.c	/^  MouseButton mouseButtonPressed;$/;"	m	struct:__anon6	file:
-mouseButtonReleased	src/input.c	/^  MouseButton mouseButtonReleased;$/;"	m	struct:__anon6	file:
+mouseButtonClicked	src/input.c	/^  MouseButton mouseButtonClicked;$/;"	m	struct:__anon7	file:
+mouseButtonPressed	src/input.c	/^  MouseButton mouseButtonPressed;$/;"	m	struct:__anon7	file:
+mouseButtonReleased	src/input.c	/^  MouseButton mouseButtonReleased;$/;"	m	struct:__anon7	file:
 newButton	src/main-menu.c	/^static Id newButton;$/;"	v	file:
 okButton	src/main-menu.c	/^  Id okButton;$/;"	m	struct:__anon12	file:
 okButtonTextureId	src/main-menu.c	/^static Id okButtonTextureId;$/;"	v	file:
@@ -368,7 +368,7 @@ opened	src/main-menu.c	/^  bool opened;$/;"	m	struct:__anon12	file:
 parent	include/gui.h	/^  int parent;$/;"	m	struct:__anon1
 parent	src/gui.c	/^  Index  parent;$/;"	m	struct:__anon10	file:
 path	src/game.c	/^  Path path;$/;"	m	struct:__anon17	file:
-quit	src/input.c	/^  bool quit;$/;"	m	struct:__anon6	file:
+quit	src/input.c	/^  bool quit;$/;"	m	struct:__anon7	file:
 quitButton	src/main-menu.c	/^static Id quitButton;$/;"	v	file:
 rectF	src/graphic.c	/^  RectF rectF[MAX_SPRITES];$/;"	m	struct:__anon21	file:
 rightBorder	src/main-menu.c	/^    Id rightBorder;$/;"	m	struct:__anon12::__anon13	file:
@@ -380,7 +380,7 @@ selectedLevelButton	src/main-menu.c	/^  } selectedLevelButton;$/;"	m	struct:__an
 setBorderAroundHoveredButton	src/main-menu.c	/^setBorderAroundHoveredButton()$/;"	f
 sprite	src/game.c	/^  Id sprite;$/;"	m	struct:__anon17	file:
 sprite	src/graphic.c	/^  _Sprite sprite[MAX_SPRITES];$/;"	m	struct:__anon21	file:
-src	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon4
+src	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon5
 src	include/gui.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
 src	src/graphic.c	/^    SDL_Rect src;$/;"	m	struct:__anon18	file:
 startGame	src/main-menu.c	/^static void startGame()$/;"	f	file:
@@ -388,9 +388,10 @@ textColor	src/main-menu.c	/^static const SDL_Color textColor = {255, 255, 0, 255
 textTexture	src/gui.c	/^  SDL_Texture* textTexture;$/;"	m	struct:__anon10	file:
 texture	include/gui.h	/^  SDL_Texture* texture;$/;"	m	struct:__anon1
 texture	src/graphic.c	/^    SDL_Texture* texture;$/;"	m	struct:__anon18	file:
-textureId	include/graphic.h	/^  Id textureId;$/;"	m	struct:__anon4
+textureId	include/graphic.h	/^  Id textureId;$/;"	m	struct:__anon5
 textures	src/graphic.c	/^    SDL_Texture* textures[MAX_TEXTURES];$/;"	m	struct:__anon20	file:
 tile	src/game.c	/^  GameTiles tile;$/;"	m	struct:__anon17	file:
+titleWidget	src/main-menu.c	/^static Id titleWidget;$/;"	v	file:
 topBar	src/main-menu.c	/^  Id topBar;$/;"	m	struct:__anon12	file:
 topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon12::__anon13	file:
 topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon12::__anon14	file:
@@ -400,7 +401,7 @@ unitInPercentFlags	src/gui.c	/^  UnitInPercentFlags unitInPercentFlags;$/;"	m	st
 update	src/main-menu.c	/^update() $/;"	f	file:
 update	src/scene.c	/^static UpdateFunc update;$/;"	v	file:
 utils_random	src/utils.c	/^utils_random()$/;"	f
-verticalAlignment	src/gui.c	/^  Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
+verticalAlignment	src/gui.c	/^  GUI_Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
 w	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 w	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 width	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
@@ -409,12 +410,12 @@ x	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 x	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 x	src/graphic.c	/^  int x, y;$/;"	m	struct:__anon22	file:
 x	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-x	src/input.c	/^  int x;$/;"	m	struct:__anon6	file:
+x	src/input.c	/^  int x;$/;"	m	struct:__anon7	file:
 y	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
 y	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 y	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 y	src/graphic.c	/^  int x, y;$/;"	m	struct:__anon22	file:
 y	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-y	src/input.c	/^  int y;$/;"	m	struct:__anon6	file:
+y	src/input.c	/^  int y;$/;"	m	struct:__anon7	file:
 z	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
 zoom	src/graphic.c	/^  double zoom;$/;"	m	struct:__anon22	file:

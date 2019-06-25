@@ -4,6 +4,7 @@
 #include "graphic.h"
 #include "input.h"
 #include "game.h"
+#include "gui.h"
 
 static Id mainMenuTitle;
 static Id newButton;
@@ -21,6 +22,8 @@ static Id backButtonTextureId;
 static Id lightScreenSolidTextureId = VOID_ID;
 static Id greenSolidTextureId = VOID_ID;
 static Id background = VOID_ID;
+
+static Id titleWidget;
 
 static struct {
   bool opened;
@@ -359,6 +362,15 @@ MainMenu_Enter()
   Graphic_InitCamera();
   levelSelector.opened = false; 
   selectedButton = 0;
+
+  titleWidget = GUI_CreateWidget(VOID_ID);
+  GUI_SetWidgetTextAligments(
+      titleWidget, 
+      GUI_HorizontalAlignCenter, 
+      GUI_VerticalAlignCenter
+  );
+  GUI_SetWidgetPosition(titleWidget, 0, 0, 100, 100, UnitInPercentFlags_Width);
+  GUI_SetWidgetText(titleWidget, "Lemon88");
 
 
   backgroundTextureId = Graphic_LoadTexture("background.png");
