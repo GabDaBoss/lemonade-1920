@@ -1,42 +1,34 @@
-#include "gui.h"
+#include "widget.h"
 #include "graphic.h"
 
-#define MAX_GUI_ELEMENTS 1000
+#define MAX_Widget_ELEMENTS 1000
 
 #define AUTO -1
 
-typedef enum {
-  FixedValueFlags_Width = 1 << 1,
-  FixedValueFlags_Height = 1 << 2,
-  FixedValueFlags_X = 1 << 3,
-  FixedValueFlags_Y = 1 << 4
-} FixedValueFlags;
-
-
 typedef struct {
   double w, h, x, y;
-  GUI_HorizontalAlignment horizontalTextAlignment;
-  GUI_VerticalAlignment verticalTextAlignment;
-  FixedValueFlags fixedValues;
+  Widget_HorizontalAlignment horizontalAlignment;
+  Widget_VerticalAlignment verticalAlignment;
   UnitInPercentFlags unitInPercentFlags;
   Index  parent;
   Uint32 backgroundColor;
   Uint32 bordersColor;
-  SDL_Texture* textTexture;
+  SDL_Texture* texture;
+  SDL_Rect dest;
 } Element;
 
 
 static struct {
-  Element elements[MAX_GUI_ELEMENTS];
-  SET_STRUCT_FOR_DOD(Id, MAX_GUI_ELEMENTS);
+  Element elements[MAX_Widget_ELEMENTS];
+  SET_STRUCT_FOR_DOD(Id, MAX_Widget_ELEMENTS);
 } _elements;
 
 Id 
-GUI_CreateWidget(Id parent)
+Widget_Create(Id parent)
 {
   Index index;
   Id id;
-  GET_NEXT_ID(_elements, id, index, MAX_GUI_ELEMENTS);
+  GET_NEXT_ID(_elements, id, index, MAX_Widget_ELEMENTS);
 
   if (parent != VOID_ID) {
     Index parentIdx;
@@ -51,19 +43,19 @@ GUI_CreateWidget(Id parent)
 }
 
 void 
-GUI_AddEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)
+Widget_AddEventListener(Id el, Widget_Events e, Widget_OnHandlerFunc handler)
 {
 
 }
 
 void 
-GUI_RemoveEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)
+Widget_RemoveEventListener(Id el, Widget_Events e, Widget_OnHandlerFunc handler)
 {
 
 }
 
 void 
-GUI_Render()
+Widget_Render()
 {
   for (Index i = 0; i < _elements.total; i++) {
     printf("render gui: %d\n", i);
@@ -90,49 +82,49 @@ GUI_Render()
 
     Graphic_FillRect(dest, el.backgroundColor);
 
-    if (el.textTexture) {
+    if (el.texture) {
       SDL_Rect textDest = dest;
-      SDL_QueryTexture(el.textTexture, NULL, NULL, &textDest.w, &textDest.h);
+      SDL_QueryTexture(el.texture, NULL, NULL, &textDest.w, &textDest.h);
 
-      switch (el.horizontalTextAlignment) {
-        case GUI_HorizontalAlignRight:
+      switch (el.horizontalAlignment) {
+        case Widget_HorizontalAlignRight:
           textDest.x = dest.x + dest.w - textDest.w;
           break;
-        case GUI_HorizontalAlignCenter:
+        case Widget_HorizontalAlignCenter:
           textDest.x = (dest.x + dest.w) / 2 - textDest.w / 2;
           break;
         default: break;
       }
 
-      switch (el.verticalTextAlignment) {
-        case GUI_VerticalAlignBottom:
+      switch (el.verticalAlignment) {
+        case Widget_VerticalAlignBottom:
           textDest.y = dest.y + dest.h - textDest.h;
           break;
-        case GUI_VerticalAlignCenter:
+        case Widget_VerticalAlignCenter:
           textDest.y = (dest.y + dest.h) / 2 - textDest.h / 2;
           break;
         default: break;
       }
-      Graphic_RenderCopy(el.textTexture, NULL, &textDest);
+      Graphic_RenderCopy(el.texture, NULL, &textDest);
     }
   }
 }
 
 void
-GUI_Init()
+Widget_Init()
 {
-  INIT_STRUCT_FOR_DOD_FREE_LIST(_elements, MAX_GUI_ELEMENTS);
+  INIT_STRUCT_FOR_DOD_FREE_LIST(_elements, MAX_Widget_ELEMENTS);
   /*
   _elements.total = 1;
-  _elements.elements[GUI_ROOT].backgroundColor = 0xFF00FFFF;
-  _elements.elements[GUI_ROOT].x = 0;
-  _elements.elements[GUI_ROOT].y = 20;
-  _elements.elements[GUI_ROOT].width = 100;
-  _elements.elements[GUI_ROOT].unitInPercentFlags |= UnitInPercentFlags_Width;
-  _elements.elements[GUI_ROOT].height = 20;
-  _elements.elements[GUI_ROOT].parent = VOID_INDEX;
+  _elements.elements[Widget_ROOT].backgroundColor = 0xFF00FFFF;
+  _elements.elements[Widget_ROOT].x = 0;
+  _elements.elements[Widget_ROOT].y = 20;
+  _elements.elements[Widget_ROOT].width = 100;
+  _elements.elements[Widget_ROOT].unitInPercentFlags |= UnitInPercentFlags_Width;
+  _elements.elements[Widget_ROOT].height = 20;
+  _elements.elements[Widget_ROOT].parent = VOID_INDEX;
   SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
-  _elements.elements[GUI_ROOT].textTexture = Graphic_CreateTextSDLTexture(
+  _elements.elements[Widget_ROOT].textTexture = Graphic_CreateTextSDLTexture(
       "Lemon2092", color, NULL, NULL);
 
   
@@ -141,35 +133,43 @@ GUI_Init()
   _elements.elements[_elements.total].y = 20;
   _elements.elements[_elements.total].width = 20;
   _elements.elements[_elements.total].height = 20;
-  _elements.elements[_elements.total++].parent = GUI_ROOT;
+  _elements.elements[_elements.total++].parent = Widget_ROOT;
   */
 }
 
 void 
-GUI_SetWidgetTextAligments(
+Widget_SetAligments(
     Id id, 
-    GUI_HorizontalAlignment horizontalAlignment, 
-    GUI_VerticalAlignment verticalAlignment) 
+    Widget_HorizontalAlignment horizontalAlignment, 
+    Widget_VerticalAlignment verticalAlignment) 
 {
   Index idx;
   GET_INDEX_FROM_ID(_elements, id, idx);
 
-  _elements.elements[idx].horizontalTextAlignment = horizontalAlignment;
-  _elements.elements[idx].verticalTextAlignment = verticalAlignment;
+  _elements.elements[idx].horizontalAlignment = horizontalAlignment;
+  _elements.elements[idx].verticalAlignment = verticalAlignment;
 }
 
 void 
-GUI_SetWidgetText(Id id, const char * const text)
+Widget_SetText(Id id, const char * const text)
 {
   Index idx;
   GET_INDEX_FROM_ID(_elements, id, idx);
   SDL_Color color = {0xFF, 0xFF, 0xFF, 0xFF};
-  _elements.elements[idx].textTexture = Graphic_CreateTextSDLTexture(
+  _elements.elements[idx].texture = Graphic_CreateTextSDLTexture(
       text, color, NULL, NULL);
 }
 
 void 
-GUI_SetWidgetPosition(
+Widget_SetImage(Id id, const char * const image)
+{
+  Index idx;
+  GET_INDEX_FROM_ID(_elements, id, idx);
+  _elements.elements[idx].texture = Graphic_CreateSDLTexture(image);
+}
+
+void 
+Widget_SetPosition(
     Id id, 
     double x, 
     double y, 

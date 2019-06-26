@@ -4,7 +4,7 @@
 #include "graphic.h"
 #include "input.h"
 #include "game.h"
-#include "gui.h"
+#include "widget.h"
 
 static Id mainMenuTitle;
 static Id newButton;
@@ -363,14 +363,14 @@ MainMenu_Enter()
   levelSelector.opened = false; 
   selectedButton = 0;
 
-  titleWidget = GUI_CreateWidget(VOID_ID);
-  GUI_SetWidgetTextAligments(
+  titleWidget = Widget_Create(VOID_ID);
+  Widget_SetAligments(
       titleWidget, 
-      GUI_HorizontalAlignCenter, 
-      GUI_VerticalAlignCenter
+      Widget_HorizontalAlignCenter, 
+      Widget_VerticalAlignCenter
   );
-  GUI_SetWidgetPosition(titleWidget, 0, 0, 100, 100, UnitInPercentFlags_Width);
-  GUI_SetWidgetText(titleWidget, "Lemon88");
+  Widget_SetPosition(titleWidget, 0, 0, 100, 100, UnitInPercentFlags_Width);
+  Widget_SetText(titleWidget, "Lemon88");
 
 
   backgroundTextureId = Graphic_LoadTexture("background.png");

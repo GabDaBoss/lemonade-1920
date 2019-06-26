@@ -77,6 +77,7 @@ Id Graphic_CreateInactiveSprite(Id textureId);
 Id Graphic_CreateInactiveText(char * const text, SDL_Color color);
 Id Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end);
 
+SDL_Texture* Graphic_CreateSDLTexture(const char* const filename);
 SDL_Texture* Graphic_CreateTextSDLTexture(
   const char * const text, 
   SDL_Color color,

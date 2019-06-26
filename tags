@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 ARRAY_LENGTH	include/utils.h	80;"	d
-AUTO	src/gui.c	6;"	d	file:
+AUTO	src/widget.c	6;"	d	file:
 BUILDDIR	Makefile	/^BUILDDIR := build$/;"	m
 CC	Makefile	/^CC := gcc$/;"	m
 CFLAGS	Makefile	/^CFLAGS := -std=c11 -g -Wall -Wextra$/;"	m
@@ -15,89 +15,63 @@ DirectoryOfThisScript	.ycm_extra_conf.py	/^def DirectoryOfThisScript():$/;"	f
 EAST_TO_WEST_NORTH_SIDE_LANE	src/game.c	69;"	d	file:
 EAST_TO_WEST_SOUTH_SIDE_LANE	src/game.c	71;"	d	file:
 EXIT_IF_HAS_NOT_ID	include/utils.h	83;"	d
-Element	src/gui.c	/^} Element;$/;"	t	typeref:struct:__anon10	file:
+Element	src/widget.c	/^} Element;$/;"	t	typeref:struct:__anon16	file:
 FLAGS_NUM	src/input.c	4;"	d	file:
 FLAGS_PER_WORD	src/input.c	3;"	d	file:
 FONT	include/graphic.h	13;"	d
-FixedValueFlags	src/gui.c	/^} FixedValueFlags;$/;"	t	typeref:enum:__anon8	file:
-FixedValueFlags_Height	src/gui.c	/^  FixedValueFlags_Height = 1 << 2,$/;"	e	enum:__anon8	file:
-FixedValueFlags_Width	src/gui.c	/^  FixedValueFlags_Width = 1 << 1,$/;"	e	enum:__anon8	file:
-FixedValueFlags_X	src/gui.c	/^  FixedValueFlags_X = 1 << 3,$/;"	e	enum:__anon8	file:
-FixedValueFlags_Y	src/gui.c	/^  FixedValueFlags_Y = 1 << 4$/;"	e	enum:__anon8	file:
 FlagsForFile	.ycm_extra_conf.py	/^def FlagsForFile( filename, **kwargs ):$/;"	f
 GAME_H	include/game.h	2;"	d
 GET_INDEX_FROM_ID	include/utils.h	108;"	d
 GET_NAME	include/utils.h	61;"	d
 GET_NEXT_ID	include/utils.h	63;"	d
-GUI_AddEventListener	src/gui.c	/^GUI_AddEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)$/;"	f
-GUI_AlignCenter	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
-GUI_AlignLeft	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
-GUI_AlignRight	include/gui.h	/^  GUI_AlignLeft, GUI_AlignRight, GUI_AlignCenter$/;"	e	enum:__anon4
-GUI_Alignment	include/gui.h	/^} GUI_Alignment;$/;"	t	typeref:enum:__anon4
-GUI_All	include/gui.h	/^  GUI_All$/;"	e	enum:__anon2
-GUI_Auto	include/gui.h	/^  GUI_Auto,$/;"	e	enum:__anon3
-GUI_CreateWidget	src/gui.c	/^GUI_CreateWidget(Id parent)$/;"	f
-GUI_Element	include/gui.h	/^} GUI_Element;$/;"	t	typeref:struct:__anon1
-GUI_Events	include/gui.h	/^} GUI_Events;$/;"	t	typeref:enum:__anon2
-GUI_H	include/gui.h	2;"	d
-GUI_Init	src/gui.c	/^GUI_Init()$/;"	f
-GUI_OnClick	include/gui.h	/^  GUI_OnClick,$/;"	e	enum:__anon2
-GUI_OnFocus	include/gui.h	/^  GUI_OnFocus,$/;"	e	enum:__anon2
-GUI_OnHandlerFunc	include/gui.h	/^typedef void (*GUI_OnHandlerFunc)(Id el, GUI_Events e);$/;"	t
-GUI_Percent	include/gui.h	/^  GUI_Percent,$/;"	e	enum:__anon3
-GUI_Pixel	include/gui.h	/^  GUI_Pixel,$/;"	e	enum:__anon3
-GUI_RemoveEventListener	src/gui.c	/^GUI_RemoveEventListener(Id el, GUI_Events e, GUI_OnHandlerFunc handler)$/;"	f
-GUI_Render	src/gui.c	/^GUI_Render()$/;"	f
-GUI_SetWidgetAligments	src/gui.c	/^GUI_SetWidgetAligments($/;"	f
-GUI_Unit	include/gui.h	/^} GUI_Unit;$/;"	t	typeref:enum:__anon3
-GameObject	src/game.c	/^} GameObject;$/;"	t	typeref:struct:__anon17	file:
-GameTile_Bush	src/game.c	/^  GameTile_Bush,$/;"	e	enum:__anon15	file:
-GameTile_CrosswalkEastWest1	src/game.c	/^  GameTile_CrosswalkEastWest1,$/;"	e	enum:__anon15	file:
-GameTile_CrosswalkEastWest2	src/game.c	/^  GameTile_CrosswalkEastWest2,$/;"	e	enum:__anon15	file:
-GameTile_CrosswalkNorthSouth1	src/game.c	/^  GameTile_CrosswalkNorthSouth1,$/;"	e	enum:__anon15	file:
-GameTile_CrosswalkNorthSouth2	src/game.c	/^  GameTile_CrosswalkNorthSouth2,$/;"	e	enum:__anon15	file:
-GameTile_EastToNorthFenceCorner	src/game.c	/^  GameTile_EastToNorthFenceCorner,$/;"	e	enum:__anon15	file:
-GameTile_EastToWestFence	src/game.c	/^  GameTile_EastToWestFence,$/;"	e	enum:__anon15	file:
-GameTile_EastToWestFenceEntrance	src/game.c	/^  GameTile_EastToWestFenceEntrance,$/;"	e	enum:__anon15	file:
-GameTile_Empty	src/game.c	/^  GameTile_Empty,$/;"	e	enum:__anon15	file:
-GameTile_FrontPorchStair	src/game.c	/^  GameTile_FrontPorchStair,$/;"	e	enum:__anon15	file:
-GameTile_Grass	src/game.c	/^  GameTile_Grass,$/;"	e	enum:__anon15	file:
-GameTile_HouseDoor	src/game.c	/^  GameTile_HouseDoor,$/;"	e	enum:__anon15	file:
-GameTile_HouseLeftRoof	src/game.c	/^  GameTile_HouseLeftRoof,$/;"	e	enum:__anon15	file:
-GameTile_HouseRightWallCenterSection	src/game.c	/^  GameTile_HouseRightWallCenterSection,$/;"	e	enum:__anon15	file:
-GameTile_HouseRightWallFirstSection	src/game.c	/^  GameTile_HouseRightWallFirstSection,$/;"	e	enum:__anon15	file:
-GameTile_HouseRightWallLastSection	src/game.c	/^  GameTile_HouseRightWallLastSection,$/;"	e	enum:__anon15	file:
-GameTile_HouseRightWallThirdSection	src/game.c	/^  GameTile_HouseRightWallThirdSection,$/;"	e	enum:__anon15	file:
-GameTile_HouseRoof	src/game.c	/^  GameTile_HouseRoof,$/;"	e	enum:__anon15	file:
-GameTile_HouseTopLeftRoof	src/game.c	/^  GameTile_HouseTopLeftRoof,$/;"	e	enum:__anon15	file:
-GameTile_HouseTopRoof	src/game.c	/^  GameTile_HouseTopRoof,$/;"	e	enum:__anon15	file:
-GameTile_LeftHouseCorner	src/game.c	/^  GameTile_LeftHouseCorner,$/;"	e	enum:__anon15	file:
-GameTile_NorthToSouthEntryWalkway	src/game.c	/^  GameTile_NorthToSouthEntryWalkway,$/;"	e	enum:__anon15	file:
-GameTile_NorthToSouthFence	src/game.c	/^  GameTile_NorthToSouthFence,$/;"	e	enum:__anon15	file:
-GameTile_RightHouseCorner	src/game.c	/^  GameTile_RightHouseCorner,$/;"	e	enum:__anon15	file:
-GameTile_Road	src/game.c	/^  GameTile_Road,$/;"	e	enum:__anon15	file:
-GameTile_SideWalk	src/game.c	/^  GameTile_SideWalk,$/;"	e	enum:__anon15	file:
-GameTile_SouthToNorthFence	src/game.c	/^  GameTile_SouthToNorthFence,$/;"	e	enum:__anon15	file:
-GameTile_Stand	src/game.c	/^  GameTile_Stand,$/;"	e	enum:__anon15	file:
-GameTile_StandingCharacterEast	src/game.c	/^  GameTile_StandingCharacterEast,$/;"	e	enum:__anon15	file:
-GameTile_StandingCharacterNorth	src/game.c	/^  GameTile_StandingCharacterNorth,$/;"	e	enum:__anon15	file:
-GameTile_StandingCharacterSouth	src/game.c	/^  GameTile_StandingCharacterSouth,$/;"	e	enum:__anon15	file:
-GameTile_StandingCharacterWest	src/game.c	/^  GameTile_StandingCharacterWest,$/;"	e	enum:__anon15	file:
-GameTile_StopSignFacingEast	src/game.c	/^  GameTile_StopSignFacingEast,$/;"	e	enum:__anon15	file:
-GameTile_StopSignFacingNorth	src/game.c	/^  GameTile_StopSignFacingNorth,$/;"	e	enum:__anon15	file:
-GameTile_StopSignFacingSouth	src/game.c	/^  GameTile_StopSignFacingSouth,$/;"	e	enum:__anon15	file:
-GameTile_StopSignFacingWest	src/game.c	/^  GameTile_StopSignFacingWest,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterEast1	src/game.c	/^  GameTile_WalkingCharacterEast1,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterEast2	src/game.c	/^  GameTile_WalkingCharacterEast2,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterNorth1	src/game.c	/^  GameTile_WalkingCharacterNorth1,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterNorth2	src/game.c	/^  GameTile_WalkingCharacterNorth2,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterSouth1	src/game.c	/^  GameTile_WalkingCharacterSouth1,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterSouth2	src/game.c	/^  GameTile_WalkingCharacterSouth2,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterWest1	src/game.c	/^  GameTile_WalkingCharacterWest1,$/;"	e	enum:__anon15	file:
-GameTile_WalkingCharacterWest2	src/game.c	/^  GameTile_WalkingCharacterWest2,$/;"	e	enum:__anon15	file:
-GameTile_Wall	src/game.c	/^  GameTile_Wall,$/;"	e	enum:__anon15	file:
-GameTile_WestToNorthFenceCorner	src/game.c	/^  GameTile_WestToNorthFenceCorner,$/;"	e	enum:__anon15	file:
-GameTiles	src/game.c	/^} GameTiles;$/;"	t	typeref:enum:__anon15	file:
+GameObject	src/game.c	/^} GameObject;$/;"	t	typeref:struct:__anon15	file:
+GameTile_Bush	src/game.c	/^  GameTile_Bush,$/;"	e	enum:__anon13	file:
+GameTile_CrosswalkEastWest1	src/game.c	/^  GameTile_CrosswalkEastWest1,$/;"	e	enum:__anon13	file:
+GameTile_CrosswalkEastWest2	src/game.c	/^  GameTile_CrosswalkEastWest2,$/;"	e	enum:__anon13	file:
+GameTile_CrosswalkNorthSouth1	src/game.c	/^  GameTile_CrosswalkNorthSouth1,$/;"	e	enum:__anon13	file:
+GameTile_CrosswalkNorthSouth2	src/game.c	/^  GameTile_CrosswalkNorthSouth2,$/;"	e	enum:__anon13	file:
+GameTile_EastToNorthFenceCorner	src/game.c	/^  GameTile_EastToNorthFenceCorner,$/;"	e	enum:__anon13	file:
+GameTile_EastToWestFence	src/game.c	/^  GameTile_EastToWestFence,$/;"	e	enum:__anon13	file:
+GameTile_EastToWestFenceEntrance	src/game.c	/^  GameTile_EastToWestFenceEntrance,$/;"	e	enum:__anon13	file:
+GameTile_Empty	src/game.c	/^  GameTile_Empty,$/;"	e	enum:__anon13	file:
+GameTile_FrontPorchStair	src/game.c	/^  GameTile_FrontPorchStair,$/;"	e	enum:__anon13	file:
+GameTile_Grass	src/game.c	/^  GameTile_Grass,$/;"	e	enum:__anon13	file:
+GameTile_HouseDoor	src/game.c	/^  GameTile_HouseDoor,$/;"	e	enum:__anon13	file:
+GameTile_HouseLeftRoof	src/game.c	/^  GameTile_HouseLeftRoof,$/;"	e	enum:__anon13	file:
+GameTile_HouseRightWallCenterSection	src/game.c	/^  GameTile_HouseRightWallCenterSection,$/;"	e	enum:__anon13	file:
+GameTile_HouseRightWallFirstSection	src/game.c	/^  GameTile_HouseRightWallFirstSection,$/;"	e	enum:__anon13	file:
+GameTile_HouseRightWallLastSection	src/game.c	/^  GameTile_HouseRightWallLastSection,$/;"	e	enum:__anon13	file:
+GameTile_HouseRightWallThirdSection	src/game.c	/^  GameTile_HouseRightWallThirdSection,$/;"	e	enum:__anon13	file:
+GameTile_HouseRoof	src/game.c	/^  GameTile_HouseRoof,$/;"	e	enum:__anon13	file:
+GameTile_HouseTopLeftRoof	src/game.c	/^  GameTile_HouseTopLeftRoof,$/;"	e	enum:__anon13	file:
+GameTile_HouseTopRoof	src/game.c	/^  GameTile_HouseTopRoof,$/;"	e	enum:__anon13	file:
+GameTile_LeftHouseCorner	src/game.c	/^  GameTile_LeftHouseCorner,$/;"	e	enum:__anon13	file:
+GameTile_NorthToSouthEntryWalkway	src/game.c	/^  GameTile_NorthToSouthEntryWalkway,$/;"	e	enum:__anon13	file:
+GameTile_NorthToSouthFence	src/game.c	/^  GameTile_NorthToSouthFence,$/;"	e	enum:__anon13	file:
+GameTile_RightHouseCorner	src/game.c	/^  GameTile_RightHouseCorner,$/;"	e	enum:__anon13	file:
+GameTile_Road	src/game.c	/^  GameTile_Road,$/;"	e	enum:__anon13	file:
+GameTile_SideWalk	src/game.c	/^  GameTile_SideWalk,$/;"	e	enum:__anon13	file:
+GameTile_SouthToNorthFence	src/game.c	/^  GameTile_SouthToNorthFence,$/;"	e	enum:__anon13	file:
+GameTile_Stand	src/game.c	/^  GameTile_Stand,$/;"	e	enum:__anon13	file:
+GameTile_StandingCharacterEast	src/game.c	/^  GameTile_StandingCharacterEast,$/;"	e	enum:__anon13	file:
+GameTile_StandingCharacterNorth	src/game.c	/^  GameTile_StandingCharacterNorth,$/;"	e	enum:__anon13	file:
+GameTile_StandingCharacterSouth	src/game.c	/^  GameTile_StandingCharacterSouth,$/;"	e	enum:__anon13	file:
+GameTile_StandingCharacterWest	src/game.c	/^  GameTile_StandingCharacterWest,$/;"	e	enum:__anon13	file:
+GameTile_StopSignFacingEast	src/game.c	/^  GameTile_StopSignFacingEast,$/;"	e	enum:__anon13	file:
+GameTile_StopSignFacingNorth	src/game.c	/^  GameTile_StopSignFacingNorth,$/;"	e	enum:__anon13	file:
+GameTile_StopSignFacingSouth	src/game.c	/^  GameTile_StopSignFacingSouth,$/;"	e	enum:__anon13	file:
+GameTile_StopSignFacingWest	src/game.c	/^  GameTile_StopSignFacingWest,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterEast1	src/game.c	/^  GameTile_WalkingCharacterEast1,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterEast2	src/game.c	/^  GameTile_WalkingCharacterEast2,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterNorth1	src/game.c	/^  GameTile_WalkingCharacterNorth1,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterNorth2	src/game.c	/^  GameTile_WalkingCharacterNorth2,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterSouth1	src/game.c	/^  GameTile_WalkingCharacterSouth1,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterSouth2	src/game.c	/^  GameTile_WalkingCharacterSouth2,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterWest1	src/game.c	/^  GameTile_WalkingCharacterWest1,$/;"	e	enum:__anon13	file:
+GameTile_WalkingCharacterWest2	src/game.c	/^  GameTile_WalkingCharacterWest2,$/;"	e	enum:__anon13	file:
+GameTile_Wall	src/game.c	/^  GameTile_Wall,$/;"	e	enum:__anon13	file:
+GameTile_WestToNorthFenceCorner	src/game.c	/^  GameTile_WestToNorthFenceCorner,$/;"	e	enum:__anon13	file:
+GameTiles	src/game.c	/^} GameTiles;$/;"	t	typeref:enum:__anon13	file:
 Game_Enter	src/game.c	/^Game_Enter(void)$/;"	f
 Game_StartSimulation	src/game.c	/^Game_StartSimulation()$/;"	f
 Game_UpdateSimulation	src/game.c	/^Game_UpdateSimulation()$/;"	f
@@ -115,6 +89,7 @@ Graphic_Clear	src/graphic.c	/^Graphic_Clear()$/;"	f
 Graphic_CreateFullTextureSprite	src/graphic.c	/^Graphic_CreateFullTextureSprite(Id texture_id, SDL_Rect dest) $/;"	f
 Graphic_CreateInactiveSprite	src/graphic.c	/^Graphic_CreateInactiveSprite(Id textureId)$/;"	f
 Graphic_CreateInactiveText	src/graphic.c	/^Graphic_CreateInactiveText(char * const text, SDL_Color color)$/;"	f
+Graphic_CreateSDLTexture	src/graphic.c	/^Graphic_CreateSDLTexture(const char* const filename)$/;"	f
 Graphic_CreateSolidTexture	src/graphic.c	/^Graphic_CreateSolidTexture(Uint32 color)$/;"	f
 Graphic_CreateSpriteFromSprites	src/graphic.c	/^Graphic_CreateSpriteFromSprites(Sprite *start, Sprite *end)$/;"	f
 Graphic_CreateText	src/graphic.c	/^Graphic_CreateText($/;"	f
@@ -170,36 +145,36 @@ Input_QueryMousePosition	src/input.c	/^void Input_QueryMousePosition(int* x, int
 Input_QueryMouseTranslation	src/input.c	/^Input_QueryMouseTranslation(int* dx, int* dy)$/;"	f
 IsHeaderFile	.ycm_extra_conf.py	/^def IsHeaderFile( filename ):$/;"	f
 LIB	Makefile	/^LIB := -lm -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf$/;"	m
-LeftMouseButton	include/input.h	/^  LeftMouseButton = 1 << 0,$/;"	e	enum:__anon6
+LeftMouseButton	include/input.h	/^  LeftMouseButton = 1 << 0,$/;"	e	enum:__anon2
 MAIN_MENU_H	include/main-menu.h	2;"	d
 MAP_HEIGHT	src/game.c	61;"	d	file:
 MAP_WIDTH	src/game.c	60;"	d	file:
 MASK	src/input.c	5;"	d	file:
 MAX_GAME_OBJECTS	src/game.c	64;"	d	file:
-MAX_GUI_ELEMENTS	src/gui.c	4;"	d	file:
 MAX_SPRITES	include/graphic.h	12;"	d
 MAX_TEXTURES	src/graphic.c	6;"	d	file:
+MAX_Widget_ELEMENTS	src/widget.c	4;"	d	file:
 MS_PER_FRAME	src/scene.c	13;"	d	file:
 MS_PER_UPDATE	src/scene.c	12;"	d	file:
 MainMenu_Enter	src/main-menu.c	/^MainMenu_Enter()$/;"	f
 MakeRelativePathsInFlagsAbsolute	.ycm_extra_conf.py	/^def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):$/;"	f
-MiddleMouseButton	include/input.h	/^  MiddleMouseButton = 1 << 2,$/;"	e	enum:__anon6
-MouseButton	include/input.h	/^} MouseButton;$/;"	t	typeref:enum:__anon6
+MiddleMouseButton	include/input.h	/^  MiddleMouseButton = 1 << 2,$/;"	e	enum:__anon2
+MouseButton	include/input.h	/^} MouseButton;$/;"	t	typeref:enum:__anon2
 NORTH_TO_SOUTH_EAST_SIDE_LANE	src/game.c	67;"	d	file:
 NORTH_TO_SOUTH_WEST_SIDE_LANE	src/game.c	65;"	d	file:
-NoMouseButton	include/input.h	/^  NoMouseButton = 0,$/;"	e	enum:__anon6
-NoPath	src/game.c	/^  NoPath,$/;"	e	enum:__anon16	file:
-NorthOnEastSideToWestOnNorthSide	src/game.c	/^  NorthOnEastSideToWestOnNorthSide,$/;"	e	enum:__anon16	file:
-NorthOnEastSideToWestOnSouthSide	src/game.c	/^  NorthOnEastSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
-NorthOnWestSideToWestOnNorthSide	src/game.c	/^  NorthOnWestSideToWestOnNorthSide,$/;"	e	enum:__anon16	file:
-NorthOnWestSideToWestOnSouthSide	src/game.c	/^  NorthOnWestSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
-NorthToSouthOnEastSide	src/game.c	/^  NorthToSouthOnEastSide,$/;"	e	enum:__anon16	file:
-NorthToSouthOnWestSide	src/game.c	/^  NorthToSouthOnWestSide,$/;"	e	enum:__anon16	file:
+NoMouseButton	include/input.h	/^  NoMouseButton = 0,$/;"	e	enum:__anon2
+NoPath	src/game.c	/^  NoPath,$/;"	e	enum:__anon14	file:
+NorthOnEastSideToWestOnNorthSide	src/game.c	/^  NorthOnEastSideToWestOnNorthSide,$/;"	e	enum:__anon14	file:
+NorthOnEastSideToWestOnSouthSide	src/game.c	/^  NorthOnEastSideToWestOnSouthSide,$/;"	e	enum:__anon14	file:
+NorthOnWestSideToWestOnNorthSide	src/game.c	/^  NorthOnWestSideToWestOnNorthSide,$/;"	e	enum:__anon14	file:
+NorthOnWestSideToWestOnSouthSide	src/game.c	/^  NorthOnWestSideToWestOnSouthSide,$/;"	e	enum:__anon14	file:
+NorthToSouthOnEastSide	src/game.c	/^  NorthToSouthOnEastSide,$/;"	e	enum:__anon14	file:
+NorthToSouthOnWestSide	src/game.c	/^  NorthToSouthOnWestSide,$/;"	e	enum:__anon14	file:
 OBJECTS	Makefile	/^OBJECTS := $(patsubst $(SRCDIR)\/%,$(BUILDDIR)\/%,$(SOURCES:.$(SRCEXT)=.o))$/;"	m
-Path	src/game.c	/^} Path;$/;"	t	typeref:enum:__anon16	file:
+Path	src/game.c	/^} Path;$/;"	t	typeref:enum:__anon14	file:
 RENDERER_H	include/graphic.h	2;"	d
 RectF	src/graphic.c	/^} RectF;$/;"	t	typeref:struct:__anon19	file:
-RightMouseButton	include/input.h	/^  RightMouseButton = 1 << 1,$/;"	e	enum:__anon6
+RightMouseButton	include/input.h	/^  RightMouseButton = 1 << 1,$/;"	e	enum:__anon2
 SCENE_H	include/scene.h	2;"	d
 SELECTION_SPEED	src/main-menu.c	/^static const double SELECTION_SPEED = 0.10;$/;"	v	file:
 SET_ID_INDEX	include/utils.h	51;"	d
@@ -219,13 +194,13 @@ Scene_Quit	src/scene.c	/^Scene_Quit() {$/;"	f
 Scene_SetUpdateTo	src/scene.c	/^Scene_SetUpdateTo(UpdateFunc func)$/;"	f
 SmallId	include/utils.h	/^    typedef unsigned short SmallId;$/;"	t
 SmallIndex	include/utils.h	/^    typedef unsigned short SmallIndex;$/;"	t
-SouthOnEastSideToWestOnNorthSide	src/game.c	/^  SouthOnEastSideToWestOnNorthSide,$/;"	e	enum:__anon16	file:
-SouthOnEastSideToWestOnSouthSide	src/game.c	/^  SouthOnEastSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
-SouthOnWestSideToWestOnNorthSide	src/game.c	/^  SouthOnWestSideToWestOnNorthSide,$/;"	e	enum:__anon16	file:
-SouthOnWestSideToWestOnSouthSide	src/game.c	/^  SouthOnWestSideToWestOnSouthSide,$/;"	e	enum:__anon16	file:
-SouthToNorthOnEastSide	src/game.c	/^  SouthToNorthOnEastSide,$/;"	e	enum:__anon16	file:
-SouthToNorthOnWestSide	src/game.c	/^  SouthToNorthOnWestSide,$/;"	e	enum:__anon16	file:
-Sprite	include/graphic.h	/^} Sprite;$/;"	t	typeref:struct:__anon5
+SouthOnEastSideToWestOnNorthSide	src/game.c	/^  SouthOnEastSideToWestOnNorthSide,$/;"	e	enum:__anon14	file:
+SouthOnEastSideToWestOnSouthSide	src/game.c	/^  SouthOnEastSideToWestOnSouthSide,$/;"	e	enum:__anon14	file:
+SouthOnWestSideToWestOnNorthSide	src/game.c	/^  SouthOnWestSideToWestOnNorthSide,$/;"	e	enum:__anon14	file:
+SouthOnWestSideToWestOnSouthSide	src/game.c	/^  SouthOnWestSideToWestOnSouthSide,$/;"	e	enum:__anon14	file:
+SouthToNorthOnEastSide	src/game.c	/^  SouthToNorthOnEastSide,$/;"	e	enum:__anon14	file:
+SouthToNorthOnWestSide	src/game.c	/^  SouthToNorthOnWestSide,$/;"	e	enum:__anon14	file:
+Sprite	include/graphic.h	/^} Sprite;$/;"	t	typeref:struct:__anon1
 TARGET	Makefile	/^TARGET := runner$/;"	m
 TARGETDIR	Makefile	/^TARGETDIR := bin$/;"	m
 TILE_HEIGHT	src/game.c	63;"	d	file:
@@ -238,11 +213,11 @@ TinyId	include/utils.h	/^    typedef unsigned char TinyId;$/;"	t
 TinyIndex	include/utils.h	/^    typedef unsigned char TinyIndex;$/;"	t
 TotalTextureIds	include/graphic.h	/^    TotalTextureIds$/;"	e	enum:TextureIds
 UTILS_H	include/utils.h	15;"	d
-UnitInPercentFlags	src/gui.c	/^} UnitInPercentFlags;$/;"	t	typeref:enum:__anon9	file:
-UnitInPercentFlags_Height	src/gui.c	/^  UnitInPercentFlags_Height = 1 << 2,$/;"	e	enum:__anon9	file:
-UnitInPercentFlags_Width	src/gui.c	/^  UnitInPercentFlags_Width = 1 << 1,$/;"	e	enum:__anon9	file:
-UnitInPercentFlags_X	src/gui.c	/^  UnitInPercentFlags_X = 1 << 3,$/;"	e	enum:__anon9	file:
-UnitInPercentFlags_Y	src/gui.c	/^  UnitInPercentFlags_Y = 1 << 4,$/;"	e	enum:__anon9	file:
+UnitInPercentFlags	include/widget.h	/^} UnitInPercentFlags;$/;"	t	typeref:enum:__anon3
+UnitInPercentFlags_Height	include/widget.h	/^  UnitInPercentFlags_Height = 1 << 2,$/;"	e	enum:__anon3
+UnitInPercentFlags_Width	include/widget.h	/^  UnitInPercentFlags_Width = 1 << 1,$/;"	e	enum:__anon3
+UnitInPercentFlags_X	include/widget.h	/^  UnitInPercentFlags_X = 1 << 3,$/;"	e	enum:__anon3
+UnitInPercentFlags_Y	include/widget.h	/^  UnitInPercentFlags_Y = 1 << 4,$/;"	e	enum:__anon3
 UpdateFunc	include/scene.h	/^typedef void (*UpdateFunc)(void);$/;"	t
 VOID_ID	include/utils.h	38;"	d
 VOID_INDEX	include/utils.h	41;"	d
@@ -252,14 +227,42 @@ VOID_TINY_ID	include/utils.h	36;"	d
 VOID_TINY_INDEX	include/utils.h	39;"	d
 WEST_TO_EAST_NORTH_SIDE_LANE	src/game.c	70;"	d	file:
 WEST_TO_EAST_SOUTH_SIDE_LANE	src/game.c	72;"	d	file:
-WestOnNorthSideToNorthOnEastSide	src/game.c	/^  WestOnNorthSideToNorthOnEastSide,$/;"	e	enum:__anon16	file:
-WestOnNorthSideToNorthOnWestSide	src/game.c	/^  WestOnNorthSideToNorthOnWestSide,$/;"	e	enum:__anon16	file:
-WestOnNorthSideToSouthOnEastSide	src/game.c	/^  WestOnNorthSideToSouthOnEastSide,$/;"	e	enum:__anon16	file:
-WestOnNorthSideToSouthOnWestSide	src/game.c	/^  WestOnNorthSideToSouthOnWestSide,$/;"	e	enum:__anon16	file:
-WestOnSouthSideToNorthOnEastSide	src/game.c	/^  WestOnSouthSideToNorthOnEastSide,$/;"	e	enum:__anon16	file:
-WestOnSouthSideToNorthOnWestSide	src/game.c	/^  WestOnSouthSideToNorthOnWestSide,$/;"	e	enum:__anon16	file:
-WestOnSouthSideToSouthOnEastSide	src/game.c	/^  WestOnSouthSideToSouthOnEastSide,$/;"	e	enum:__anon16	file:
-WestOnSouthSideToSouthOnWestSide	src/game.c	/^  WestOnSouthSideToSouthOnWestSide,$/;"	e	enum:__anon16	file:
+WIDGET_H	include/widget.h	2;"	d
+WestOnNorthSideToNorthOnEastSide	src/game.c	/^  WestOnNorthSideToNorthOnEastSide,$/;"	e	enum:__anon14	file:
+WestOnNorthSideToNorthOnWestSide	src/game.c	/^  WestOnNorthSideToNorthOnWestSide,$/;"	e	enum:__anon14	file:
+WestOnNorthSideToSouthOnEastSide	src/game.c	/^  WestOnNorthSideToSouthOnEastSide,$/;"	e	enum:__anon14	file:
+WestOnNorthSideToSouthOnWestSide	src/game.c	/^  WestOnNorthSideToSouthOnWestSide,$/;"	e	enum:__anon14	file:
+WestOnSouthSideToNorthOnEastSide	src/game.c	/^  WestOnSouthSideToNorthOnEastSide,$/;"	e	enum:__anon14	file:
+WestOnSouthSideToNorthOnWestSide	src/game.c	/^  WestOnSouthSideToNorthOnWestSide,$/;"	e	enum:__anon14	file:
+WestOnSouthSideToSouthOnEastSide	src/game.c	/^  WestOnSouthSideToSouthOnEastSide,$/;"	e	enum:__anon14	file:
+WestOnSouthSideToSouthOnWestSide	src/game.c	/^  WestOnSouthSideToSouthOnWestSide,$/;"	e	enum:__anon14	file:
+Widget_AddEventListener	src/widget.c	/^Widget_AddEventListener(Id el, Widget_Events e, Widget_OnHandlerFunc handler)$/;"	f
+Widget_All	include/widget.h	/^  Widget_All$/;"	e	enum:__anon5
+Widget_Auto	include/widget.h	/^  Widget_Auto,$/;"	e	enum:__anon6
+Widget_Create	src/widget.c	/^Widget_Create(Id parent)$/;"	f
+Widget_Element	include/widget.h	/^} Widget_Element;$/;"	t	typeref:struct:__anon4
+Widget_Events	include/widget.h	/^} Widget_Events;$/;"	t	typeref:enum:__anon5
+Widget_HorizontalAlignCenter	include/widget.h	/^  Widget_HorizontalAlignLeft, Widget_HorizontalAlignRight, Widget_HorizontalAlignCenter$/;"	e	enum:__anon8
+Widget_HorizontalAlignLeft	include/widget.h	/^  Widget_HorizontalAlignLeft, Widget_HorizontalAlignRight, Widget_HorizontalAlignCenter$/;"	e	enum:__anon8
+Widget_HorizontalAlignRight	include/widget.h	/^  Widget_HorizontalAlignLeft, Widget_HorizontalAlignRight, Widget_HorizontalAlignCenter$/;"	e	enum:__anon8
+Widget_HorizontalAlignment	include/widget.h	/^} Widget_HorizontalAlignment;$/;"	t	typeref:enum:__anon8
+Widget_Init	src/widget.c	/^Widget_Init()$/;"	f
+Widget_OnClick	include/widget.h	/^  Widget_OnClick,$/;"	e	enum:__anon5
+Widget_OnFocus	include/widget.h	/^  Widget_OnFocus,$/;"	e	enum:__anon5
+Widget_OnHandlerFunc	include/widget.h	/^typedef void (*Widget_OnHandlerFunc)(Id el, Widget_Events e);$/;"	t
+Widget_Percent	include/widget.h	/^  Widget_Percent,$/;"	e	enum:__anon6
+Widget_Pixel	include/widget.h	/^  Widget_Pixel,$/;"	e	enum:__anon6
+Widget_RemoveEventListener	src/widget.c	/^Widget_RemoveEventListener(Id el, Widget_Events e, Widget_OnHandlerFunc handler)$/;"	f
+Widget_Render	src/widget.c	/^Widget_Render()$/;"	f
+Widget_SetAligments	src/widget.c	/^Widget_SetAligments($/;"	f
+Widget_SetImage	src/widget.c	/^Widget_SetImage(Id id, const char * const image)$/;"	f
+Widget_SetPosition	src/widget.c	/^Widget_SetPosition($/;"	f
+Widget_SetText	src/widget.c	/^Widget_SetText(Id id, const char * const text)$/;"	f
+Widget_Unit	include/widget.h	/^} Widget_Unit;$/;"	t	typeref:enum:__anon6
+Widget_VerticalAlignBottom	include/widget.h	/^  Widget_VerticalAlignTop, Widget_VerticalAlignBottom, Widget_VerticalAlignCenter$/;"	e	enum:__anon7
+Widget_VerticalAlignCenter	include/widget.h	/^  Widget_VerticalAlignTop, Widget_VerticalAlignBottom, Widget_VerticalAlignCenter$/;"	e	enum:__anon7
+Widget_VerticalAlignTop	include/widget.h	/^  Widget_VerticalAlignTop, Widget_VerticalAlignBottom, Widget_VerticalAlignCenter$/;"	e	enum:__anon7
+Widget_VerticalAlignment	include/widget.h	/^} Widget_VerticalAlignment;$/;"	t	typeref:enum:__anon7
 _Sprite	src/graphic.c	/^} _Sprite;$/;"	t	typeref:struct:__anon18	file:
 _activeGameObjects	src/game.c	/^static int _activeGameObjects;$/;"	v	file:
 _animateGameObject	src/game.c	/^_animateGameObject(int i, GameTiles frame1, GameTiles frame2)$/;"	f	file:
@@ -281,7 +284,7 @@ _createTilesetSprite	src/graphic.c	/^_createTilesetSprite(SDL_Texture* texture, 
 _dt	src/game.c	/^static int _dt = 0;$/;"	v	file:
 _dx	src/input.c	/^static int _dx, _dy;$/;"	v	file:
 _dy	src/input.c	/^static int _dx, _dy;$/;"	v	file:
-_elements	src/gui.c	/^} _elements;$/;"	v	typeref:struct:__anon11	file:
+_elements	src/widget.c	/^} _elements;$/;"	v	typeref:struct:__anon17	file:
 _font	src/graphic.c	/^static TTF_Font* _font;$/;"	v	file:
 _gameObjects	src/game.c	/^static GameObject _gameObjects[MAX_GAME_OBJECTS];$/;"	v	file:
 _getObjectSpriteDest	src/game.c	/^_getObjectSpriteDest(SDL_Rect src, int x, int y, int z)$/;"	f	file:
@@ -294,10 +297,9 @@ _objectTiles	src/game.c	/^static GameTiles _objectTiles[MAP_HEIGHT][MAP_WIDTH];$
 _pause	src/game.c	/^static bool _pause = false;$/;"	v	file:
 _renderer	src/graphic.c	/^static SDL_Renderer* _renderer;$/;"	v	file:
 _reorderGameObjects	src/game.c	/^_reorderGameObjects()$/;"	f	file:
-_setElementText	src/gui.c	/^_setElementText(Element* el, const char * const text)$/;"	f	file:
 _spriteSheetId	src/game.c	/^static Id _spriteSheetId = VOID_ID;$/;"	v	file:
 _sprites	src/graphic.c	/^} _sprites;$/;"	v	typeref:struct:__anon21	file:
-_state	src/input.c	/^} _state;$/;"	v	typeref:struct:__anon7	file:
+_state	src/input.c	/^} _state;$/;"	v	typeref:struct:__anon9	file:
 _swap	src/graphic.c	/^_swap(Index it, Id id, Index with)$/;"	f	file:
 _textures	src/graphic.c	/^} _textures;$/;"	v	typeref:struct:__anon20	file:
 _tilesObjectSpriteId	src/game.c	/^static Id _tilesObjectSpriteId[MAP_HEIGHT][MAP_WIDTH];$/;"	v	file:
@@ -309,113 +311,113 @@ _updateCameraBoundRight	src/graphic.c	/^_updateCameraBoundRight(int x, int w)$/;
 _updateCameraBoundTop	src/graphic.c	/^_updateCameraBoundTop(int y)$/;"	f	file:
 _updateCameraBounds	src/graphic.c	/^_updateCameraBounds()$/;"	f	file:
 _window	src/graphic.c	/^static SDL_Window* _window;$/;"	v	file:
-backButton	src/main-menu.c	/^  Id backButton;$/;"	m	struct:__anon12	file:
+backButton	src/main-menu.c	/^  Id backButton;$/;"	m	struct:__anon10	file:
 backButtonTextureId	src/main-menu.c	/^static Id backButtonTextureId;$/;"	v	file:
-background	src/main-menu.c	/^  Id background;$/;"	m	struct:__anon12	file:
+background	src/main-menu.c	/^  Id background;$/;"	m	struct:__anon10	file:
 background	src/main-menu.c	/^static Id background = VOID_ID;$/;"	v	file:
-backgroundColor	src/gui.c	/^  Uint32 backgroundColor;$/;"	m	struct:__anon10	file:
+backgroundColor	src/widget.c	/^  Uint32 backgroundColor;$/;"	m	struct:__anon16	file:
 backgroundTextureId	src/main-menu.c	/^static Id backgroundTextureId;$/;"	v	file:
-bordersColor	src/gui.c	/^  Uint32 bordersColor;$/;"	m	struct:__anon10	file:
-bottomBorder	src/main-menu.c	/^    Id bottomBorder;$/;"	m	struct:__anon12::__anon13	file:
-bottomBorder	src/main-menu.c	/^    Id bottomBorder;$/;"	m	struct:__anon12::__anon14	file:
-bottomBorder	src/main-menu.c	/^  Id bottomBorder;$/;"	m	struct:__anon12	file:
+bordersColor	src/widget.c	/^  Uint32 bordersColor;$/;"	m	struct:__anon16	file:
+bottomBorder	src/main-menu.c	/^    Id bottomBorder;$/;"	m	struct:__anon10::__anon11	file:
+bottomBorder	src/main-menu.c	/^    Id bottomBorder;$/;"	m	struct:__anon10::__anon12	file:
+bottomBorder	src/main-menu.c	/^  Id bottomBorder;$/;"	m	struct:__anon10	file:
 bounds	src/graphic.c	/^  } bounds;$/;"	m	struct:__anon22	typeref:struct:__anon22::__anon23	file:
 centerMainMenu	src/main-menu.c	/^centerMainMenu() $/;"	f
 closeLevelSelector	src/main-menu.c	/^closeLevelSelector()$/;"	f
 compilation_database_folder	.ycm_extra_conf.py	/^compilation_database_folder = ''$/;"	v
 database	.ycm_extra_conf.py	/^  database = None$/;"	v
 database	.ycm_extra_conf.py	/^  database = ycm_core.CompilationDatabase( compilation_database_folder )$/;"	v
-dest	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon5
-dest	include/gui.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
+dest	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
+dest	include/widget.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon4
 dest	src/graphic.c	/^    SDL_Rect dest;$/;"	m	struct:__anon18	file:
+dest	src/widget.c	/^  SDL_Rect dest;$/;"	m	struct:__anon16	file:
 dirty	src/graphic.c	/^    bool dirty;$/;"	m	struct:__anon22::__anon23	file:
-dx	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
-dy	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
-dz	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
-elements	src/gui.c	/^  Element elements[MAX_GUI_ELEMENTS];$/;"	m	struct:__anon11	file:
-firstLevelButton	src/main-menu.c	/^  Id firstLevelButton;$/;"	m	struct:__anon12	file:
-fixedValues	src/gui.c	/^  FixedValueFlags fixedValues;$/;"	m	struct:__anon10	file:
+dx	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
+dy	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
+dz	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
+elements	src/widget.c	/^  Element elements[MAX_Widget_ELEMENTS];$/;"	m	struct:__anon17	file:
+firstLevelButton	src/main-menu.c	/^  Id firstLevelButton;$/;"	m	struct:__anon10	file:
 flagIndex	src/input.c	/^flagIndex(SDL_Keycode code)$/;"	f	file:
 flags	.ycm_extra_conf.py	/^flags = [$/;"	v
 greenSolidTextureId	src/main-menu.c	/^static Id greenSolidTextureId = VOID_ID;$/;"	v	file:
 greenTextColor	src/main-menu.c	/^static const SDL_Color greenTextColor = { 0x22, 0x55, 0, 0xFF };$/;"	v	file:
 h	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 h	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
-height	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-horizontalAlignment	src/gui.c	/^  GUI_Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
-hoveredButton	src/main-menu.c	/^  } hoveredButton;$/;"	m	struct:__anon12	typeref:struct:__anon12::__anon14	file:
-id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon12::__anon13	file:
-id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon12::__anon14	file:
+h	src/widget.c	/^  double w, h, x, y;$/;"	m	struct:__anon16	file:
+horizontalAlignment	src/widget.c	/^  Widget_HorizontalAlignment horizontalAlignment;$/;"	m	struct:__anon16	file:
+hoveredButton	src/main-menu.c	/^  } hoveredButton;$/;"	m	struct:__anon10	typeref:struct:__anon10::__anon12	file:
+id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon10::__anon11	file:
+id	src/main-menu.c	/^    Id id;$/;"	m	struct:__anon10::__anon12	file:
 initiated	src/utils.c	/^static bool initiated;$/;"	v	file:
-keyPressed	src/input.c	/^  unsigned long keyPressed[FLAGS_NUM]; $/;"	m	struct:__anon7	file:
-keyReleased	src/input.c	/^  unsigned long keyReleased[FLAGS_NUM]; $/;"	m	struct:__anon7	file:
-leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon12::__anon13	file:
-leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon12::__anon14	file:
-leftBorder	src/main-menu.c	/^  Id leftBorder;$/;"	m	struct:__anon12	file:
-levelSelector	src/main-menu.c	/^} levelSelector;$/;"	v	typeref:struct:__anon12	file:
+keyPressed	src/input.c	/^  unsigned long keyPressed[FLAGS_NUM]; $/;"	m	struct:__anon9	file:
+keyReleased	src/input.c	/^  unsigned long keyReleased[FLAGS_NUM]; $/;"	m	struct:__anon9	file:
+leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon10::__anon11	file:
+leftBorder	src/main-menu.c	/^    Id leftBorder;$/;"	m	struct:__anon10::__anon12	file:
+leftBorder	src/main-menu.c	/^  Id leftBorder;$/;"	m	struct:__anon10	file:
+levelSelector	src/main-menu.c	/^} levelSelector;$/;"	v	typeref:struct:__anon10	file:
 lightScreenSolidTextureId	src/main-menu.c	/^static Id lightScreenSolidTextureId = VOID_ID;$/;"	v	file:
 loadButton	src/main-menu.c	/^static Id loadButton;$/;"	v	file:
 main	src/main.c	/^main() $/;"	f
 mainMenuTitle	src/main-menu.c	/^static Id mainMenuTitle;$/;"	v	file:
-mouseButtonClicked	src/input.c	/^  MouseButton mouseButtonClicked;$/;"	m	struct:__anon7	file:
-mouseButtonPressed	src/input.c	/^  MouseButton mouseButtonPressed;$/;"	m	struct:__anon7	file:
-mouseButtonReleased	src/input.c	/^  MouseButton mouseButtonReleased;$/;"	m	struct:__anon7	file:
+mouseButtonClicked	src/input.c	/^  MouseButton mouseButtonClicked;$/;"	m	struct:__anon9	file:
+mouseButtonPressed	src/input.c	/^  MouseButton mouseButtonPressed;$/;"	m	struct:__anon9	file:
+mouseButtonReleased	src/input.c	/^  MouseButton mouseButtonReleased;$/;"	m	struct:__anon9	file:
 newButton	src/main-menu.c	/^static Id newButton;$/;"	v	file:
-okButton	src/main-menu.c	/^  Id okButton;$/;"	m	struct:__anon12	file:
+okButton	src/main-menu.c	/^  Id okButton;$/;"	m	struct:__anon10	file:
 okButtonTextureId	src/main-menu.c	/^static Id okButtonTextureId;$/;"	v	file:
 openLevelSelector	src/main-menu.c	/^openLevelSelector()$/;"	f
-opened	src/main-menu.c	/^  bool opened;$/;"	m	struct:__anon12	file:
-parent	include/gui.h	/^  int parent;$/;"	m	struct:__anon1
-parent	src/gui.c	/^  Index  parent;$/;"	m	struct:__anon10	file:
-path	src/game.c	/^  Path path;$/;"	m	struct:__anon17	file:
-quit	src/input.c	/^  bool quit;$/;"	m	struct:__anon7	file:
+opened	src/main-menu.c	/^  bool opened;$/;"	m	struct:__anon10	file:
+parent	include/widget.h	/^  int parent;$/;"	m	struct:__anon4
+parent	src/widget.c	/^  Index  parent;$/;"	m	struct:__anon16	file:
+path	src/game.c	/^  Path path;$/;"	m	struct:__anon15	file:
+quit	src/input.c	/^  bool quit;$/;"	m	struct:__anon9	file:
 quitButton	src/main-menu.c	/^static Id quitButton;$/;"	v	file:
 rectF	src/graphic.c	/^  RectF rectF[MAX_SPRITES];$/;"	m	struct:__anon21	file:
-rightBorder	src/main-menu.c	/^    Id rightBorder;$/;"	m	struct:__anon12::__anon13	file:
-rightBorder	src/main-menu.c	/^    Id rightBorder;$/;"	m	struct:__anon12::__anon14	file:
-rightBorder	src/main-menu.c	/^  Id rightBorder;$/;"	m	struct:__anon12	file:
+rightBorder	src/main-menu.c	/^    Id rightBorder;$/;"	m	struct:__anon10::__anon11	file:
+rightBorder	src/main-menu.c	/^    Id rightBorder;$/;"	m	struct:__anon10::__anon12	file:
+rightBorder	src/main-menu.c	/^  Id rightBorder;$/;"	m	struct:__anon10	file:
 running	src/scene.c	/^static bool running = true;$/;"	v	file:
 selectedButton	src/main-menu.c	/^static double selectedButton;$/;"	v	file:
-selectedLevelButton	src/main-menu.c	/^  } selectedLevelButton;$/;"	m	struct:__anon12	typeref:struct:__anon12::__anon13	file:
+selectedLevelButton	src/main-menu.c	/^  } selectedLevelButton;$/;"	m	struct:__anon10	typeref:struct:__anon10::__anon11	file:
 setBorderAroundHoveredButton	src/main-menu.c	/^setBorderAroundHoveredButton()$/;"	f
-sprite	src/game.c	/^  Id sprite;$/;"	m	struct:__anon17	file:
+sprite	src/game.c	/^  Id sprite;$/;"	m	struct:__anon15	file:
 sprite	src/graphic.c	/^  _Sprite sprite[MAX_SPRITES];$/;"	m	struct:__anon21	file:
-src	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon5
-src	include/gui.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
+src	include/graphic.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon1
+src	include/widget.h	/^  SDL_Rect src, dest;$/;"	m	struct:__anon4
 src	src/graphic.c	/^    SDL_Rect src;$/;"	m	struct:__anon18	file:
 startGame	src/main-menu.c	/^static void startGame()$/;"	f	file:
 textColor	src/main-menu.c	/^static const SDL_Color textColor = {255, 255, 0, 255};$/;"	v	file:
-textTexture	src/gui.c	/^  SDL_Texture* textTexture;$/;"	m	struct:__anon10	file:
-texture	include/gui.h	/^  SDL_Texture* texture;$/;"	m	struct:__anon1
+texture	include/widget.h	/^  SDL_Texture* texture;$/;"	m	struct:__anon4
 texture	src/graphic.c	/^    SDL_Texture* texture;$/;"	m	struct:__anon18	file:
-textureId	include/graphic.h	/^  Id textureId;$/;"	m	struct:__anon5
+texture	src/widget.c	/^  SDL_Texture* texture;$/;"	m	struct:__anon16	file:
+textureId	include/graphic.h	/^  Id textureId;$/;"	m	struct:__anon1
 textures	src/graphic.c	/^    SDL_Texture* textures[MAX_TEXTURES];$/;"	m	struct:__anon20	file:
-tile	src/game.c	/^  GameTiles tile;$/;"	m	struct:__anon17	file:
+tile	src/game.c	/^  GameTiles tile;$/;"	m	struct:__anon15	file:
 titleWidget	src/main-menu.c	/^static Id titleWidget;$/;"	v	file:
-topBar	src/main-menu.c	/^  Id topBar;$/;"	m	struct:__anon12	file:
-topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon12::__anon13	file:
-topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon12::__anon14	file:
-topText	src/main-menu.c	/^  Id topText;$/;"	m	struct:__anon12	file:
+topBar	src/main-menu.c	/^  Id topBar;$/;"	m	struct:__anon10	file:
+topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon10::__anon11	file:
+topBorder	src/main-menu.c	/^    Id topBorder;$/;"	m	struct:__anon10::__anon12	file:
+topText	src/main-menu.c	/^  Id topText;$/;"	m	struct:__anon10	file:
 totalActive	src/graphic.c	/^  unsigned int totalActive;$/;"	m	struct:__anon21	file:
-unitInPercentFlags	src/gui.c	/^  UnitInPercentFlags unitInPercentFlags;$/;"	m	struct:__anon10	file:
+unitInPercentFlags	src/widget.c	/^  UnitInPercentFlags unitInPercentFlags;$/;"	m	struct:__anon16	file:
 update	src/main-menu.c	/^update() $/;"	f	file:
 update	src/scene.c	/^static UpdateFunc update;$/;"	v	file:
 utils_random	src/utils.c	/^utils_random()$/;"	f
-verticalAlignment	src/gui.c	/^  GUI_Alignment horizontalAlignment, verticalAlignment;$/;"	m	struct:__anon10	file:
+verticalAlignment	src/widget.c	/^  Widget_VerticalAlignment verticalAlignment;$/;"	m	struct:__anon16	file:
 w	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 w	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
-width	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-x	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
+w	src/widget.c	/^  double w, h, x, y;$/;"	m	struct:__anon16	file:
+x	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
 x	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 x	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 x	src/graphic.c	/^  int x, y;$/;"	m	struct:__anon22	file:
-x	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-x	src/input.c	/^  int x;$/;"	m	struct:__anon7	file:
-y	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
+x	src/input.c	/^  int x;$/;"	m	struct:__anon9	file:
+x	src/widget.c	/^  double w, h, x, y;$/;"	m	struct:__anon16	file:
+y	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
 y	src/graphic.c	/^    int x, y, w, h;$/;"	m	struct:__anon22::__anon23	file:
 y	src/graphic.c	/^  double x, y, w, h;$/;"	m	struct:__anon19	file:
 y	src/graphic.c	/^  int x, y;$/;"	m	struct:__anon22	file:
-y	src/gui.c	/^  double width, height, x, y;$/;"	m	struct:__anon10	file:
-y	src/input.c	/^  int y;$/;"	m	struct:__anon7	file:
-z	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon17	file:
+y	src/input.c	/^  int y;$/;"	m	struct:__anon9	file:
+y	src/widget.c	/^  double w, h, x, y;$/;"	m	struct:__anon16	file:
+z	src/game.c	/^  double x, y, z, dx, dy, dz;$/;"	m	struct:__anon15	file:
 zoom	src/graphic.c	/^  double zoom;$/;"	m	struct:__anon22	file:

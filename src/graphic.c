@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "graphic.h"
-#include "gui.h"
+#include "widget.h"
 
 #define MAX_TEXTURES 1024
 
@@ -262,28 +262,14 @@ Graphic_Render()
     );
   }
 
-  GUI_Render();
+  Widget_Render();
   SDL_RenderPresent(_renderer);
 }
 
 Id 
 Graphic_LoadTexture(const char* const filename) 
 {
-  SDL_Surface* surface = IMG_Load(filename);
-  Uint32 colorkey = SDL_MapRGB(surface->format, 0xff, 0, 0xff);
-  SDL_SetColorKey(surface, SDL_TRUE, colorkey);
-
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
-  SDL_FreeSurface(surface);
-  if (texture == NULL) {
-    fprintf(
-      stderr, "Texture %s could not be loaded! SDL_Error: %s\n", 
-      filename, 
-      SDL_GetError()
-    );
-    exit(EXIT_FAILURE);
-  }
-
+  SDL_Texture* texture = Graphic_CreateSDLTexture(filename);
   Index index;
   Id id;
   GET_NEXT_ID(_textures, id, index, MAX_TEXTURES);
@@ -1204,3 +1190,23 @@ Graphic_RenderCopy(SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dest)
   SDL_RenderCopy(_renderer, texture, src, dest);
 }
 
+SDL_Texture*
+Graphic_CreateSDLTexture(const char* const filename)
+{
+  SDL_Surface* surface = IMG_Load(filename);
+  Uint32 colorkey = SDL_MapRGB(surface->format, 0xff, 0, 0xff);
+  SDL_SetColorKey(surface, SDL_TRUE, colorkey);
+
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
+  SDL_FreeSurface(surface);
+  if (texture == NULL) {
+    fprintf(
+      stderr, "Texture %s could not be loaded! SDL_Error: %s\n", 
+      filename, 
+      SDL_GetError()
+    );
+    exit(EXIT_FAILURE);
+  }
+
+  return texture;
+}
