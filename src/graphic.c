@@ -1210,3 +1210,9 @@ Graphic_CreateSDLTexture(const char* const filename)
 
   return texture;
 }
+
+void 
+Graphic_QuerySDLTextureSize(SDL_Texture* texture, int* w, int* h)
+{
+  SDL_QueryTexture(texture, NULL, NULL, w, h);
+}

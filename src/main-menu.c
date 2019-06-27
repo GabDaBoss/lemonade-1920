@@ -370,7 +370,13 @@ MainMenu_Enter()
       Widget_VerticalAlignCenter
   );
   Widget_SetPosition(titleWidget, 0, 0, 100, 100, UnitInPercentFlags_Width);
-  Widget_SetText(titleWidget, "Lemon88");
+  Widget_SetImage(titleWidget, "title.bmp");
+  SDL_Rect src;
+  src.x = 0;
+  src.y = 0;
+  src.w = 83;
+  src.h = 21;
+  Widget_SetSrc(titleWidget, src);
 
 
   backgroundTextureId = Graphic_LoadTexture("background.png");

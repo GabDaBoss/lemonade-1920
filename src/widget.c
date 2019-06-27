@@ -15,6 +15,7 @@ typedef struct {
   Uint32 bordersColor;
   SDL_Texture* texture;
   SDL_Rect dest;
+  SDL_Rect src;
 } Element;
 
 
@@ -105,7 +106,7 @@ Widget_Render()
           break;
         default: break;
       }
-      Graphic_RenderCopy(el.texture, NULL, &textDest);
+      Graphic_RenderCopy(el.texture, &el.src, &textDest);
     }
   }
 }
@@ -166,6 +167,14 @@ Widget_SetImage(Id id, const char * const image)
   Index idx;
   GET_INDEX_FROM_ID(_elements, id, idx);
   _elements.elements[idx].texture = Graphic_CreateSDLTexture(image);
+  _elements.elements[idx].src.x = 0;
+  _elements.elements[idx].src.y = 0;
+
+  Graphic_QuerySDLTextureSize(
+      _elements.elements[idx].texture,
+      &_elements.elements[idx].src.w,
+      &_elements.elements[idx].src.h
+  );
 }
 
 void 
@@ -185,4 +194,12 @@ Widget_SetPosition(
   _elements.elements[idx].w = w;
   _elements.elements[idx].h = h;
   _elements.elements[idx].unitInPercentFlags = flags;
+}
+
+void 
+Widget_SetSrc(Id id, SDL_Rect src)
+{
+  Index idx;
+  GET_INDEX_FROM_ID(_elements, id, idx);
+  _elements.elements[idx].src = src;
 }

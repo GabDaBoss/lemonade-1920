@@ -62,5 +62,6 @@ void Widget_SetPosition(
 
 void Widget_SetText(Id id, const char * const text);
 void Widget_SetImage(Id id, const char * const image);
+void Widget_SetSrc(Id id, SDL_Rect src);
  
 #endif

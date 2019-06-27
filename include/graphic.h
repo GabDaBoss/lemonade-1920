@@ -89,6 +89,7 @@ void Graphic_RenderCopy(SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dest);
 
 double Graphic_GetCameraZoom();
 void Graphic_FillRect(SDL_Rect dest, Uint32 color);
+void Graphic_QuerySDLTextureSize(SDL_Texture* texture, int* w, int* h);
 
 #endif /* RENDERER_H */
 
