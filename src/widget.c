@@ -59,54 +59,68 @@ void
 Widget_Render()
 {
   for (Index i = 0; i < _elements.total; i++) {
-    printf("render gui: %d\n", i);
+    Element element = _elements.elements[i];
     SDL_Rect dest = {0};
-    Element el = _elements.elements[i];
+    SDL_Rect parentDest = {0};
 
-    for (Index j = i; j != VOID_INDEX; j = _elements.elements[j].parent){
-      dest.x += _elements.elements[j].x;
-      dest.y += _elements.elements[j].y;
-    }
-
-    if (el.unitInPercentFlags & UnitInPercentFlags_Width) {
-      if (el.parent == VOID_INDEX) {
-        Graphic_QueryWindowSize(&dest.w, NULL);
-        dest.w *= el.w / 100;
-      } else {
-        dest.w = _elements.elements[el.parent].w * el.w / 100;
-      }
+    if (element.parent == VOID_INDEX) {
+      Graphic_QueryWindowSize(&parentDest.w, &parentDest.h);
     } else {
-      dest.w = el.w;
+      parentDest = _elements.elements[element.parent].dest;
     }
 
-    dest.h = el.h;
+    dest.x = element.x;
+    if (element.unitInPercentFlags & UnitInPercentFlags_X) {
+      dest.x *= parentDest.w / 100;
+    }
+    dest.x += parentDest.x;
 
-    Graphic_FillRect(dest, el.backgroundColor);
+    dest.y = element.y;
+    if (element.unitInPercentFlags & UnitInPercentFlags_Y) {
+      dest.y *= parentDest.w / 100;
+    }
+    dest.y += parentDest.y;
 
-    if (el.texture) {
-      SDL_Rect textDest = dest;
-      SDL_QueryTexture(el.texture, NULL, NULL, &textDest.w, &textDest.h);
+    dest.w = element.w;
+    if (element.unitInPercentFlags & UnitInPercentFlags_Width) {
+      dest.w *= parentDest.w / 100;
+    }
 
-      switch (el.horizontalAlignment) {
+    dest.h = element.h;
+    if (element.unitInPercentFlags & UnitInPercentFlags_Height) {
+      dest.h *= parentDest.h / 100;
+    }
+
+    switch (element.horizontalAlignment) {
         case Widget_HorizontalAlignRight:
-          textDest.x = dest.x + dest.w - textDest.w;
+          dest.x = parentDest.x + parentDest.w - dest.w;
           break;
         case Widget_HorizontalAlignCenter:
-          textDest.x = (dest.x + dest.w) / 2 - textDest.w / 2;
+          dest.x = (parentDest.x + parentDest.w) / 2 - dest.w / 2;
           break;
         default: break;
-      }
+    }
 
-      switch (el.verticalAlignment) {
+    switch (element.verticalAlignment) {
         case Widget_VerticalAlignBottom:
-          textDest.y = dest.y + dest.h - textDest.h;
+          dest.y = parentDest.y + parentDest.h - dest.h;
           break;
         case Widget_VerticalAlignCenter:
-          textDest.y = (dest.y + dest.h) / 2 - textDest.h / 2;
+          dest.y = (parentDest.y + parentDest.h) / 2 - dest.h / 2;
           break;
         default: break;
-      }
-      Graphic_RenderCopy(el.texture, &el.src, &textDest);
+    }
+
+    _elements.elements[i].dest = dest;
+  }
+
+  for (Index i = 0; i < _elements.total; i++) {
+    Element el = _elements.elements[i];
+
+    Graphic_FillRect(el.dest, el.backgroundColor);
+
+    if (el.texture) {
+      Graphic_RenderCopy(el.texture, &el.src, &el.dest);
     }
   }
 }
